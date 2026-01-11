@@ -1,0 +1,12 @@
+{
+  "preset": "laravel",
+  "rules": {
+    "explicit_indirect_variable": true,
+    "method_chaining_indentation": true,
+    "no_blank_lines_after_class_opening": true,
+    "single_quote": true,
+    "types_spaces": {
+      "space": "single"
+    }
+  }
+}

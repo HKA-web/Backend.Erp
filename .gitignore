@@ -1,30 +1,72 @@
+# ===============================
+# Laravel + PHP
+# ===============================
 /vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Laravel 4 specific
-bootstrap/compiled.php
+/node_modules/
+/public/storage
+/public/hot
+/public/build
+/storage/*.key
+/storage/pail
+/bootstrap/compiled.php
 app/storage/
-
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
-
-# Laravel 5 & Lumen specific with changed public path
-public_html/storage
-public_html/hot
-
-storage/*.key
-.env
+/.env
+.env.backup
+.env.production
+.env.local
+.env.testing
 Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
-
-/public/build
-/storage/pail
-.env.backup
-.env.production
 .phpactor.json
 auth.json
+
+# Laravel cache & sessions
+/storage/framework/cache/data/*
+/storage/framework/views/*
+/storage/framework/sessions/*
+
+# Composer
+composer.lock
+
+# ===============================
+# PhpStorm
+# ===============================
+.idea/
+*.iml
+*.iws
+workspace.xml
+tasks.xml
+dictionaries/
+usage.statistics.xml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/usage.statistics.xml
+.idea/caches/
+.idea/libraries/
+.idea/.name
+.idea/modules.xml
+.idea/vcs.xml
+.idea/dataSources/
+.idea/dataSources.ids
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# ===============================
+# OS / System
+# ===============================
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
