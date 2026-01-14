@@ -9,6 +9,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\V1\CompanyController;
 use App\Http\Controllers\V1\OptionController;
+use App\Http\Controllers\V1\OrderController;
+use App\Http\Controllers\V1\OrderTemporaryController;
 use App\Http\Controllers\V1\ProductController;
 use App\Http\Controllers\V1\ProvinceController;
 use App\Http\Controllers\V1\UserController;
@@ -32,5 +34,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('province', ProvinceController::class);
     Route::apiResource('option', OptionController::class);
     Route::apiResource('product', ProductController::class);
+    Route::apiResource('order', OrderController::class);
+    Route::apiResource('order_temporary', OrderTemporaryController::class);
+    Route::post('order_temporary/commit', [OrderTemporaryController::class, 'commit']);
 });
 

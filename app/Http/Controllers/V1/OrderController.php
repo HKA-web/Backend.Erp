@@ -6,23 +6,23 @@ use App\Helpers\DebugHelper;
 use App\Helpers\ExpandHelper;
 use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Province\StoreProvinceRequest;
-use App\Http\Requests\Province\UpdateProvinceRequest;
-use App\Http\Resources\Province\ProvinceResource;
-use App\Models\Province;
+use App\Http\Requests\Order\StoreOrderRequest;
+use App\Http\Requests\Order\UpdateOrderRequest;
+use App\Http\Resources\Order\OrderResource;
+use App\Models\Order;
 use App\Traits\HasTransactionResponse;
 use App\Traits\Paginatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class ProvinceController extends Controller
+class OrderController extends Controller
 {
     use Paginatable, HasTransactionResponse;
 
     public function index(Request $request)
     {
         try {
-            $model = new Province();
+            $model = new Order();
             $connection = QueryHelper::getConnection($request, $model);
 
             $expandTree = ExpandHelper::parse($request->query('expand'));
@@ -40,16 +40,16 @@ class ProvinceController extends Controller
 
             return response()->json(array_merge([
                 'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
+                'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
                 'expand'     => $expandTree,
             ], $pagination, [
-                'data' => ProvinceResource::collection($pagination['data']),
+                'data' => OrderResource::collection($pagination['data']),
             ]));
         } catch (\Throwable $e) {
             return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Province()),
-                'status'     => Str::studly('error'),
+                'connection' => QueryHelper::getConnection($request, new Order()),
+                'status'     => 'error',
                 'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while retrieving data.',
                 'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
             ], 500);
@@ -59,7 +59,7 @@ class ProvinceController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $model = new Province();
+            $model = new Order();
             $connection = QueryHelper::getConnection($request, $model);
 
             $expandTree = ExpandHelper::parse($request->query('expand'));
@@ -69,64 +69,63 @@ class ProvinceController extends Controller
 
             $query = QueryHelper::newQuery($model, $connection)->with($with);
             $query = $this->applyExpressionFilter($query, $filterExpr);
-            $query->where('province_id', $id);
+            $query->where('Order_id', $id);
 
             $data = $query->firstOrFail();
 
             return response()->json([
                 'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
+                'status'     => 'success',
                 'message'    => 'Data retrieved successfully',
                 'expand'     => $expandTree,
-                'data'       => new ProvinceResource($data),
+                'data'       => new OrderResource($data),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Province()),
-                'status'     => Str::studly('error'),
+                'connection' => QueryHelper::getConnection($request, new Order()),
+                'status'     => 'error',
                 'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while retrieving data.',
                 'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
             ], 500);
         }
     }
 
-    public function store(StoreProvinceRequest $request)
+    public function store(StoreOrderRequest $request)
     {
         return $this->executeTransaction(function () use ($request) {
-            $model = new Province();
+            $model = new Order();
             $connection = QueryHelper::getConnection($request, $model);
-
             $data = $request->validated();
-            $province = $model;
-            if ($connection) $province->setConnection($connection);
-            $province->fill($data);
-            $province->save();
+            if ($connection) $model->setConnection($connection);
+            $model->fill($data);
+            $model->save();
 
-            return new ProvinceResource($province);
+            return new OrderResource($model);
         }, 'Data created successfully');
     }
 
-    public function update(UpdateProvinceRequest $request, $id)
+    public function update(UpdateOrderRequest $request, $id)
     {
         return $this->executeTransaction(function () use ($request, $id) {
-            $query = QueryHelper::query(Province::class, $request);
-            $province = $query->findOrFail($id);
+            $query = QueryHelper::query(Order::class, $request);
+            $item = $query->findOrFail($id);
 
             $data = $request->validated();
-            $province->update($data);
+            $item->update($data);
 
-            return new ProvinceResource($province);
+            return new OrderResource($item);
         }, 'Data updated successfully');
     }
 
     public function destroy(Request $request, $id)
     {
         return $this->executeTransaction(function () use ($request, $id) {
-            $query = QueryHelper::query(Province::class, $request);
-            $province = $query->findOrFail($id);
-            $province->delete();
+            $query = QueryHelper::query(Order::class, $request);
+            $item = $query->findOrFail($id);
+            $item->delete();
 
-            return null; // tidak ada data untuk return
+            return null;
         }, 'Data deleted successfully');
     }
+
 }

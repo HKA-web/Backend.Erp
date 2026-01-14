@@ -10,13 +10,14 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
+use App\Traits\HasTransactionResponse;
 use App\Traits\Paginatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    use Paginatable;
+    use Paginatable, HasTransactionResponse;
 
     public function index(Request $request)
     {
@@ -91,7 +92,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        try {
+        return $this->executeTransaction(function () use ($request) {
             $model = new Product();
             $connection = QueryHelper::getConnection($request, $model);
 
@@ -101,66 +102,31 @@ class ProductController extends Controller
             $item->fill($data);
             $item->save();
 
-            return response()->json([
-                'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data created successfully',
-                'data'       => new ProductResource($item),
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while creating data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return new ProductResource($item);
+        }, 'Data created successfully');
     }
 
     public function update(UpdateProductRequest $request, $id)
     {
-        try {
+        return $this->executeTransaction(function () use ($request, $id) {
             $query = QueryHelper::query(Product::class, $request);
             $item = $query->findOrFail($id);
 
             $data = $request->validated();
             $item->update($data);
 
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data updated successfully',
-                'data'       => new ProductResource($item),
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while updating data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return new ProductResource($item);
+        }, 'Data updated successfully');
     }
 
     public function destroy(Request $request, $id)
     {
-        try {
+        return $this->executeTransaction(function () use ($request, $id) {
             $query = QueryHelper::query(Product::class, $request);
             $item = $query->findOrFail($id);
             $item->delete();
 
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data deleted successfully',
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while deleting data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return null;
+        }, 'Data deleted successfully');
     }
 }

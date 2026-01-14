@@ -10,13 +10,14 @@ use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Http\Resources\Company\CompanyResource;
 use App\Models\Company;
+use App\Traits\HasTransactionResponse;
 use App\Traits\Paginatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    use Paginatable;
+    use Paginatable, HasTransactionResponse;
 
     public function index(Request $request)
     {
@@ -90,7 +91,7 @@ class CompanyController extends Controller
 
     public function store(StoreCompanyRequest $request)
     {
-        try {
+        return $this->executeTransaction(function () use ($request) {
             $model = new Company();
             $connection = QueryHelper::getConnection($request, $model);
 
@@ -100,66 +101,31 @@ class CompanyController extends Controller
             $company->fill($data);
             $company->save();
 
-            return response()->json([
-                'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data created successfully',
-                'data'       => new CompanyResource($company),
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Company()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while creating data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return new CompanyResource($company);
+        }, 'Data created successfully');
     }
 
     public function update(UpdateCompanyRequest $request, $id)
     {
-        try {
+        return $this->executeTransaction(function () use ($request, $id) {
             $query = QueryHelper::query(Company::class, $request);
             $company = $query->findOrFail($id);
 
             $data = $request->validated();
             $company->update($data);
 
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Company()),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data updated successfully',
-                'data'       => new CompanyResource($company),
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Company()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while updating data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return new CompanyResource($company);
+        }, 'Data updated successfully');
     }
 
     public function destroy(Request $request, $id)
     {
-        try {
+        return $this->executeTransaction(function () use ($request, $id) {
             $query = QueryHelper::query(Company::class, $request);
             $company = $query->findOrFail($id);
             $company->delete();
 
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Company()),
-                'status'     => Str::studly('success'),
-                'message'    => 'Data deleted successfully',
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'connection' => QueryHelper::getConnection($request, new Company()),
-                'status'     => Str::studly('error'),
-                'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while deleting data.',
-                'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
-            ], 500);
-        }
+            return null;
+        }, 'Data deleted successfully');
     }
 }
