@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Helpers\DebugHelper;
+use App\Helpers\ExpandHelper;
 use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderTemporary\StoreOrderTemporaryRequest;
@@ -25,6 +26,8 @@ class OrderTemporaryController extends Controller
         try {
             $model = new OrderTemporary();
             $connection = QueryHelper::getConnection($request, $model);
+            $expandTree = ExpandHelper::parse($request->query('expand'));
+            $with = ExpandHelper::toWith($expandTree);
             $sessionId = $request->query('session_id');
 
             $filterExpr = $this->getFilterExpression($request);
@@ -33,7 +36,7 @@ class OrderTemporaryController extends Controller
             $baseQuery = $this->applyExpressionFilter($baseQuery, $filterExpr);
 
             $query = clone $baseQuery;
-            $query = $query->with([]);
+            $query = $query->with($with);
 
             if ($sessionId) {
                 $query->where('session_id', $sessionId);
@@ -45,7 +48,7 @@ class OrderTemporaryController extends Controller
                 'connection' => Str::studly($connection),
                 'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
-                'expand'     => [],
+                'expand'     => $expandTree,
             ], $pagination, [
                 'data' => OrderTemporaryResource::collection($pagination['data']),
             ]));
@@ -65,9 +68,12 @@ class OrderTemporaryController extends Controller
             $model = new OrderTemporary();
             $connection = QueryHelper::getConnection($request, $model);
 
+            $expandTree = ExpandHelper::parse($request->query('expand'));
+            $with = ExpandHelper::toWith($expandTree);
+
             $filterExpr = $this->getFilterExpression($request);
 
-            $baseQuery = QueryHelper::newQuery($model, $connection);
+            $baseQuery = QueryHelper::newQuery($model, $connection)->with($with);
             $baseQuery = $this->applyExpressionFilter($baseQuery, $filterExpr);
 
             $query = clone $baseQuery;
@@ -79,7 +85,7 @@ class OrderTemporaryController extends Controller
                 'connection' => Str::studly($connection),
                 'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
-                'expand'     => [],
+                'expand'     => $expandTree,
                 'data' => new OrderTemporaryResource($data),
             ]));
         } catch (\Throwable $e) {

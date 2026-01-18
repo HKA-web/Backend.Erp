@@ -10,9 +10,10 @@ use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
-use App\Traits\HasTransactionResponse;
 use App\Traits\Paginatable;
+use App\Traits\HasTransactionResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -69,7 +70,7 @@ class OrderController extends Controller
 
             $query = QueryHelper::newQuery($model, $connection)->with($with);
             $query = $this->applyExpressionFilter($query, $filterExpr);
-            $query->where('Order_id', $id);
+            $query->where('order_id', $id);
 
             $data = $query->firstOrFail();
 

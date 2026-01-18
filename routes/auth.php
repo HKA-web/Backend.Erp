@@ -36,6 +36,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('product', ProductController::class);
     Route::apiResource('order', OrderController::class);
     Route::apiResource('order_temporary', OrderTemporaryController::class);
-    Route::post('order_temporary/commit', [OrderTemporaryController::class, 'commit']);
+    Route::post('order_temporary/commit', [
+        OrderTemporaryController::class, 'commit'
+    ])->name('order_temporary.commit');
 });
 

@@ -135,10 +135,11 @@ class {$name} extends Model
         '{$fillableStr}',
     ];
 
-    /*public function {$this->original_name}()
-    {
-        return \$this->belongsTo({$masterModel}::class, '{$this->original_name}_id', '{$this->original_name}_id');
-    }*/
+    // Uncoment this code if with relation
+    //public function {$this->original_name}()
+    //{
+    //   return \$this->belongsTo({$masterModel}::class, '{$this->original_name}_id', '{$this->original_name}_id');
+    //}
 }
 PHP;
 
@@ -161,6 +162,7 @@ PHP;
 namespace App\Http\Controllers\V1;
 
 use App\Helpers\DebugHelper;
+use App\Helpers\ExpandHelper;
 use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use {$temporaryRequestNs}\\Store{$name}Request;
@@ -183,6 +185,8 @@ class {$name}Controller extends Controller
         try {
             \$model = new {$name}();
             \$connection = QueryHelper::getConnection(\$request, \$model);
+            \$expandTree = ExpandHelper::parse(\$request->query('expand'));
+            \$with = ExpandHelper::toWith(\$expandTree);
             \$sessionId = \$request->query('session_id');
 
             \$filterExpr = \$this->getFilterExpression(\$request);
@@ -191,7 +195,7 @@ class {$name}Controller extends Controller
             \$baseQuery = \$this->applyExpressionFilter(\$baseQuery, \$filterExpr);
 
             \$query = clone \$baseQuery;
-            \$query = \$query->with([]);
+            \$query = \$query->with(\$with);
 
             if (\$sessionId) {
                 \$query->where('session_id', \$sessionId);
@@ -203,7 +207,7 @@ class {$name}Controller extends Controller
                 'connection' => Str::studly(\$connection),
                 'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
-                'expand'     => [],
+                'expand'     => \$expandTree,
             ], \$pagination, [
                 'data' => {$name}Resource::collection(\$pagination['data']),
             ]));
@@ -223,9 +227,12 @@ class {$name}Controller extends Controller
             \$model = new {$name}();
             \$connection = QueryHelper::getConnection(\$request, \$model);
 
+            \$expandTree = ExpandHelper::parse(\$request->query('expand'));
+            \$with = ExpandHelper::toWith(\$expandTree);
+
             \$filterExpr = \$this->getFilterExpression(\$request);
 
-            \$baseQuery = QueryHelper::newQuery(\$model, \$connection);
+            \$baseQuery = QueryHelper::newQuery(\$model, \$connection)->with(\$with);
             \$baseQuery = \$this->applyExpressionFilter(\$baseQuery, \$filterExpr);
 
             \$query = clone \$baseQuery;
@@ -237,7 +244,7 @@ class {$name}Controller extends Controller
                 'connection' => Str::studly(\$connection),
                 'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
-                'expand'     => [],
+                'expand'     => \$expandTree,
                 'data' => new {$name}Resource(\$data),
             ]));
         } catch (\\Throwable \$e) {

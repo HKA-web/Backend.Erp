@@ -18,12 +18,15 @@ class MakeApiCrud extends Command
     public function __construct(protected Filesystem $files)
     {
         parent::__construct();
+        $this->original_name = '';
     }
 
     public function handle(): int
     {
         [$studly, $snake] = $this->normalize($this->argument('name'));
         $withMigration = ! $this->option('no-migration');
+
+        $this->original_name    = Str::lower($studly);
 
         $this->info('INFO  Generating API CRUD.');
         $this->newLine();
@@ -76,7 +79,6 @@ class MakeApiCrud extends Command
         $this->line($status === 'DONE' ? "<info>{$line}</info>" : "<error>{$line}</error>");
     }
 
-    // ------------------- MODEL -------------------
     protected function makeModel(string $name, string $table): void
     {
         $path = app_path("Models/{$name}.php");
@@ -96,31 +98,45 @@ class MakeApiCrud extends Command
 
 namespace App\Models;
 
+use App\Observers\HistoryObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Traits\SoftDelete;
 
 class {$name} extends Model
 {
 {$unmanagedComment}    use HasApiTokens, HasFactory, Notifiable;
 
+    // Uncoment with soft delete
+    //use SoftDelete;
+
     protected \$connection = 'pgsql';
     protected \$table = '{$table}';
+
     protected \$primaryKey = '{$primaryKey}';
     public \$incrementing = {$incrementing};
     protected \$keyType = '{$keyType}';
 
+    protected \$guarded = ['is_removed',];
+    protected \$casts = ['is_removed' => 'boolean',];
+
     protected \$fillable = [
         '{$table}_id',
         'status',
+        'is_removed',
     ];
+
+    protected static function booted()
+    {
+        static::observe(HistoryObserver::class);
+    }
 }
 PHP;
         $this->files->put($path, $stub);
     }
 
-    // ------------------- CONTROLLER -------------------
     protected function makeController(string $name, string $table): void
     {
         $path = app_path("Http/Controllers/V1/{$name}Controller.php");
@@ -199,7 +215,7 @@ class {$name}Controller extends Controller
 
             \$query = QueryHelper::newQuery(\$model, \$connection)->with(\$with);
             \$query = \$this->applyExpressionFilter(\$query, \$filterExpr);
-            \$query->where('{$name}_id', \$id);
+            \$query->where('{$this->original_name}_id', \$id);
 
             \$data = \$query->firstOrFail();
 
@@ -264,7 +280,6 @@ PHP;
         $this->files->put($path, $stub);
     }
 
-    // ------------------- REQUESTS -------------------
     protected function makeRequests(string $name, string $table): void
     {
         $dir = app_path("Http/Requests/{$name}");
@@ -286,6 +301,7 @@ class Store{$name}Request extends BaseFormRequest
         return [
             '{$table}_id' => 'required|string|max:255',
             'status'      => 'nullable|string|max:50',
+            'is_removed'  => 'nullable|boolean',
         ];
     }
 }
@@ -307,7 +323,8 @@ class Update{$name}Request extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'status' => 'sometimes|required|string|max:50',
+            'status'    => 'sometimes|required|string|max:50',
+            'is_removed'=> 'nullable|boolean',
         ];
     }
 }
@@ -316,7 +333,6 @@ PHP;
         }
     }
 
-    // ------------------- RESOURCE -------------------
     protected function makeResource(string $name, string $table): void
     {
         $dir = app_path("Http/Resources/{$name}");
@@ -342,6 +358,7 @@ class {$name}Resource extends JsonResource
         return [
             '{$table}_id' => \$this->{$table}_id,
             'status'      => \$this->status,
+            'is_removed'  => \$this->is_removed,
         ];
     }
 }
@@ -349,7 +366,6 @@ PHP;
         $this->files->put($path, $stub);
     }
 
-    // ------------------- MIGRATION -------------------
     protected function makeMigration(string $table, bool $temporary): void
     {
         $exists = collect(glob(database_path("migrations/*_create_{$table}_table.php")))->isNotEmpty();
@@ -373,12 +389,27 @@ return new class extends Migration
         Schema::create('{$table}', function (Blueprint \$table) {
             \$table->string('{$table}_id')->primary();
             \$table->string('status')->default('draft');
+            \$table->boolean('is_removed')->default(false);
             \$table->timestamps();
         });
+
+        // Uncoment this code if with sequnce
+        //DB::statement('
+        //    DROP TRIGGER IF EXISTS before_insert_{$this->original_name} ON \'{$this->original_name}\';
+        //');
+        //DB::statement('
+        //    CREATE TRIGGER before_insert_{$this->original_name}
+        //    BEFORE INSERT ON \'{$this->original_name}\'
+        //    FOR EACH ROW
+        //    EXECUTE FUNCTION trg_set_pk_from_sequence();
+        //');
     }
 
     public function down(): void
     {
+        // Uncoment this code if with sequnce
+        //DB::statement("DROP TRIGGER before_insert_{$this->original_name};");
+
         Schema::dropIfExists('{$table}');
     }
 };

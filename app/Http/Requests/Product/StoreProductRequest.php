@@ -9,8 +9,9 @@ class StoreProductRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'product_id'   => 'required|string|max:255',
-            'product_name' => 'required|string|max:255',
+            'product_id' => 'required|string|max:255',
+            'status'      => 'nullable|string|max:50',
+            'is_removed'  => 'nullable|boolean',
         ];
     }
 }

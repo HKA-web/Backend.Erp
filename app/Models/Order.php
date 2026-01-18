@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\HistoryObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -21,4 +22,9 @@ class Order extends Model
         'order_id',
         'status',
     ];
+
+    protected static function booted()
+    {
+        static::observe(HistoryObserver::class);
+    }
 }

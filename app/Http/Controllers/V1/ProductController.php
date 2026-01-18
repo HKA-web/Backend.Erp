@@ -10,9 +10,10 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
-use App\Traits\HasTransactionResponse;
 use App\Traits\Paginatable;
+use App\Traits\HasTransactionResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -40,7 +41,7 @@ class ProductController extends Controller
 
             return response()->json(array_merge([
                 'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
+                'status'     => 'success',
                 'message'    => 'List data retrieved successfully',
                 'expand'     => $expandTree,
             ], $pagination, [
@@ -49,7 +50,7 @@ class ProductController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('error'),
+                'status'     => 'error',
                 'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while retrieving data.',
                 'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
             ], 500);
@@ -75,7 +76,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'connection' => Str::studly($connection),
-                'status'     => Str::studly('success'),
+                'status'     => 'success',
                 'message'    => 'Data retrieved successfully',
                 'expand'     => $expandTree,
                 'data'       => new ProductResource($data),
@@ -83,7 +84,7 @@ class ProductController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'connection' => QueryHelper::getConnection($request, new Product()),
-                'status'     => Str::studly('error'),
+                'status'     => 'error',
                 'message'    => config('app.debug') ? $e->getMessage() : 'An error occurred while retrieving data.',
                 'trace'      => config('app.debug') ? DebugHelper::formatTrace($e) : null,
             ], 500);
@@ -95,14 +96,12 @@ class ProductController extends Controller
         return $this->executeTransaction(function () use ($request) {
             $model = new Product();
             $connection = QueryHelper::getConnection($request, $model);
-
             $data = $request->validated();
-            $item = $model;
-            if ($connection) $item->setConnection($connection);
-            $item->fill($data);
-            $item->save();
+            if ($connection) $model->setConnection($connection);
+            $model->fill($data);
+            $model->save();
 
-            return new ProductResource($item);
+            return new ProductResource($model);
         }, 'Data created successfully');
     }
 
@@ -129,4 +128,5 @@ class ProductController extends Controller
             return null;
         }, 'Data deleted successfully');
     }
+
 }

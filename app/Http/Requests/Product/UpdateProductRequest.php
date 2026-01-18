@@ -9,7 +9,8 @@ class UpdateProductRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'product_name' => 'sometimes|required|string|max:255',
+            'status'    => 'sometimes|required|string|max:50',
+            'is_removed'=> 'nullable|boolean',
         ];
     }
 }
