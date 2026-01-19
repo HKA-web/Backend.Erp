@@ -10,14 +10,14 @@ use App\Http\Requests\Option\StoreOptionRequest;
 use App\Http\Requests\Option\UpdateOptionRequest;
 use App\Http\Resources\Option\OptionResource;
 use App\Models\Option;
-use App\Traits\HasTransactionResponse;
-use App\Traits\Paginatable;
+use App\Traits\TransactionTrait;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class OptionController extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request $request)
     {

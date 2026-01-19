@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Throwable;
 use Illuminate\Http\JsonResponse;
 
-trait HasTransactionResponse
+trait TransactionTrait
 {
     public function executeTransaction(callable $callback, string $successMessage = 'Operation successful'): JsonResponse
     {

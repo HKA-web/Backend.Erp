@@ -10,15 +10,15 @@ use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
-use App\Traits\Paginatable;
-use App\Traits\HasTransactionResponse;
+use App\Traits\PaginateTrait;
+use App\Traits\TransactionTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request $request)
     {

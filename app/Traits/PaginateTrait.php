@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Request;
 
-trait Paginatable
+trait PaginateTrait
 {
     public function paginateQuery($query, Request $request, int $maxTake = 100)
     {

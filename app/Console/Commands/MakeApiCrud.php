@@ -98,19 +98,22 @@ class MakeApiCrud extends Command
 
 namespace App\Models;
 
-use App\Observers\HistoryObserver;
+use App\Traits\HistoryTrait;
+use App\Traits\SoftDeleteTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Traits\SoftDelete;
 
 class {$name} extends Model
 {
 {$unmanagedComment}    use HasApiTokens, HasFactory, Notifiable;
 
-    // Uncoment with soft delete
-    //use SoftDelete;
+    // Uncoment this code if using soft delete
+    //use SoftDeleteTrait;
+
+    // Uncoment this code if using history
+    //use HistoryTrait;
 
     protected \$connection = 'pgsql';
     protected \$table = '{$table}';
@@ -127,11 +130,6 @@ class {$name} extends Model
         'status',
         'is_removed',
     ];
-
-    protected static function booted()
-    {
-        static::observe(HistoryObserver::class);
-    }
 }
 PHP;
         $this->files->put($path, $stub);
@@ -155,15 +153,15 @@ use App\Http\Requests\\{$name}\Store{$name}Request;
 use App\Http\Requests\\{$name}\Update{$name}Request;
 use App\Http\Resources\\{$name}\\{$name}Resource;
 use App\Models\\{$name};
-use App\Traits\Paginatable;
-use App\Traits\HasTransactionResponse;
+use App\Traits\PaginateTrait;
+use App\Traits\TransactionTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class {$name}Controller extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request \$request)
     {
@@ -393,7 +391,21 @@ return new class extends Migration
             \$table->timestamps();
         });
 
-        // Uncoment this code if with sequnce
+        // Uncoment this code if using sequnce
+
+        // NOTE
+        // If the name is a database reserved or operational keyword, use the following format:
+
+        // \'model_name\'
+
+        // Example:
+        // the word order → 'order'
+
+        // Otherwise, for the six standard models, the quotes can be omitted.
+
+        // Example:
+        // the word product → product
+
         //DB::statement('
         //    DROP TRIGGER IF EXISTS before_insert_{$this->original_name} ON \'{$this->original_name}\';
         //');
@@ -407,7 +419,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Uncoment this code if with sequnce
+        // Uncoment this code if using sequnce
         //DB::statement("DROP TRIGGER before_insert_{$this->original_name};");
 
         Schema::dropIfExists('{$table}');

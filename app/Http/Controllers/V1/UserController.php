@@ -10,13 +10,13 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
-use App\Traits\Paginatable;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    use Paginatable;
+    use PaginateTrait;
 
     public function index(Request $request)
     {

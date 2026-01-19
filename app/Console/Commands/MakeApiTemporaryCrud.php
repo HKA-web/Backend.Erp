@@ -170,15 +170,15 @@ use {$temporaryRequestNs}\\Update{$name}Request;
 use {$temporaryResourceNs}\\{$name}Resource;
 use App\Models\\{$name};
 use App\Models\\{$masterModel};
-use App\Traits\HasTransactionResponse;
-use App\Traits\Paginatable;
+use App\Traits\TransactionTrait;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class {$name}Controller extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request \$request)
     {

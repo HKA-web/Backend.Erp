@@ -10,14 +10,14 @@ use App\Http\Requests\Province\StoreProvinceRequest;
 use App\Http\Requests\Province\UpdateProvinceRequest;
 use App\Http\Resources\Province\ProvinceResource;
 use App\Models\Province;
-use App\Traits\HasTransactionResponse;
-use App\Traits\Paginatable;
+use App\Traits\TransactionTrait;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ProvinceController extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request $request)
     {

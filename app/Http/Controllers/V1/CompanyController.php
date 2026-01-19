@@ -10,14 +10,14 @@ use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Http\Resources\Company\CompanyResource;
 use App\Models\Company;
-use App\Traits\HasTransactionResponse;
-use App\Traits\Paginatable;
+use App\Traits\TransactionTrait;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request $request)
     {

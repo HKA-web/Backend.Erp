@@ -4,9 +4,9 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 
-trait SoftDelete
+trait SoftDeleteTrait
 {
-    protected static function bootSoftDelete()
+    protected static function bootSoftDeleteTrait()
     {
         static::addGlobalScope('not_deleted', function (Builder $builder) {
             $builder->where(
@@ -21,7 +21,7 @@ trait SoftDelete
             }
 
             $model->is_removed = true;
-            $model->saveQuietly();
+            $model->save();
 
             return false;
         });

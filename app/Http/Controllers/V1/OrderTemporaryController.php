@@ -11,15 +11,15 @@ use App\Http\Requests\OrderTemporary\UpdateOrderTemporaryRequest;
 use App\Http\Resources\OrderTemporary\OrderTemporaryResource;
 use App\Models\OrderTemporary;
 use App\Models\Order;
-use App\Traits\HasTransactionResponse;
-use App\Traits\Paginatable;
+use App\Traits\TransactionTrait;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OrderTemporaryController extends Controller
 {
-    use Paginatable, HasTransactionResponse;
+    use PaginateTrait, TransactionTrait;
 
     public function index(Request $request)
     {
