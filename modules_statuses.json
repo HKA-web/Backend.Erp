@@ -1,0 +1,6 @@
+{
+    "Blog": true,
+    "Authentication": true,
+    "Keuangan": true,
+    "Core": true
+}

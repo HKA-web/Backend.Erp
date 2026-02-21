@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Traits;
+
+use DateTimeInterface;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
+trait SerializableDate
+{
+    protected function serializeDate(DateTimeInterface $date): array
+    {
+        $user = Auth::guard('sanctum')->user();
+        $targetTimezone = $user->timezone ?? config('app.timezone', 'Asia/Jakarta');
+
+        $dt = Carbon::instance($date);
+
+        $utc = $dt->copy()->tz('UTC');
+
+        $dt->setTimezone($targetTimezone);
+
+        return [
+            'zone'         => $dt->getOffsetString(),
+            'utc'          => $utc->toIso8601ZuluString('microsecond'),
+            'date'         => $dt->toDateString(),
+            'time'         => $dt->toTimeString('microsecond'),
+            'datetime'     => $dt->toIso8601String('microsecond'),
+            'datetimezone' => $dt->format('Y-m-d\TH:i:s.uP'),
+        ];
+    }
+}
