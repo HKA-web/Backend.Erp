@@ -18,8 +18,8 @@
 -   PHP 8.2 or higher
 -   Composer
 -   Laravel 12.x
--   MySQL or any other supported database
-- 
+-   PgSQL or any other supported database
+  
 ### Installation
 
 1. **Clone the repository:**
@@ -110,7 +110,7 @@
       
 5. **Config Seed:**
 
-    Add seeder in file `{module}/databases/seeders` and configure your route settings.
+    Add seeder in file `{module}/databases/seeders` and configure your seeder.
 
     ```bash
    {model}::factory()->create();
