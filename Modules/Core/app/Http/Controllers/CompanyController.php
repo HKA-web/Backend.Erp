@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\{{module}}\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
 use Illuminate\Http\Request;
-use Modules\{{module}}\Http\Requests\{{model}}Request;
-use Modules\{{module}}\Models\{{model}};
+use Modules\Core\Http\Requests\CompanyRequest;
+use Modules\Core\Models\Company;
 
-class {{model}}Controller extends Controller
+class CompanyController extends Controller
 {
     /**
      * Display a listing of the resource with ERP filtering & sorting.
@@ -16,25 +16,25 @@ class {{model}}Controller extends Controller
     public function index()
     {
         return $this->erpExecution(function () {
-            return $this->erpResponse({{model}}::query());
+            return $this->erpResponse(Company::query());
         });
     }
 
     /**
      * Store a newly created resource in storage (Draft or Posted).
      */
-    public function store({{model}}Request $request, BaseStaging $staging)
+    public function store(CompanyRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
 
             // Memanggil stored procedure hasil generate migration otomatis
-            $staging->executeStaging('{{module_lower}}.push_{{model_lower}}', $request->validated());
+            $staging->executeStaging('core.push_company', $request->validated());
 
             return $this->erpResponse(
-                message: "{{model}} {$request->{{model_lower}}_name} Successfully Processed."
+                message: "Company {$request->company_name} Successfully Processed."
             );
 
-        }, "Failed to process {{model}}.");
+        }, "Failed to process Company.");
     }
 
     /**
@@ -43,7 +43,7 @@ class {{model}}Controller extends Controller
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
-            $data = {{model}}::findOrFail($id);
+            $data = Company::findOrFail($id);
             return $this->erpResponse($data);
         });
     }
@@ -51,17 +51,17 @@ class {{model}}Controller extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update({{model}}Request $request, $id, BaseStaging $staging)
+    public function update(CompanyRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
 
-            $staging->executeStaging('{{module_lower}}.push_{{model_lower}}', $request->validated());
+            $staging->executeStaging('core.push_company', $request->validated());
 
             return $this->erpResponse(
-                message: "{{model}} updated successfully."
+                message: "Company updated successfully."
             );
 
-        }, "Failed to update {{model}}.");
+        }, "Failed to update Company.");
     }
 
     /**
@@ -70,8 +70,8 @@ class {{model}}Controller extends Controller
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
-            {{model}}::destroy($id);
-            return $this->erpResponse(message: "{{model}} deleted successfully.");
+            Company::destroy($id);
+            return $this->erpResponse(message: "Company deleted successfully.");
         });
     }
 }

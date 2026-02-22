@@ -175,25 +175,38 @@ trait ViewSets
         }
     }
 
-    protected function erpResponse(Builder $query)
+    protected function erpResponse($data = null, $message = 'Success')
     {
-        $this->applyFieldsExpand($query);
+        if ($data instanceof Builder) {
+            $query = $data;
 
-        if (request()->has('filter')) {
-            $this->applyFilter($query, request()->input('filter'));
+            $this->applyFieldsExpand($query);
+
+            if (request()->has('filter')) {
+                $this->applyFilter($query, request()->input('filter'));
+            }
+
+            if (request()->has('sort')) {
+                $this->applySort($query, request()->input('sort'));
+            }
+
+            $totalCount = (clone $query)->count();
+            $results = $query->takeSkip()->get();
+
+            return response()->json([
+                'totalCount' => $totalCount,
+                'data'       => $results,
+            ], 200);
         }
 
-        if (request()->has('sort')) {
-            $this->applySort($query, request()->input('sort'));
+        $response = [
+            'message' => $message,
+        ];
+
+        if (!is_null($data)) {
+            $response['data'] = $data;
         }
 
-        $totalCount = (clone $query)->count();
-
-        $data = $query->takeSkip()->get();
-
-        return response()->json([
-            'totalCount' => $totalCount,
-            'data'       => $data
-        ], 200);
+        return response()->json($response, 200);
     }
 }

@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Helpers\ExpandHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             $this->string('created_by')->nullable();
             $this->string('updated_by')->nullable();
             $this->timestamps();
+            $this->string('status')->default('DRAFT');
         });
 
         Builder::macro('takeSkip', function () {
@@ -67,6 +70,23 @@ class AppServiceProvider extends ServiceProvider
                 return $this->with($with);
             }
             return $this;
+        });
+
+        Schema::macro('createWithTemp', function ($table, \Closure $callback) {
+            Schema::create($table, $callback);
+
+            $tempSchema = 'temporary';
+            $flatTableName = str_replace('.', '_', $table);
+            $fullTempPath = "{$tempSchema}.{$flatTableName}";
+
+            DB::statement("CREATE SCHEMA IF NOT EXISTS {$tempSchema}");
+
+            DB::statement("DROP TABLE IF EXISTS {$fullTempPath}");
+            DB::statement("CREATE TABLE {$fullTempPath} (LIKE {$table} INCLUDING ALL)");
+
+            Schema::table($fullTempPath, function (Blueprint $table) {
+                $table->uuid('session_id')->nullable()->index();
+            });
         });
     }
 }

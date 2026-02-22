@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Modules\Core\Database\Factories\DistrictFactory;
+use Modules\Core\Database\Factories\VillageFactory;
 use Spatie\Permission\Traits\HasRoles;
 
-class District extends Model
+class Village extends Model
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel;
 
     protected $connection = 'pgsql';
-    protected $table = 'core.district';
+    protected $table = 'core.village';
 
-    protected $primaryKey = 'district_id';
+    protected $primaryKey = 'village_id';
     protected $guard_name = 'api';
 
     public $incrementing = false;
@@ -26,16 +26,11 @@ class District extends Model
 
     protected static function newFactory()
     {
-        return DistrictFactory::new();
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(City::class, 'city_id', 'city_id');
+        return VillageFactory::new();
     }
 
     public function district()
     {
-        return $this->hasMany(Village::class, 'district_id', 'district_id');
+        return $this->belongsTo(District::class, 'district_id', 'district_id');
     }
 }

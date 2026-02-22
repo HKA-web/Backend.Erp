@@ -1,0 +1,31 @@
+<?php
+
+namespace Modules\{{module}}\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class {{model}}Request extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            '{{model_lower}}_id'   => 'required|string|max:10',
+            '{{model_lower}}_name' => 'required|string|max:255',
+            'status'                => 'required|in:DRAFT,POSTED',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            '{{model_lower}}_id.required'   => 'ID wajib diisi.',
+            '{{model_lower}}_name.required' => 'Nama tidak boleh kosong.',
+            'status.in'                      => 'Status harus DRAFT atau POSTED.',
+        ];
+    }
+}
