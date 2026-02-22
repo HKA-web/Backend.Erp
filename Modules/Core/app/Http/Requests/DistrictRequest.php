@@ -4,7 +4,7 @@ namespace Modules\Core\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CompanyRequest extends FormRequest
+class DistrictRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,8 +16,8 @@ class CompanyRequest extends FormRequest
         $allowed = in_array($this->input('status'), ['EDIT','DELETE']);
 
         return [
-            'company_id'   => $allowed ? 'nullable|string' : 'required|string',
-            'company_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
+            'district_id'   => $allowed ? 'nullable|string' : 'required|string',
+            'district_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
             'status'    => 'required|in:DRAFT,POSTED,EDIT,DELETE',
         ];
     }
@@ -25,8 +25,8 @@ class CompanyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'company_id.required'   => 'Id field is required.',
-            'company_name.required' => 'Name field is required.',
+            'district_id.required'   => 'Id field is required.',
+            'district_name.required' => 'Name field is required.',
             'status.in' => 'Status choice DRAFT,POSTED,EDIT,DELETE',
         ];
     }

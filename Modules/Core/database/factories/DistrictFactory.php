@@ -10,8 +10,6 @@ class DistrictFactory extends Factory
 {
     protected $model = District::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [

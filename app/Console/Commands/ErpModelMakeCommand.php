@@ -196,7 +196,7 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- RAISE EXCEPTION akan membatalkan semua perubahan jika terjadi error
-        RAISE EXCEPTION 'ERROR PROCEDURE: %', SQLERRM;
+        RAISE EXCEPTION '%', SQLERRM;
 END;
 $$;
 SQL;

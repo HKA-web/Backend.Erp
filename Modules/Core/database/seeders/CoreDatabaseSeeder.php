@@ -4,8 +4,10 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Core\Models\City;
+use Modules\Core\Models\Company;
 use Modules\Core\Models\District;
 use Modules\Core\Models\Province;
+use Modules\Core\Models\Village;
 
 class CoreDatabaseSeeder extends Seeder
 {
@@ -17,5 +19,7 @@ class CoreDatabaseSeeder extends Seeder
         Province::factory()->create();
         City::factory()->create();
         District::factory()->create();
+        Village::factory()->create();
+        Company::factory()->create();
     }
 }

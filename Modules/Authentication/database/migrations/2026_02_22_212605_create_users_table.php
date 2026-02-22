@@ -3,13 +3,17 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('authentication.user', function (Blueprint $table) {
+        Schema::createWithTemp('authentication.user', function (Blueprint $table) {
             $table->string('user_id')->primary();
             $table->string('user_name');
             $table->string('email')->unique();
@@ -34,19 +38,24 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_212605_authentication.procedure_action_user.sql');
+        DB::unprepared($sql);
+
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
         foreach ($actions as $action) {
-            Permission::firstOrCreate([
-                'name' => "authentication.{$action}.user",
-                'guard_name' => 'api'
-            ]);
+            Permission::firstOrCreate(['name' => "authentication.{$action}.user", 'guard_name' => 'api']);
         }
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
+        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_action_user");
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('temporary.authentication_user');
         Schema::dropIfExists('authentication.user');
     }
 };

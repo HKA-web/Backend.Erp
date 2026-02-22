@@ -4,7 +4,6 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Illuminate\Http\Request;
 use Modules\Core\Http\Requests\CompanyRequest;
 use Modules\Core\Models\Company;
 
@@ -33,7 +32,7 @@ class CompanyController extends Controller
                 message: "Company {$request->company_name} Successfully Processed."
             );
 
-        }, 'Failed to process Company.');
+        }, "Failed to process Company.");
     }
 
     /**

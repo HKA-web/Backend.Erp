@@ -4,7 +4,6 @@ namespace Modules\{{module}}\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Illuminate\Http\Request;
 use Modules\{{module}}\Http\Requests\{{model}}Request;
 use Modules\{{module}}\Models\{{model}};
 
@@ -42,8 +41,8 @@ class {{model}}Controller extends Controller
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
-            $query = {{model}}::where('{{module_lower}}', $id);
-            return $this->erpResponse($data);
+            $query = {{model}}::where('{{model_lower}}_id', $id);
+            return $this->erpResponse($query);
         });
     }
 

@@ -49,6 +49,80 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "user store",
+          "id": "d78ad258-7caf-4c27-83d5-523cac1e4a9d",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "1|WjJe2dJFpjU6vuJGyzOyxwXIgvBybmXhU5zrB4Fi6d56361f",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129701",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "001",
+                  "type": "text"
+                },
+                {
+                  "key": "user_name",
+                  "value": "name 001",
+                  "type": "text",
+                  "uuid": "d23083c5-8db8-415c-a49b-d77efd5f5f5a"
+                },
+                {
+                  "key": "email",
+                  "value": "001@email.com",
+                  "type": "text",
+                  "uuid": "5a481a03-af0e-4ed4-aa19-f2efe74dd4bf"
+                },
+                {
+                  "key": "status",
+                  "value": "POSTED",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8001/api/v1/authentication/user",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v1",
+                "authentication",
+                "user"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "id": "5a147f12-35a0-4e08-b1ce-0724d9d2d6a9"
@@ -634,6 +708,77 @@
                 {
                   "key": "expand",
                   "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "village",
+          "id": "a6c21889-b7c4-4e98-ba72-f67678183088",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "1|WjJe2dJFpjU6vuJGyzOyxwXIgvBybmXhU5zrB4Fi6d56361f",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8001/api/v1/core/village",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "village"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",true]",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.province",
+                  "uuid": "82c59d3c-b603-42d1-b38a-4c43a74da54b",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "district_name,city.city_name,city.province.province_name",
+                  "uuid": "bf15e7d0-7ecf-48cc-ad98-8874ffcefcc8",
                   "disabled": true
                 }
               ]

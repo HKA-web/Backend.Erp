@@ -3,6 +3,7 @@
 namespace Modules\Authentication\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Authentication\Models\User;
 
 class AuthenticationDatabaseSeeder extends Seeder
 {
@@ -11,6 +12,6 @@ class AuthenticationDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+        User::factory()->create();
     }
 }

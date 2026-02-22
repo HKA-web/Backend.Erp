@@ -10,8 +10,6 @@ class {{model}}Factory extends Factory
 {
     protected $model = {{model}}::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [

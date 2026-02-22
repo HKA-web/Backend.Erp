@@ -21,7 +21,7 @@ return new class extends Migration
 
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_123759_core.push_company.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_215101_core.procedure_action_company.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -35,7 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.push_company");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_action_company");
         Schema::dropIfExists('temporary.core_company');
         Schema::dropIfExists('core.company');
     }

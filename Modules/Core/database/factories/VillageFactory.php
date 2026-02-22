@@ -10,8 +10,6 @@ class VillageFactory extends Factory
 {
     protected $model = Village::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [

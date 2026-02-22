@@ -10,8 +10,6 @@ class CityFactory extends Factory
 {
     protected $model = City::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [

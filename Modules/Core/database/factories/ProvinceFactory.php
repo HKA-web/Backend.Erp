@@ -10,12 +10,10 @@ class ProvinceFactory extends Factory
 {
     protected $model = Province::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [
-            'province_id'    => Str::uuid(),
+            'province_id'   => Str::uuid(),
             'province_name' => fake()->name(),
         ];
     }

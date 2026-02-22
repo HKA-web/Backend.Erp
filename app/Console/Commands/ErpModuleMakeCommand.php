@@ -40,8 +40,7 @@ class ErpModuleMakeCommand extends Command
             }
         }
 
-        $timestamp = now()->format('Y_m_d_His');
-        $fileName = "{$timestamp}_create_{$lowerName}_schema.php";
+        $fileName = "0000_00_00_000000_create_{$lowerName}_schema.php";
         $fullPath = "{$path}/{$fileName}";
 
         $template = $this->getSchemaTemplate($lowerName);

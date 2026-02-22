@@ -13,19 +13,21 @@ class VillageRequest extends FormRequest
 
     public function rules(): array
     {
+        $allowed = in_array($this->input('status'), ['EDIT','DELETE']);
+
         return [
-            'village_id'   => 'required|string|max:10',
-            'village_name' => 'required|string|max:255',
-            'status'       => 'required|in:DRAFT,POSTED',
+            'village_id'   => $allowed ? 'nullable|string' : 'required|string',
+            'village_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
+            'status'    => 'required|in:DRAFT,POSTED,EDIT,DELETE',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'village_id.required'   => 'ID Desa wajib diisi.',
-            'village_name.required' => 'Nama Desa tidak boleh kosong.',
-            'status.in'             => 'Status harus DRAFT atau POSTED.',
+            'village_id.required'   => 'Id field is required.',
+            'village_name.required' => 'Name field is required.',
+            'status.in' => 'Status choice DRAFT,POSTED,EDIT,DELETE',
         ];
     }
 }
