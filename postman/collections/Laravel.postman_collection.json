@@ -1,0 +1,720 @@
+{
+  "info": {
+    "_postman_id": "725b08f4-4385-400b-bde7-77dd8ed1e77f",
+    "name": "Laravel",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "user",
+          "id": "8a32e60d-073b-4f4e-bbbf-ec29f0e3d185",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "6|6U0WW6nhMTvg3c3GjPF83L7rZEQJcwQzV8ICoR2O1f0cfde9",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/authentication/user",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "authentication",
+                "user"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "5a147f12-35a0-4e08-b1ce-0724d9d2d6a9"
+    },
+    {
+      "name": "Core",
+      "item": [
+        {
+          "name": "province",
+          "id": "8b7cdf9f-cd68-423d-952f-838844a7add7",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "13|EEadJsUD1w6Qil586g3kYjNSEPKb3HG3VqGz3xLwd27d8643",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/province",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "province"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "province_name,city.city_name,city.district.district_name",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "city",
+          "id": "d1b34ebb-a338-47e4-abb1-778cafc4ce87",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "13|EEadJsUD1w6Qil586g3kYjNSEPKb3HG3VqGz3xLwd27d8643",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/city?fields=city_name,district.district_name&expand=district",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "city"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",true]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "city_name,district.district_name"
+                },
+                {
+                  "key": "expand",
+                  "value": "district"
+                },
+                {
+                  "key": "sort",
+                  "value": "[{\"selector\":\"city_name\",\"desc\":false}]",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "district",
+          "id": "8f865712-0aff-4bce-990c-d4a33a58f92a",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "13|EEadJsUD1w6Qil586g3kYjNSEPKb3HG3VqGz3xLwd27d8643",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/district?expand=city,city.province&fields=district_name,city.city_name,city.province.province_name",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "district"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",true]",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.province"
+                },
+                {
+                  "key": "fields",
+                  "value": "district_name,city.city_name,city.province.province_name"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "company",
+          "id": "81bd2b50-47ee-4f2d-9ba1-9a1beeb96c62",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/company",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "company"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "province_name,city.city_name,city.district.district_name",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "company store",
+          "id": "eb33d60e-2da1-4461-9319-2774999c9344",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129701",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "company_id",
+                  "value": "002",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "company_name",
+                  "value": "coba2 update",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "POSTED",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/company",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "company"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "company show",
+          "id": "a6b4324b-bac2-46d7-90e6-b4f33ff0dcba",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/company/001",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "company",
+                "001"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "province_name,city.city_name,city.district.district_name",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "company edit",
+          "id": "11ac428f-47d4-435e-aa0f-b10ad63d5697",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "16|rxa0NZi0NsrSraGSmWNWJi16nVSDrsftGHLYzTZ1bbb04d75",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129701",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"EDIT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8001/api/v1/core/company/001",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "company",
+                "001"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "company__name,enable",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "company destroy",
+          "id": "943cb031-1cf5-4fda-83f7-79907993b84d",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "16|rxa0NZi0NsrSraGSmWNWJi16nVSDrsftGHLYzTZ1bbb04d75",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129701",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"DELETE\",\n    \"is_removed\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8001/api/v1/core/company/002",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "company",
+                "002"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "company__name,enable",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "22bf4f46-78d9-4b1f-ae22-5a79c0948ca0"
+    },
+    {
+      "name": "Register",
+      "id": "cb0ce8dc-b3ac-4075-b357-9f5729edae0b",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_name\": \"root\",\n  \"email\": \"admin@email.com\",\n  \"password\": \"password\"\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/register",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "id": "3a3dcfd1-fcbc-42cf-ad8d-97811f1a602b",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@email.com\",\n  \"password\": \"password\"\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

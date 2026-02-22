@@ -7,10 +7,79 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# Change Language
+
+[🇮🇩 Bahasa Indonesia](README.id.md)
+
+---
 ## Laravel Module
 
 #### This program is designed with a modular concept. For more details, please visit [Documentation](https://laravelmodules.com/docs/12/advanced/artisan-commands#modulemigrate).
 
+---
+# Workflow
+
+### API Endpoint (POST `/store`)
+
+Called by the Frontend.
+
+### Laravel
+
+Laravel is only responsible for:
+
+* Performing basic input validation (e.g., “name cannot be empty”).
+* Inserting the validated data into a temporary table.
+* Calling example procedure `CALL core.procedure_commit()`.
+
+---
+
+## Inside the Procedure (SQL)
+
+1. The SQL procedure retrieves the data from the temporary table.
+2. SQL checks the status:
+
+    * “Is this `DRAFT` or `POSTED`?”
+3. If the status is `POSTED`, SQL performs an `INSERT` into the Master table.
+
+---
+
+## Inside the Master Table (Trigger)
+
+As soon as an `INSERT` (or status `UPDATE`) occurs:
+
+The trigger immediately fires and says:
+
+> “New data detected! Execute balance calculation, create journal entries, and update stock.”
+
+---
+
+## Finish
+
+1. The database returns an `"OK"` signal to Laravel.
+2. Laravel sends a success JSON response back to the user.
+
+---
+
+# Main Advantage for You (As a Maintainer)
+
+With this architecture, if one day your boss says:
+
+> “From now on, whenever we save a Village, please automatically create data in the `Region` table as well.”
+
+Then:
+
+* You DO NOT need to open VS Code.
+* You DO NOT need to modify the PHP Controller or Service.
+* You DO NOT need to redeploy the application.
+
+You ONLY need to:
+
+* Open pgAdmin.
+* Add one `INSERT` statement inside the Trigger or Procedure.
+
+Done.
+
+---
 ## Getting Started
 
 ### Prerequisites
@@ -86,13 +155,15 @@
     php artisan erp:make-model {model} {module}
     ```
 
-3. **Use Module:**
+3. **Migrate Module:**
 
     ```bash
-    php artisan module:use {module}
+    php artisan module:migrate {module}
     ```
 
-4. **Migrate Module:**
+4. **Migrate Procedure:**
+
+   Excecution query file to `Modules/{module}/database/migrations/sql/xxxx_xx_xx_xxxxxx_{modul}.procedure_action_{model}.sql`.
 
     ```bash
     php artisan module:migrate {module}
@@ -130,7 +201,8 @@
     php artisan config:cache
     php artisan optimize:clear
     ```
-
+   
+---
 ## Spatie
 
 #### For permit processing, this program is built with spatie. For more details, please visit [Documentation](https://spatie.be/docs/laravel-permission/v7/basic-usage/role-permissions).
@@ -166,3 +238,9 @@
     $role->givePermissionTo(['create-post', 'delete-post']);
     ```
 
+---
+# Documentation API
+
+#### import collection file `Laravel.postman_collection.json` inside folder `postman/collections/`.
+
+---

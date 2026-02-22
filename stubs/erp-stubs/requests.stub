@@ -13,19 +13,21 @@ class {{model}}Request extends FormRequest
 
     public function rules(): array
     {
+        $allowed = in_array($this->input('status'), ['EDIT','DELETE']);
+
         return [
-            '{{model_lower}}_id'   => 'required|string|max:10',
-            '{{model_lower}}_name' => 'required|string|max:255',
-            'status'                => 'required|in:DRAFT,POSTED',
+            '{{model_lower}}_id'   => $allowed ? 'nullable|string' : 'required|string',
+            '{{model_lower}}_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
+            'status'    => 'required|in:DRAFT,POSTED,EDIT,DELETE',
         ];
     }
 
     public function messages(): array
     {
         return [
-            '{{model_lower}}_id.required'   => 'ID wajib diisi.',
-            '{{model_lower}}_name.required' => 'Nama tidak boleh kosong.',
-            'status.in'                      => 'Status harus DRAFT atau POSTED.',
+            '{{model_lower}}_id.required'   => 'Id field is required.',
+            '{{model_lower}}_name.required' => 'Name field is required.',
+            'status.in' => 'Status choice DRAFT,POSTED,EDIT,DELETE',
         ];
     }
 }

@@ -27,8 +27,7 @@ class {{model}}Controller extends Controller
     {
         return $this->erpExecution(function () use ($staging, $request) {
 
-            // Memanggil stored procedure hasil generate migration otomatis
-            $staging->executeStaging('{{module_lower}}.push_{{model_lower}}', $request->validated());
+            $staging->executeStaging('{{module_lower}}.procedure_action_{{model_lower}}', $request->validated());
 
             return $this->erpResponse(
                 message: "{{model}} {$request->{{model_lower}}_name} Successfully Processed."
@@ -43,7 +42,7 @@ class {{model}}Controller extends Controller
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
-            $data = {{model}}::findOrFail($id);
+            $query = {{model}}::where('{{module_lower}}', $id);
             return $this->erpResponse($data);
         });
     }
@@ -53,25 +52,43 @@ class {{model}}Controller extends Controller
      */
     public function update({{model}}Request $request, $id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
+        return $this->erpExecution(function () use ($staging, $request, $id) {
 
-            $staging->executeStaging('{{module_lower}}.push_{{model_lower}}', $request->validated());
+            $validated = $request->validated();
+
+            $payload = array_merge($validated, [
+                '{{model_lower}}_id' => $id
+            ]);
+
+            $staging->executeStaging('{{module_lower}}.procedure_action_{{model_lower}}', $payload);
 
             return $this->erpResponse(
-                message: "{{model}} updated successfully."
+                message: "{{model}} {$id} ready for editing."
             );
 
-        }, "Failed to update {{model}}.");
+        }, 'Failed to update {{model}}.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy({{model}}Request $request, $id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($id) {
-            {{model}}::destroy($id);
-            return $this->erpResponse(message: "{{model}} deleted successfully.");
-        });
+        return $this->erpExecution(function () use ($staging, $request, $id) {
+
+            $validated = $request->validated();
+
+            $payload = array_merge($validated, [
+                '{{model_lower}}_id' => $id,
+                'is_removed' => true
+            ]);
+
+            $staging->executeStaging('{{module_lower}}.procedure_action_{{model_lower}}', $payload);
+
+            return $this->erpResponse(
+                message: "{{model}} {$id} ready for delete."
+            );
+
+        }, 'Failed to delete {{model}}.');
     }
 }

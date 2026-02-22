@@ -27,14 +27,13 @@ class CompanyController extends Controller
     {
         return $this->erpExecution(function () use ($staging, $request) {
 
-            // Memanggil stored procedure hasil generate migration otomatis
-            $staging->executeStaging('core.push_company', $request->validated());
+            $staging->executeStaging('core.procedure_action_company', $request->validated());
 
             return $this->erpResponse(
                 message: "Company {$request->company_name} Successfully Processed."
             );
 
-        }, "Failed to process Company.");
+        }, 'Failed to process Company.');
     }
 
     /**
@@ -43,8 +42,8 @@ class CompanyController extends Controller
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
-            $data = Company::findOrFail($id);
-            return $this->erpResponse($data);
+            $query = Company::where('company_id', $id);
+            return $this->erpResponse($query);
         });
     }
 
@@ -53,25 +52,43 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, $id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
+        return $this->erpExecution(function () use ($staging, $request, $id) {
 
-            $staging->executeStaging('core.push_company', $request->validated());
+            $validated = $request->validated();
+
+            $payload = array_merge($validated, [
+                'company_id' => $id
+            ]);
+
+            $staging->executeStaging('core.procedure_action_company', $payload);
 
             return $this->erpResponse(
-                message: "Company updated successfully."
+                message: "Company {$id} ready for editing."
             );
 
-        }, "Failed to update Company.");
+        }, 'Failed to update Company.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(CompanyRequest $request, $id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($id) {
-            Company::destroy($id);
-            return $this->erpResponse(message: "Company deleted successfully.");
-        });
+        return $this->erpExecution(function () use ($staging, $request, $id) {
+
+            $validated = $request->validated();
+
+            $payload = array_merge($validated, [
+                'company_id' => $id,
+                'is_removed' => true
+            ]);
+
+            $staging->executeStaging('core.procedure_action_company', $payload);
+
+            return $this->erpResponse(
+                message: "Company {$id} ready for delete."
+            );
+
+        }, 'Failed to delete Company.');
     }
 }

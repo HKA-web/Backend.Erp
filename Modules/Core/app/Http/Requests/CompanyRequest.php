@@ -13,10 +13,12 @@ class CompanyRequest extends FormRequest
 
     public function rules(): array
     {
+        $allowed = in_array($this->input('status'), ['EDIT','DELETE']);
+
         return [
-            'company_id'   => 'required|string|max:10',
-            'company_name' => 'required|string|max:255',
-            'status'                => 'required|in:DRAFT,POSTED',
+            'company_id'   => $allowed ? 'nullable|string' : 'required|string',
+            'company_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
+            'status'       => 'required|in:DRAFT,POSTED,EDIT,DELETE',
         ];
     }
 
@@ -25,7 +27,7 @@ class CompanyRequest extends FormRequest
         return [
             'company_id.required'   => 'ID wajib diisi.',
             'company_name.required' => 'Nama tidak boleh kosong.',
-            'status.in'                      => 'Status harus DRAFT atau POSTED.',
+            'status.in'                      => 'Status harus DRAFT, POSTED, EDIT, DELETE.',
         ];
     }
 }

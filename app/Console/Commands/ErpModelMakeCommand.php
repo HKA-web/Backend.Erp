@@ -64,13 +64,11 @@ class ErpModelMakeCommand extends Command
         $dir = base_path("Modules/{$module}/Database/Migrations");
         if (!File::isDirectory($dir)) $dir = base_path("Modules/{$module}/database/migrations");
 
-        // Ambil file migrasi terbaru yang baru saja dibuat oleh command artisan
         $latestFile = collect(File::files($dir))->sortByDesc(fn($f) => $f->getMTime())->first();
 
         if ($latestFile) {
             $content = File::get($latestFile->getRealPath());
 
-            // Standarisasi Penamaan
             $modelLower  = Str::lower($model);
             $schemaLower = Str::lower($schema);
             $fullTableName = "{$schemaLower}.{$modelLower}";
@@ -81,76 +79,129 @@ class ErpModelMakeCommand extends Command
             if (!File::isDirectory($sqlDir)) File::makeDirectory($sqlDir, 0755, true);
 
             $timestamp   = date('Y_m_d_His');
-            $sqlFileName = "{$timestamp}_{$schemaLower}.push_{$modelLower}.sql";
+            $sqlFileName = "{$timestamp}_{$schemaLower}.procedure_action_{$modelLower}.sql";
             $sqlFilePath = $sqlDir . "/" . $sqlFileName;
 
             $sqlContent = <<<SQL
-CREATE OR REPLACE PROCEDURE {$schemaLower}.push_{$modelLower}(
+DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_action_{$modelLower};
+CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_action_{$modelLower}(
     p_session_id UUID,
     p_payload JSONB
 )
-LANGUAGE plpgsql
-AS $$
+    LANGUAGE plpgsql
+AS
+$$
 DECLARE
-    v_status TEXT;
+    v_status     TEXT;
     v_{$modelLower}_id TEXT;
+    v_is_removed BOOLEAN;
 BEGIN
-    -- Extract info dari JSONB
-    v_status := COALESCE(p_payload->>'status', 'DRAFT');
-    v_{$modelLower}_id := p_payload->>'{$modelLower}_id';
+    -- 1. Ambil data dasar dari payload
+    v_status := COALESCE(p_payload ->> 'status', 'DRAFT');
+    v_{$modelLower}_id := p_payload ->> '{$modelLower}_id';
 
+    -- Ambil flag is_removed, konversi Text ke Boolean secara eksplisit
+    v_is_removed := COALESCE((p_payload ->> 'is_removed')::BOOLEAN, FALSE);
+
+    -- 2. LOGIKA POSTED (COMMIT ACTION)
     IF v_status = 'POSTED' THEN
-        -- 1. MASUK KE MASTER
-        INSERT INTO {$schemaLower}.{$modelLower} (
-            {$modelLower}_id,
-            {$modelLower}_name,
-            status,
-            created_at
-        )
-        VALUES (
-            v_{$modelLower}_id,
-            p_payload->>'{$modelLower}_name',
-            'POSTED',
-            NOW()
-        )
-        ON CONFLICT ({$modelLower}_id)
-        DO UPDATE SET
-            {$modelLower}_name = EXCLUDED.{$modelLower}_name,
-            status = EXCLUDED.status,
-            updated_at = NOW();
+        -- Cek apakah data ada di temporary untuk session ini
+        IF EXISTS (SELECT 1 FROM temporary.{$schemaLower}_{$modelLower} WHERE {$modelLower}_id = v_{$modelLower}_id AND session_id = p_session_id) THEN
 
-        -- 2. BERSIHKAN DRAFT DI TEMPORARY
-        DELETE FROM temporary.{$schemaLower}_{$modelLower}
+            INSERT INTO {$schemaLower}.{$modelLower} (
+                    {$modelLower}_id,
+                    {$modelLower}_name,
+                    status,
+                    created_at,
+                    updated_at,
+                    is_removed
+                )
+                SELECT
+                    {$modelLower}_id,
+                    {$modelLower}_name,
+                    'POSTED',
+                    NOW(),
+                    NOW(),
+                    is_removed
+                FROM temporary.{$schemaLower}_{$modelLower}
+                WHERE {$modelLower}_id = v_{$modelLower}_id AND session_id = p_session_id
+                ON CONFLICT ({$modelLower}_id)
+                    DO UPDATE SET
+                                  {$modelLower}_name = EXCLUDED.{$modelLower}_name,
+                                  status = EXCLUDED.status,
+                                  is_removed = EXCLUDED.is_removed,
+                                  updated_at = NOW();
+
+            -- Setelah berhasil dipindahkan atau dihapus, bersihkan tabel temporary
+            DELETE FROM temporary.{$schemaLower}_{$modelLower}
+            WHERE {$modelLower}_id = v_{$modelLower}_id AND session_id = p_session_id;
+
+        ELSE
+            -- Opsional: Jika user kirim POSTED tapi di temporary tidak ada datanya
+            RAISE EXCEPTION 'ERROR PROCEDURE: Data not found in temporary for ID % in this session.', v_{$modelLower}_id;
+        END IF;
+
+    -- 3. LOGIKA EDIT (Salin Master ke Temp as Draft)
+    ELSIF v_status = 'EDIT' THEN
+        INSERT INTO temporary.{$schemaLower}_{$modelLower} ({$modelLower}_id,
+                                            {$modelLower}_name,
+                                            status,
+                                            session_id,
+                                            is_removed)
+        SELECT {$modelLower}_id,
+               {$modelLower}_name,
+               'DRAFT',
+               p_session_id,
+               FALSE -- Default False saat inisialisasi edit
+        FROM {$schemaLower}.{$modelLower}
         WHERE {$modelLower}_id = v_{$modelLower}_id
-          AND session_id = p_session_id;
-    ELSE
-        -- 3. JIKA DRAFT, MASUK KE TEMPORARY
-        INSERT INTO temporary.{$schemaLower}_{$modelLower} (
-            {$modelLower}_id,
-            {$modelLower}_name,
-            status,
-            session_id
-        )
-        VALUES (
-            v_{$modelLower}_id,
-            p_payload->>'{$modelLower}_name',
-            'DRAFT',
-            p_session_id
-        )
+        ON CONFLICT ({$modelLower}_id) -- Gunakan composite key jika ada
+            DO NOTHING;
+
+    -- 4. LOGIKA DELETE (Salin Master ke Temp as Draft)
+    ELSIF v_status = 'DELETE' THEN
+        INSERT INTO temporary.{$schemaLower}_{$modelLower} ({$modelLower}_id,
+                                            {$modelLower}_name,
+                                            status,
+                                            session_id,
+                                            is_removed)
+        SELECT {$modelLower}_id,
+               {$modelLower}_name,
+               'DRAFT',
+               p_session_id,
+               TRUE -- Tandai akan dihapus
+        FROM {$schemaLower}.{$modelLower}
+        WHERE {$modelLower}_id = v_{$modelLower}_id
         ON CONFLICT ({$modelLower}_id)
-        DO UPDATE SET
-            {$modelLower}_name = EXCLUDED.{$modelLower}_name,
-            status = EXCLUDED.status;
+            DO UPDATE SET status = 'DELETED', is_removed = TRUE;
+
+    -- 5. LOGIKA DRAFT / DEFAULT
+    ELSE
+        INSERT INTO temporary.{$schemaLower}_{$modelLower} ({$modelLower}_id,
+                                            {$modelLower}_name,
+                                            status,
+                                            session_id,
+                                            is_removed)
+        VALUES (v_{$modelLower}_id,
+                p_payload ->> '{$modelLower}_name',
+                'DRAFT',
+                p_session_id,
+                v_is_removed) -- Menggunakan variabel yang sudah di-cast
+        ON CONFLICT ({$modelLower}_id)
+            DO UPDATE SET {$modelLower}_name = EXCLUDED.{$modelLower}_name,
+                          status       = EXCLUDED.status,
+                          is_removed   = EXCLUDED.is_removed;
     END IF;
+
 EXCEPTION
     WHEN OTHERS THEN
-        RAISE EXCEPTION 'UPSERT_FAILED: %', SQLERRM;
+        -- RAISE EXCEPTION akan membatalkan semua perubahan jika terjadi error
+        RAISE EXCEPTION 'ERROR PROCEDURE: %', SQLERRM;
 END;
 $$;
 SQL;
             File::put($sqlFilePath, $sqlContent);
 
-            // --- 2. INJECT NAMESPACE & FACADES KE MIGRASI PHP ---
             if (!str_contains($content, 'use Spatie\Permission\Models\Permission;')) {
                 $content = str_replace(
                     "use Illuminate\Support\Facades\Schema;",
@@ -159,10 +210,8 @@ SQL;
                 );
             }
 
-            // --- 3. REFACTOR SCHEMA CREATE (MASTER & TEMP) ---
             $content = preg_replace("/Schema::create\(['\"][^'\"]+['\"]/", "Schema::createWithTemp('{$fullTableName}'", $content);
 
-            // --- 4. REFACTOR COLUMNS (Dinamis berdasarkan Model) ---
             $content = preg_replace("/^\s*\\\$table->id\(\);\s*$/m", "", $content);
             $content = preg_replace("/^\s*\\\$table->timestamps\(\);\s*$/m", "", $content);
 
@@ -172,21 +221,17 @@ SQL;
 
             $content = preg_replace("/(function\s*\(Blueprint\s*\\\$table\)\s*\{)/", "$1$newColumns", $content);
 
-            // --- 5. INJECT PEMANGGILAN SQL & PERMISSION ---
             $sqlInvoke = "\n        \$sql = file_get_contents(__DIR__ . '/sql/{$sqlFileName}');\n        DB::unprepared(\$sql);";
 
             $permissionCode = "\n        \$actions = ['lookup', 'view', 'add', 'edit', 'delete'];\n        foreach (\$actions as \$action) {\n            Permission::firstOrCreate(['name' => \"{$schemaLower}.{\$action}.{$modelLower}\", 'guard_name' => 'api']);\n        }";
 
             if (!str_contains($content, 'Permission::firstOrCreate')) {
-                // Kita letakkan setelah penutup Schema::create agar tabel sudah ada saat procedure dibuat
                 $content = str_replace("});\n    }", "});\n{$sqlInvoke}\n{$permissionCode}\n    }", $content);
             }
 
-            // --- 6. REFACTOR DOWN METHOD ---
-            $downReplacement = "public function down(): void\n    {\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.push_{$modelLower}\");\n        Schema::dropIfExists('{$tempTableName}');\n        Schema::dropIfExists('{$fullTableName}');\n    }";
+            $downReplacement = "public function down(): void\n    {\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_action_{$modelLower}\");\n        Schema::dropIfExists('{$tempTableName}');\n        Schema::dropIfExists('{$fullTableName}');\n    }";
             $content = preg_replace("/public function down\(\): void\s*\{.*?Schema::dropIfExists\(.*?\);\s*\}/s", $downReplacement, $content);
 
-            // Simpan Perubahan
             File::put($latestFile->getRealPath(), $content);
 
             $this->line("Fixed Migration: <info>{$latestFile->getFilename()}</info>");
