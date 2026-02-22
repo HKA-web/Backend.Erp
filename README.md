@@ -133,7 +133,7 @@
 
 ## Spatie
 
-#### For permit processing, this program is built with spatie. For more details, please visit [Documentation](https://github.com/commitizen/cz-cli).
+#### For permit processing, this program is built with spatie. For more details, please visit [Documentation](https://spatie.be/docs/laravel-permission/v7/basic-usage/role-permissions).
 
 ## Example Execution With Tinker
 
