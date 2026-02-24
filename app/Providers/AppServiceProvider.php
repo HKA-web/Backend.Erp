@@ -32,12 +32,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Blueprint::macro('baseColumn', function () {
-            $this->boolean('enable')->default(true);
-            $this->boolean('is_removed')->default(false);
-            $this->boolean('readonly')->default(false);
             $this->jsonb('properties')->nullable();
-            $this->string('created_by')->nullable();
-            $this->string('updated_by')->nullable();
+            $this->boolean('enable')->default(true);
+            $this->boolean('readonly')->default(false);
+            $this->boolean('is_removed')->default(false);
+            $this->remoteForeign('created_by', 'authentication.user', 'user_id');
+            $this->remoteForeign('updated_by', 'authentication.user', 'user_id');
             $this->timestamps();
             $this->string('status')->default('DRAFT');
         });

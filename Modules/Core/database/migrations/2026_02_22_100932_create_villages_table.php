@@ -15,10 +15,19 @@ return new class extends Migration
     {
         Schema::createWithTemp('core.village', function (Blueprint $table) {
             $table->string('village_id')->primary();
-            $table->string('village_name');
             $table->remoteForeign('district_id', 'core.district', 'district_id');
+            $table->string('village_name');
             $table->baseColumn();
 
+        });
+
+        Schema::create('history.core_village', function (Blueprint $table) {
+            $table->uuid('history_id')->primary();
+            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('action');
+            $table->jsonb('old_data')->nullable();
+            $table->jsonb('new_data')->nullable();
+            $table->timestamp('executed_at')->useCurrent();
         });
 
         $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_214831_core.procedure_action_village.sql');

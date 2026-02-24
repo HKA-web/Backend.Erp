@@ -15,10 +15,26 @@ return new class extends Migration
     {
         Schema::createWithTemp('core.company', function (Blueprint $table) {
             $table->string('company_id')->primary();
+            $table->remoteForeign('province_id', 'core.province', 'province_id');
+            $table->remoteForeign('city_id', 'core.city', 'city_id');
+            $table->remoteForeign('district_id', 'core.district', 'district_id');
+            $table->remoteForeign('village_id', 'core.village', 'village_id');
             $table->string('company_name');
-
+            $table->string('email')->unique();
+            $table->string('phone');
+            $table->string('address');
+            $table->string('website');
             $table->baseColumn();
 
+        });
+
+        Schema::create('history.core_company', function (Blueprint $table) {
+            $table->uuid('history_id')->primary();
+            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('action');
+            $table->jsonb('old_data')->nullable();
+            $table->jsonb('new_data')->nullable();
+            $table->timestamp('executed_at')->useCurrent();
         });
 
         $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_215101_core.procedure_action_company.sql');

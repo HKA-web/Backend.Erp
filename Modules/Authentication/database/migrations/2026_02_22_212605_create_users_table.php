@@ -23,6 +23,15 @@ return new class extends Migration
             $table->baseColumn();
         });
 
+        Schema::create('history.user_history', function (Blueprint $table) {
+            $table->uuid('history_id')->primary();
+            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('action');
+            $table->jsonb('old_data')->nullable();
+            $table->jsonb('new_data')->nullable();
+            $table->timestamp('executed_at')->useCurrent();
+        });
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

@@ -16,9 +16,17 @@ return new class extends Migration
         Schema::createWithTemp('core.province', function (Blueprint $table) {
             $table->string('province_id')->primary();
             $table->string('province_name');
-
             $table->baseColumn();
 
+        });
+
+        Schema::create('history.core_province', function (Blueprint $table) {
+            $table->uuid('history_id')->primary();
+            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('action');
+            $table->jsonb('old_data')->nullable();
+            $table->jsonb('new_data')->nullable();
+            $table->timestamp('executed_at')->useCurrent();
         });
 
         $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_213729_core.procedure_action_province.sql');

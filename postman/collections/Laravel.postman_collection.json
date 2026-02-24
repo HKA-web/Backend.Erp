@@ -785,6 +785,77 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "dictionary",
+          "id": "91d5b330-0a9c-4996-9f57-16093b522007",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|rLRuSixoIJc1AVsYvWllCaCKSjcaC7qwXKhwx6144d1c5523",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/dictionary",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "dictionary"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",true]",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.province",
+                  "uuid": "82c59d3c-b603-42d1-b38a-4c43a74da54b",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "district_name,city.city_name,city.province.province_name",
+                  "uuid": "bf15e7d0-7ecf-48cc-ad98-8874ffcefcc8",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "id": "22bf4f46-78d9-4b1f-ae22-5a79c0948ca0"
