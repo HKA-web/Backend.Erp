@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::createWithTemp('core.city', function (Blueprint $table) {
-            $table->string('city_id')->primary();
-            $table->remoteForeign('province_id', 'core.province', 'province_id');
-            $table->string('city_name');
+        Schema::createWithTemp('core.dictionary', function (Blueprint $table) {
+            $table->string('dictionary_id')->primary();
+            $table->string('dictionary_name');
+
             $table->baseColumn();
 
         });
 
-        Schema::create('history.core_city', function (Blueprint $table) {
+        Schema::create('history.dictionary_history', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
@@ -30,12 +30,12 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_214419_core.procedure_action_city.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130157_core.procedures_dictionary.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
         foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.city", 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => "core.{$action}.dictionary", 'guard_name' => 'api']);
         }
     }
 
@@ -44,8 +44,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_action_city");
-        Schema::dropIfExists('temporary.core_city');
-        Schema::dropIfExists('core.city');
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_dictionary_draft");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_dictionary");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_dictionary");
+        Schema::dropIfExists('history.dictionary_history');
+        Schema::dropIfExists('temporary.core_dictionary');
+        Schema::dropIfExists('core.dictionary');
     }
 };

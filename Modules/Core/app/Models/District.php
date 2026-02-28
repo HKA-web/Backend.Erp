@@ -4,6 +4,7 @@ namespace Modules\Core\Models;
 
 use App\Traits\BaseModel;
 use App\Traits\SerializableDate;
+use App\Traits\SoftDelete;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -13,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class District extends Model
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel, SoftDelete;
 
     protected $connection = 'pgsql';
     protected $table = 'core.district';
@@ -34,7 +35,7 @@ class District extends Model
         return $this->belongsTo(City::class, 'city_id', 'city_id');
     }
 
-    public function district()
+    public function village()
     {
         return $this->hasMany(Village::class, 'district_id', 'district_id');
     }

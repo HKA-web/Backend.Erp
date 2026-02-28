@@ -4,13 +4,13 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\CompanyRequest;
 use Modules\Core\Models\Company;
+use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
     /**
-     * Display a listing of the resource with ERP filtering & sorting.
+     * Display a listing of final posted resources.
      */
     public function index()
     {
@@ -20,23 +20,7 @@ class CompanyController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage (Draft or Posted).
-     */
-    public function store(CompanyRequest $request, BaseStaging $staging)
-    {
-        return $this->erpExecution(function () use ($staging, $request) {
-
-            $staging->executeStaging('core.procedure_action_company', $request->validated());
-
-            return $this->erpResponse(
-                message: "Company {$request->company_name} Successfully Processed."
-            );
-
-        }, "Failed to process Company.");
-    }
-
-    /**
-     * Show the specified resource.
+     * Show the specified final resource.
      */
     public function show($id)
     {
@@ -47,47 +31,38 @@ class CompanyController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Action to pull Master data into Draft for revision.
+     * POST /v1/{{model_plural_lower}}/{id}/revise
      */
-    public function update(CompanyRequest $request, $id, BaseStaging $staging)
+    public function revise($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($staging, $id) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
+            $staging->executeStaging('core.procedure_revise_company', [
                 'company_id' => $id
             ]);
 
-            $staging->executeStaging('core.procedure_action_company', $payload);
-
             return $this->erpResponse(
-                message: "Company {$id} ready for editing."
+                message: "Company {$id} has been moved to drafts for revision."
             );
-
-        }, 'Failed to update Company.');
+        }, "Failed to initiate revision for Company.");
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (Encapsulated logic in BaseStaging).
+     * DELETE /v1/{{model_plural_lower}}/{id}
      */
-    public function destroy(CompanyRequest $request, $id, BaseStaging $staging)
+    public function destroy($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($id, $staging) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
-                'company_id' => $id,
-                'is_removed' => true
-            ]);
-
-            $staging->executeStaging('core.procedure_action_company', $payload);
+            // Logika pengecekan trait & eksekusi SP ada di dalam sini
+            $staging->requestDelete(Company::class, $id, 'core.procedure_upsert_company_draft');
 
             return $this->erpResponse(
-                message: "Company {$id} ready for delete."
+                message: "Delete request for Company {$id} processed according to model policy."
             );
 
-        }, 'Failed to delete Company.');
+        }, "Failed to process delete request for Company.");
     }
 }

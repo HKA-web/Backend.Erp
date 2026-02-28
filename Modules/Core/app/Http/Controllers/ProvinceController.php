@@ -4,13 +4,13 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\ProvinceRequest;
 use Modules\Core\Models\Province;
+use Illuminate\Http\Request;
 
 class ProvinceController extends Controller
 {
     /**
-     * Display a listing of the resource with ERP filtering & sorting.
+     * Display a listing of final posted resources.
      */
     public function index()
     {
@@ -20,23 +20,7 @@ class ProvinceController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage (Draft or Posted).
-     */
-    public function store(ProvinceRequest $request, BaseStaging $staging)
-    {
-        return $this->erpExecution(function () use ($staging, $request) {
-
-            $staging->executeStaging('core.procedure_action_province', $request->validated());
-
-            return $this->erpResponse(
-                message: "Province {$request->province_name} Successfully Processed."
-            );
-
-        }, "Failed to process Province.");
-    }
-
-    /**
-     * Show the specified resource.
+     * Show the specified final resource.
      */
     public function show($id)
     {
@@ -47,47 +31,38 @@ class ProvinceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Action to pull Master data into Draft for revision.
+     * POST /v1/{{model_plural_lower}}/{id}/revise
      */
-    public function update(ProvinceRequest $request, $id, BaseStaging $staging)
+    public function revise($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($staging, $id) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
+            $staging->executeStaging('core.procedure_revise_province', [
                 'province_id' => $id
             ]);
 
-            $staging->executeStaging('core.procedure_action_province', $payload);
-
             return $this->erpResponse(
-                message: "Province {$id} ready for editing."
+                message: "Province {$id} has been moved to drafts for revision."
             );
-
-        }, 'Failed to update Province.');
+        }, "Failed to initiate revision for Province.");
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (Encapsulated logic in BaseStaging).
+     * DELETE /v1/{{model_plural_lower}}/{id}
      */
-    public function destroy(ProvinceRequest $request, $id, BaseStaging $staging)
+    public function destroy($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($id, $staging) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
-                'province_id' => $id,
-                'is_removed' => true
-            ]);
-
-            $staging->executeStaging('core.procedure_action_province', $payload);
+            // Logika pengecekan trait & eksekusi SP ada di dalam sini
+            $staging->requestDelete(Province::class, $id, 'core.procedure_upsert_province_draft');
 
             return $this->erpResponse(
-                message: "Province {$id} ready for delete."
+                message: "Delete request for Province {$id} processed according to model policy."
             );
 
-        }, 'Failed to delete Province.');
+        }, "Failed to process delete request for Province.");
     }
 }

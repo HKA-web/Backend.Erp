@@ -416,7 +416,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a",
+                  "value": "6|uU4IrNcjjHD8GRSqyRroyk7WgUJL0oxwcPJq7lzA421f4b7a",
                   "type": "string"
                 }
               ]
@@ -439,21 +439,18 @@
               "formdata": [
                 {
                   "key": "company_id",
-                  "value": "002",
-                  "type": "text",
-                  "disabled": true
+                  "value": "001",
+                  "type": "text"
                 },
                 {
                   "key": "company_name",
-                  "value": "coba2 update",
-                  "type": "text",
-                  "disabled": true
+                  "value": "Company 1",
+                  "type": "text"
                 },
                 {
                   "key": "status",
                   "value": "POSTED",
-                  "type": "text",
-                  "disabled": true
+                  "type": "text"
                 }
               ]
             },
@@ -850,6 +847,169 @@
                   "key": "fields",
                   "value": "district_name,city.city_name,city.province.province_name",
                   "uuid": "bf15e7d0-7ecf-48cc-ad98-8874ffcefcc8",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "dictionary store",
+          "id": "7adcf4a3-6a2f-400f-8065-6dd3e2b3a7cb",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "4|r5g4xwtmxUh5nVdztzRz3Ke7rUHkrDj8aDHssDEIb5693c86",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129701",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "dictionary_id",
+                  "value": "002",
+                  "type": "text"
+                },
+                {
+                  "key": "dictionary_name",
+                  "value": "coba 3",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "DRAFT",
+                  "type": "text"
+                },
+                {
+                  "key": "key",
+                  "value": "-",
+                  "type": "text",
+                  "uuid": "cdcad023-f87e-44ed-af76-e53b782572cc"
+                },
+                {
+                  "key": "company_id",
+                  "value": "A001",
+                  "type": "text",
+                  "uuid": "9b4ec4ea-e3ee-4825-a92b-fb36aaf2ce2b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/dictionary",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "dictionary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "dictionary edit",
+          "id": "3c892bd3-558f-402c-a485-e034d0640006",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "7|9TDbrFLo1golD4pVP25veHScZJNjllyZccOW0eq14cdd56c6",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-session-id",
+                "value": "ce4c06dc-4799-40d1-bfbe-37fc18129702",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"EDIT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/core/dictionary/001",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "dictionary",
+                "001"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter",
+                  "value": "[\"is_removed\",\"=\",false]",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "company__name,enable",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "city,city.district",
                   "disabled": true
                 }
               ]

@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::createWithTemp('core.village', function (Blueprint $table) {
-            $table->string('village_id')->primary();
-            $table->remoteForeign('district_id', 'core.district', 'district_id');
-            $table->string('village_name');
+        Schema::createWithTemp('core.province', function (Blueprint $table) {
+            $table->string('province_id')->primary();
+            $table->string('province_name');
+
             $table->baseColumn();
 
         });
 
-        Schema::create('history.core_village', function (Blueprint $table) {
+        Schema::create('history.province_history', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
@@ -30,12 +30,12 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_214831_core.procedure_action_village.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130116_core.procedures_province.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
         foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.village", 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => "core.{$action}.province", 'guard_name' => 'api']);
         }
     }
 
@@ -44,8 +44,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_action_village");
-        Schema::dropIfExists('temporary.core_village');
-        Schema::dropIfExists('core.village');
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_province_draft");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_province");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_province");
+        Schema::dropIfExists('history.province_history');
+        Schema::dropIfExists('temporary.core_province');
+        Schema::dropIfExists('core.province');
     }
 };

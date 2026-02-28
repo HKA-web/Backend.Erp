@@ -1,0 +1,95 @@
+<?php
+
+namespace Modules\{{module}}\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Services\BaseStaging;
+use Modules\{{module}}\Http\Requests\{{model}}Request;
+use Illuminate\Support\Facades\DB;
+
+class {{model}}DraftController extends Controller
+{
+    /**
+     * Display all active drafts in the temporary table for current session.
+     */
+    public function index()
+    {
+        return $this->erpExecution(function () {
+            // Membaca langsung dari tabel temporary
+            $query = DB::table('temporary.{{module_lower}}_{{model_lower}}');
+            return $this->erpResponse($query);
+        });
+    }
+
+    /**
+     * Save a new draft.
+     */
+    public function store({{model}}Request $request, BaseStaging $staging)
+    {
+        return $this->erpExecution(function () use ($staging, $request) {
+            $staging->executeStaging('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $request->validated());
+
+            return $this->erpResponse(
+                message: "Draft {{model}} saved successfully."
+            );
+        });
+    }
+
+    /**
+     * Show draft details from temporary table.
+     */
+    public function show($id)
+    {
+        return $this->erpExecution(function () use ($id) {
+            $draft = DB::table('temporary.{{module_lower}}_{{model_lower}}')
+                ->where('{{model_lower}}_id', $id);
+
+            return $this->erpResponse($draft);
+        });
+    }
+
+    /**
+     * Update existing draft in temporary table.
+     */
+    public function update({{model}}Request $request, $id, BaseStaging $staging)
+    {
+        return $this->erpExecution(function () use ($staging, $request, $id) {
+            $payload = array_merge($request->validated(), ['{{model_lower}}_id' => $id]);
+
+            $staging->executeStaging('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $payload);
+
+            return $this->erpResponse(message: "Draft updated.");
+        });
+    }
+
+    /**
+     * Discard draft (Delete from temporary).
+     */
+    public function destroy($id)
+    {
+        return $this->erpExecution(function () use ($id) {
+            DB::table('temporary.{{module_lower}}_{{model_lower}}')
+                ->where('{{model_lower}}_id', $id)
+                ->delete();
+
+            return $this->erpResponse(message: "Draft discarded.");
+        });
+    }
+
+    /**
+     * Final Action: Commit Draft to Master.
+     * POST /v1/{{model_lower}}-drafts/{id}/commit
+     */
+    public function commit($id, BaseStaging $staging)
+    {
+        return $this->erpExecution(function () use ($staging, $id) {
+            $payload = ['{{model_lower}}_id' => $id];
+
+            $staging->executeStaging('{{module_lower}}.procedure_commit_{{model_lower}}', $payload);
+
+            return $this->erpResponse(
+                message: "{{model}} committed to master successfully."
+            );
+        }, "Failed to commit draft.");
+    }
+}

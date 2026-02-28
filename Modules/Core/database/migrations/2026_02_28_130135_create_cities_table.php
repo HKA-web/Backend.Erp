@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::createWithTemp('core.district', function (Blueprint $table) {
-            $table->string('district_id')->primary();
-            $table->remoteForeign('city_id', 'core.city', 'city_id');
-            $table->string('district_name');
+        Schema::createWithTemp('core.city', function (Blueprint $table) {
+            $table->string('city_id')->primary();
+            $table->string('city_name');
+            $table->remoteForeign('province_id', 'core.province', 'province_id');
             $table->baseColumn();
 
         });
 
-        Schema::create('history.core_district', function (Blueprint $table) {
+        Schema::create('history.city_history', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
@@ -30,12 +30,12 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_214655_core.procedure_action_district.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130136_core.procedures_city.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
         foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.district", 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => "core.{$action}.city", 'guard_name' => 'api']);
         }
     }
 
@@ -44,8 +44,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_action_district");
-        Schema::dropIfExists('temporary.core_district');
-        Schema::dropIfExists('core.district');
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_city_draft");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_city");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_city");
+        Schema::dropIfExists('history.city_history');
+        Schema::dropIfExists('temporary.core_city');
+        Schema::dropIfExists('core.city');
     }
 };

@@ -1,56 +1,53 @@
 <?php
+
 namespace App\Services;
 
+use App\Traits\SoftDelete;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BaseStaging
 {
     /**
-     * Jalankan proses Staging ke Master
-     * * @param string $tempTable Nama tabel temporary (e.g., temporary.core_village)
-     * @param string $procedureName Nama prosedur (e.g., core.commit_village)
-     * @param array $data Data dari request
+     * Menjalankan Stored Procedure dengan otomatisasi session dan user_id.
      */
-    public function process(string $tempTable, string $procedureName, array $data)
+    public function executeStaging(string $procedureName, array $payload)
     {
-        return DB::transaction(function () use ($tempTable, $procedureName, $data) {
-            // 1. Generate atau ambil Session ID
-            $sessionId = request()->header('x-session-id', (string) Str::uuid());
+        // 1. Ambil Session ID (Misal dari Session Laravel atau Header)
+        $sessionId = request()->header('X-Session-ID') ?? Str::uuid()->toString();
 
-            // 2. Insert ke Tabel Temporary
-            // Kita gunakan DB table agar fleksibel tanpa Model khusus
-            DB::table($tempTable)->insert(array_merge($data, [
-                'session_id' => $sessionId,
-            ]));
+        // 2. Suntikkan User ID ke dalam payload untuk audit history di SP
+        $payload['user_id'] = Auth::id();
 
-            // 3. Panggil Stored Procedure
-            // PostgreSQL menggunakan CALL untuk procedure
-            try {
-                DB::statement("CALL {$procedureName}(?)", [$sessionId]);
-            } catch (\Exception $e) {
-                // Lempar kembali agar transaksi rollback
-                throw new \Exception("Database Procedure Error: " . $e->getMessage());
-            }
-
-            return [
-                'status' => 'success',
-                'session_id' => $sessionId
-            ];
-        });
-    }
-
-    public function executeStaging(string $procedureName, array $data)
-    {
-        $sessionId = request()->header('x-session-id');
-
-        if (!$sessionId) {
-            throw new \Exception("x-session-id is required.", 400);
-        }
-
+        // 3. Eksekusi Procedure
         return DB::statement("CALL {$procedureName}(?, ?)", [
             $sessionId,
-            json_encode($data)
+            json_encode($payload)
         ]);
+    }
+
+    /**
+     * Logika cerdas untuk menghapus data berdasarkan kebijakan model (Trait).
+     */
+    public function requestDelete($modelClass, $id, $procedureName)
+    {
+        $model = new $modelClass;
+        $primaryKey = $model->getKeyName() ?? "{$this->model_lower}_id";
+
+        // CEK: Apakah Model menggunakan Trait SoftDeletesStaging
+        $traits = class_uses_recursive($model);
+        $hasStagingTrait = in_array(SoftDelete::class, $traits);
+
+        if ($hasStagingTrait) {
+            // JIKA PAKAI TRAIT: Masukkan ke Staging (is_removed = true)
+            return $this->executeStaging($procedureName, [
+                $primaryKey  => $id,
+                'is_removed' => true
+            ]);
+        }
+
+        // JIKA TIDAK PAKAI TRAIT: Hard Delete Langsung di Master
+        return $model->where($primaryKey, $id)->delete();
     }
 }

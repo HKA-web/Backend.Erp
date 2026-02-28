@@ -1,3 +1,12 @@
+
+# Change Language
+
+[🇮🇩 Indonesia](README.id.md)
+
+---
+
+# 🚀 ERP Backend – Enterprise Modular Architecture
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
@@ -7,240 +16,311 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-# Change Language
-
-[🇮🇩 Bahasa Indonesia](README.id.md)
-
 ---
-## Laravel Module
 
-#### This program is designed with a modular concept. For more details, please visit [Documentation](https://laravelmodules.com/docs/12/advanced/artisan-commands#modulemigrate).
+# 📚 Table of Contents
 
----
-# Workflow
-
-### API Endpoint (POST `/store`)
-
-Called by the Frontend.
-
-### Laravel
-
-Laravel is only responsible for:
-
-* Performing basic input validation (e.g., “name cannot be empty”).
-* Inserting the validated data into a temporary table.
-* Calling example procedure `CALL core.procedure_commit()`.
+* [Overview](#-overview)
+* [Architecture](#-architecture)
+* [Workflow](#-workflow)
+* [API Structure](#-api-structure)
+* [Database Flow](#-database-flow)
+* [Why This Architecture?](#-why-this-architecture)
+* [Installation](#-installation)
+* [Creating New Modules](#-creating-new-modules)
+* [Permission Management](#-permission-management)
+* [API Documentation](#-api-documentation)
 
 ---
 
-## Inside the Procedure (SQL)
+# 🧭 Overview
 
-1. The SQL procedure retrieves the data from the temporary table.
-2. SQL checks the status:
+This project is built using a **fully modular architecture**.
 
-    * “Is this `DRAFT` or `POSTED`?”
-3. If the status is `POSTED`, SQL performs an `INSERT` into the Master table.
+Core principles:
 
----
+* Separation between **Master (Posted Data)** and **Draft (Temporary Workspace)**
+* Business logic handled at **database level (Triggers & Stored Procedures)**
+* Laravel acts as:
 
-## Inside the Master Table (Trigger)
-
-As soon as an `INSERT` (or status `UPDATE`) occurs:
-
-The trigger immediately fires and says:
-
-> “New data detected! Execute balance calculation, create journal entries, and update stock.”
+    * Validator
+    * Orchestrator
+    * API responder
 
 ---
 
-## Finish
+# 🏗 Architecture
 
-1. The database returns an `"OK"` signal to Laravel.
-2. Laravel sends a success JSON response back to the user.
+## Master–Draft Pattern + remoteForeign Support
+
+* ✅ Master & Draft schema separation
+* ✅ Cross-schema relationship using `remoteForeign`
+* ✅ All Master modifications via Stored Procedures
+* ✅ Audit-friendly & workflow-ready
+
+---
+
+## 🧩 High-Level Architecture Diagram
+
+![Architecture Diagram](public/documentation/arcitecture-diagram.png)
 
 ---
 
-# Main Advantage for You (As a Maintainer)
+# 🔄 Workflow
 
-With this architecture, if one day your boss says:
+## API Endpoint Example
 
-> “From now on, whenever we save a Village, please automatically create data in the `Region` table as well.”
+`POST /store`
 
-Then:
+### Laravel Responsibilities
 
-* You DO NOT need to open VS Code.
-* You DO NOT need to modify the PHP Controller or Service.
-* You DO NOT need to redeploy the application.
+* Validate input
+* Store validated data into temporary table
+* Execute stored procedure:
 
-You ONLY need to:
-
-* Open pgAdmin.
-* Add one `INSERT` statement inside the Trigger or Procedure.
-
-Done.
+```sql
+CALL core.procedure_commit();
+```
 
 ---
-## Getting Started
 
-### Prerequisites
+## Database Responsibilities
 
--   PHP 8.2 or higher
--   Composer
--   Laravel 12.x
--   PgSQL or any other supported database
-  
-### Installation
+When an `INSERT` or status update occurs:
 
-1. **Clone the repository:**
+Trigger automatically executes:
 
-    ```bash
-    https://github.com/HKA-web/Backend.Erp.git {project_name}
-    ```
-
-2. **Navigate to the project directory:**
-
-    ```bash
-    cd {project_name}
-    ```
-
-3. **Install dependencies:**
-
-    ```bash
-    composer install --prefer-dist
-    ```
-
-4. **Set up environment variables:**
-
-   Copy the `.env.example` file to `.env` and configure your database settings.
-
-    ```bash
-    cp .env.example .env
-    ```
-
-5. **Generate application key:**
-
-    ```bash
-    php artisan key:generate
-    ```
-
-6. **Run migrations:**
-
-    ```bash
-    php artisan migrate
-    ```
-
-7. **Seed the database (optional):**
-
-    ```bash
-    php artisan db:seed
-    ``` 
-
-8. **Running:**
-
-    ```bash
-    php artisan serve
-    ``` 
-
-### Crete New Features
-
-1. **Make Module:**
-
-    ```bash
-    php artisan erp:make-module {module}
-    ```
-
-2. **Make Model:**
-
-    ```bash
-    php artisan erp:make-model {model} {module}
-    ```
-
-3. **Migrate Module:**
-
-    ```bash
-    php artisan module:migrate {module}
-    ```
-
-4. **Migrate Procedure:**
-
-   Excecution query file to `Modules/{module}/database/migrations/sql/xxxx_xx_xx_xxxxxx_{modul}.procedure_action_{model}.sql`.
-
-    ```bash
-    php artisan module:migrate {module}
-    ```
-
-5. **Set up routes:**
-
-   Add route in file `{module}/routes/api` and configure your route settings.
-
-    ```bash
-    Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-      Route::apiResource('{module}/{model}', {model}Controller::class)->names('{module}-{model}');
-    });
-    ```
-      
-5. **Config Seed:**
-
-    Add seeder in file `{module}/databases/seeders` and configure your seeder.
-
-    ```bash
-   {model}::factory()->create();
-    ```
-
-6. **Seed the database (optional):**
-
-    ```bash
-    php artisan module:seed {module}
-    ```
-   
-6. **Clear Cache:**
-
-    ```bash
-    php artisan config:clear
-    php artisan permission:cache-reset
-    php artisan config:cache
-    php artisan optimize:clear
-    ```
-   
----
-## Spatie
-
-#### For permit processing, this program is built with spatie. For more details, please visit [Documentation](https://spatie.be/docs/laravel-permission/v7/basic-usage/role-permissions).
-
-## Example Execution With Tinker
-
-1. **Open tinker:**
-
-    ```bash
-    php artisan tinker
-    ```
-
-2. **Import:**
-
-    ```bash
-    use Modules\Authentication\Models\User;
-    use Spatie\Permission\Models\Role;
-    use Spatie\Permission\Models\Permission;
-    ```
-
-3. **Spatie Add User To Role:**
-
-    ```bash
-    $user = User::where('email', 'admin@email.com')->first();
-    $user->assignRole('admin');
-    ```
-
-4. **Spatie Add Permission To Role:**
-
-    ```bash
-    $role = Role::findByName('admin', 'api');
-    $role->givePermissionTo('edit-user');
-    $role->givePermissionTo(['create-post', 'delete-post']);
-    ```
+> "New data detected → calculate balance → create journal → update stock."
 
 ---
-# Documentation API
 
-#### import collection file `Laravel.postman_collection.json` inside folder `postman/collections/`.
+## Final Flow
+
+1. Database returns **OK**
+2. Laravel returns JSON success response
 
 ---
+
+# 📦 Example Module
+
+Example generated module:
+
+* Module: `Core`
+* Model: `Dictionary`
+* Master Table: `core.dictionaries`
+* Temporary Table: `temporary.core_dictionary`
+
+---
+
+# 🏛 API Structure
+
+---
+
+## 1️⃣ Master Resource (Official / Posted Data)
+
+🔒 No direct edits allowed.
+
+| Method | Endpoint                       | Description          |
+| ------ | ------------------------------ | -------------------- |
+| GET    | `/v1/dictionaries`             | List POSTED data     |
+| GET    | `/v1/dictionaries/{id}`        | View official detail |
+| POST   | `/v1/dictionaries/{id}/revise` | Lock & copy to Draft |
+| DELETE | `/v1/dictionaries/{id}`        | Request deletion     |
+
+---
+
+## 2️⃣ Draft Resource (Workspace / Sandbox)
+
+| Method | Endpoint                            | Description   |
+| ------ | ----------------------------------- | ------------- |
+| GET    | `/v1/dictionary-drafts`             | List drafts   |
+| POST   | `/v1/dictionary-drafts`             | Create draft  |
+| GET    | `/v1/dictionary-drafts/{id}`        | Draft detail  |
+| PUT    | `/v1/dictionary-drafts/{id}`        | Update draft  |
+| DELETE | `/v1/dictionary-drafts/{id}`        | Discard draft |
+| POST   | `/v1/dictionary-drafts/{id}/commit` | Finalize      |
+
+---
+
+# 🧠 Database Flow
+
+## ✏️ Edit Flow
+
+![Edit Flow Diagram](public/documentation/edit-flow-diagram.png)
+
+---
+
+## 🗑 Delete Flow
+
+![Delete Flow Diagram](public/documentation/delete-flow-diagram.png)
+
+---
+
+# 🎯 Why This Architecture?
+
+* ✅ Zero direct edits to Master
+* ✅ Fully auditable
+* ✅ Supports approval workflow
+* ✅ Multi-user safe
+* ✅ Database-driven business rules
+* ✅ No redeploy needed for business logic changes
+
+---
+
+# 💼 Real Enterprise Advantage
+
+If your manager says:
+
+> “Every time we save a Village, automatically create a Region record.”
+
+You DO NOT need to:
+
+* Modify Controller
+* Change Service layer
+* Redeploy the app
+
+You ONLY:
+
+1. Open pgAdmin
+2. Modify Trigger or Procedure
+3. Done.
+
+---
+
+# 🚀 Installation
+
+## Requirements
+
+* PHP 8.2+
+* Composer
+* Laravel 12.x
+* PostgreSQL
+
+---
+
+## Setup
+
+Clone repository:
+
+```bash
+git clone https://github.com/HKA-web/Backend.Erp.git {project_name}
+```
+
+Enter project:
+
+```bash
+cd {project_name}
+```
+
+Install dependencies:
+
+```bash
+composer install --prefer-dist
+```
+
+Setup environment:
+
+```bash
+cp .env.example .env
+```
+
+Generate key:
+
+```bash
+php artisan key:generate
+```
+
+Run migration:
+
+```bash
+php artisan migrate
+```
+
+Run server:
+
+```bash
+php artisan serve
+```
+
+---
+
+# 🛠 Creating New Modules
+
+Create module:
+
+```bash
+php artisan erp:make-module {module}
+```
+
+Create model:
+
+```bash
+php artisan erp:make-model {model} {module}
+```
+
+Run module migration:
+
+```bash
+php artisan module:migrate {module}
+```
+
+---
+
+## Configure Routes
+
+```php
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+    Route::apiResource('{module}/{model}', {model}Controller::class)
+        ->names('{module}-{model}');
+});
+```
+
+---
+
+# 🔐 Permission Management
+
+This project uses **Spatie Laravel Permission**.
+
+Example:
+
+```php
+$user->assignRole('admin');
+$role->givePermissionTo('edit-user');
+```
+
+---
+
+# 📄 API Documentation
+
+Import Postman collection from:
+
+```
+postman/collections/Laravel.postman_collection.json
+```
+
+---
+
+# 🏁 Status Lifecycle
+
+![Lifecycle Diagram](public/documentation/lifecycle-diagram.png)
+
+---
+
+# 🏢 Designed For
+
+* ERP Systems
+* Enterprise Applications
+* Financial Systems
+* Audit-sensitive environments
+* Multi-user transactional systems
+
+---
+
+Kalau kamu mau, next level kita bisa bikin:
+
+* 🔥 README versi SaaS Product Style
+* 📊 Architecture diagram versi Clean Architecture
+* 🧠 Whitepaper PDF untuk presentasi ke manajemen
+* 🏗 Visual database schema diagram
+
+Kamu mau naik ke level mana sekarang? 🚀

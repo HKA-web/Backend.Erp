@@ -1,3 +1,11 @@
+# Ubah Bahasa
+
+[🇺🇸 English](README.md)
+
+---
+
+# 🚀 ERP Backend – Arsitektur Modular Enterprise
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
@@ -7,140 +15,229 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-
-# Ganti Bahasa
-
-[🇺🇸 English](README.md)
+Backend modular kelas enterprise yang dibangun dengan Laravel dan PostgreSQL menggunakan **Pola Master–Draft**, Stored Procedure, dan logika bisnis berbasis database.
 
 ---
 
-# Laravel Module
+# 📚 Daftar Isi
 
-#### Program ini dirancang dengan konsep modular. Untuk detail lebih lanjut, silakan kunjungi [Documentation](https://laravelmodules.com/docs/12/advanced/artisan-commands#modulemigrate).
-
----
-
-# Alur Kerja
-
-### API Endpoint (POST `/store`)
-
-Dipanggil oleh Frontend.
-
-### Laravel
-
-Laravel hanya bertugas untuk:
-
-* Melakukan validasi input dasar (misalnya: “nama tidak boleh kosong”).
-* Menyimpan data yang sudah divalidasi ke tabel temporary.
-* Memanggil contoh procedure `CALL core.procedure_commit()`.
+* [Ringkasan](#-ringkasan)
+* [Arsitektur](#-arsitektur)
+* [Alur Kerja](#-alur-kerja)
+* [Struktur API](#-struktur-api)
+* [Alur Database](#-alur-database)
+* [Mengapa Arsitektur Ini?](#-mengapa-arsitektur-ini)
+* [Instalasi](#-instalasi)
+* [Membuat Modul Baru](#-membuat-modul-baru)
+* [Manajemen Permission](#-manajemen-permission)
+* [Dokumentasi API](#-dokumentasi-api)
 
 ---
 
-## Di Dalam Procedure (SQL)
+# 🧭 Ringkasan
 
-1. Procedure SQL mengambil data dari tabel temporary.
-2. SQL mengecek status:
+Proyek ini dibangun menggunakan **arsitektur modular penuh**.
 
-    * “Apakah ini `DRAFT` atau `POSTED`?”
-3. Jika status adalah `POSTED`, SQL akan melakukan `INSERT` ke tabel Master.
+Prinsip utama:
 
----
+* Pemisahan antara **Master (Data Posted)** dan **Draft (Ruang Kerja Sementara)**
+* Logika bisnis ditangani di **level database (Trigger & Stored Procedure)**
+* Laravel berperan sebagai:
 
-## Di Dalam Tabel Master (Trigger)
-
-Begitu terjadi `INSERT` (atau perubahan status melalui `UPDATE`):
-
-Trigger akan langsung berjalan dan mengeksekusi:
-
-> “Data baru terdeteksi! Jalankan perhitungan saldo, buat jurnal, dan perbarui stok.”
+    * Validator
+    * Orkestrator
+    * Pemberi respons API
 
 ---
 
-## Selesai
+# 🏗 Arsitektur
 
-1. Database mengembalikan sinyal `"OK"` ke Laravel.
-2. Laravel mengirimkan respons JSON sukses ke pengguna.
+## Pola Master–Draft + Dukungan remoteForeign
 
----
-
-# Keuntungan Utama untuk Anda (Sebagai Maintainer)
-
-Dengan arsitektur ini, jika suatu hari atasan Anda mengatakan:
-
-> “Mulai sekarang, setiap kali menyimpan Village, tolong otomatis buatkan data di tabel `Region` juga.”
-
-Maka:
-
-* Anda TIDAK perlu membuka VS Code.
-* Anda TIDAK perlu mengubah Controller atau Service di PHP.
-* Anda TIDAK perlu melakukan deploy ulang aplikasi.
-
-Anda HANYA perlu:
-
-* Membuka pgAdmin.
-* Menambahkan satu statement `INSERT` di dalam Trigger atau Procedure.
-
-Selesai.
-
----
-# Memulai
-
-## Prasyarat
-
-* PHP 8.2 atau lebih tinggi
-* Composer
-* Laravel 12.x
-* PgSQL atau database lain yang didukung
+* ✅ Pemisahan skema Master & Draft
+* ✅ Relasi lintas skema menggunakan `remoteForeign`
+* ✅ Semua perubahan Master melalui Stored Procedure
+* ✅ Ramah audit & siap workflow
 
 ---
 
-## Instalasi
+## 🧩 Diagram Arsitektur Tingkat Tinggi
 
-1. **Clone repository:**
+![Architecture Diagram](public/documentation/arcitecture-diagram.png)
 
-```bash
-https://github.com/HKA-web/Backend.Erp.git {project_name}
+---
+
+# 🔄 Alur Kerja
+
+## Contoh Endpoint API
+
+`POST /store`
+
+### Tanggung Jawab Laravel
+
+* Validasi input
+* Simpan data tervalidasi ke tabel sementara
+* Jalankan stored procedure:
+
+```sql
+CALL core.procedure_commit();
 ```
 
-2. **Masuk ke direktori project:**
+---
+
+## Tanggung Jawab Database
+
+Ketika terjadi `INSERT` atau pembaruan status:
+
+Trigger akan otomatis menjalankan:
+
+> "Data baru terdeteksi → hitung saldo → buat jurnal → perbarui stok."
+
+---
+
+## Alur Akhir
+
+1. Database mengembalikan **OK**
+2. Laravel mengembalikan respons sukses dalam bentuk JSON
+
+---
+
+# 📦 Contoh Modul
+
+Contoh modul yang dihasilkan:
+
+* Modul: `Core`
+* Model: `Dictionary`
+* Tabel Master: `core.dictionaries`
+* Tabel Sementara: `temporary.core_dictionary`
+
+---
+
+# 🏛 Struktur API
+
+---
+
+## 1️⃣ Resource Master (Data Resmi / Posted)
+
+🔒 Tidak diperbolehkan edit langsung.
+
+| Method | Endpoint                       | Deskripsi              |
+| ------ | ------------------------------ | ---------------------- |
+| GET    | `/v1/dictionaries`             | Daftar data POSTED     |
+| GET    | `/v1/dictionaries/{id}`        | Lihat detail resmi     |
+| POST   | `/v1/dictionaries/{id}/revise` | Kunci & salin ke Draft |
+| DELETE | `/v1/dictionaries/{id}`        | Ajukan penghapusan     |
+
+---
+
+## 2️⃣ Resource Draft (Workspace / Sandbox)
+
+| Method | Endpoint                            | Deskripsi      |
+| ------ | ----------------------------------- | -------------- |
+| GET    | `/v1/dictionary-drafts`             | Daftar draft   |
+| POST   | `/v1/dictionary-drafts`             | Buat draft     |
+| GET    | `/v1/dictionary-drafts/{id}`        | Detail draft   |
+| PUT    | `/v1/dictionary-drafts/{id}`        | Perbarui draft |
+| DELETE | `/v1/dictionary-drafts/{id}`        | Buang draft    |
+| POST   | `/v1/dictionary-drafts/{id}/commit` | Finalisasi     |
+
+---
+
+# 🧠 Alur Database
+
+## ✏️ Alur Edit
+
+![Edit Flow Diagram](public/documentation/edit-flow-diagram.png)
+
+---
+
+## 🗑 Alur Hapus
+
+![Delete Flow Diagram](public/documentation/delete-flow-diagram.png)
+
+---
+
+# 🎯 Mengapa Arsitektur Ini?
+
+* ✅ Tidak ada edit langsung ke Master
+* ✅ Sepenuhnya dapat diaudit
+* ✅ Mendukung approval workflow
+* ✅ Aman untuk multi-user
+* ✅ Aturan bisnis berbasis database
+* ✅ Tidak perlu redeploy untuk perubahan logika bisnis
+
+---
+
+# 💼 Keunggulan Enterprise Nyata
+
+Jika manajer Anda berkata:
+
+> “Setiap kali kita menyimpan Village, otomatis buat record Region.”
+
+Anda TIDAK perlu:
+
+* Mengubah Controller
+* Mengubah Service layer
+* Redeploy aplikasi
+
+Anda HANYA:
+
+1. Buka pgAdmin
+2. Ubah Trigger atau Procedure
+3. Selesai.
+
+---
+
+# 🚀 Instalasi
+
+## Kebutuhan
+
+* PHP 8.2+
+* Composer
+* Laravel 12.x
+* PostgreSQL
+
+---
+
+## Setup
+
+Clone repository:
+
+```bash
+git clone https://github.com/HKA-web/Backend.Erp.git {project_name}
+```
+
+Masuk ke proyek:
 
 ```bash
 cd {project_name}
 ```
 
-3. **Install dependency:**
+Install dependensi:
 
 ```bash
 composer install --prefer-dist
 ```
 
-4. **Atur environment:**
-
-Salin file `.env.example` menjadi `.env` lalu konfigurasi pengaturan database Anda.
+Setup environment:
 
 ```bash
 cp .env.example .env
 ```
 
-5. **Generate application key:**
+Generate key:
 
 ```bash
 php artisan key:generate
 ```
 
-6. **Jalankan migration:**
+Jalankan migration:
 
 ```bash
 php artisan migrate
 ```
 
-7. **Seed database (opsional):**
-
-```bash
-php artisan db:seed
-```
-
-8. **Menjalankan aplikasi:**
+Jalankan server:
 
 ```bash
 php artisan serve
@@ -148,109 +245,83 @@ php artisan serve
 
 ---
 
-# Membuat Fitur Baru
+# 🛠 Membuat Modul Baru
 
-1. **Buat Module:**
+Buat modul:
 
 ```bash
 php artisan erp:make-module {module}
 ```
 
-2. **Buat Model:**
+Buat model:
 
 ```bash
 php artisan erp:make-model {model} {module}
 ```
 
-3. **Migrasi Module:**
+Jalankan migration modul:
 
 ```bash
 php artisan module:migrate {module}
 ```
 
-4. **Migrasi Procedure:**
+---
 
-Eksekusi file query pada `Modules/{module}/database/migrations/sql/xxxx_xx_xx_xxxxxx_{modul}.procedure_action_{model}.sql`.
+## Konfigurasi Routes
 
-```bash
-php artisan module:migrate {module}
-```
-
-5. **Atur Routes:**
-
-Tambahkan route pada file `{module}/routes/api` dan sesuaikan konfigurasi route Anda.
-
-```bash
+```php
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-  Route::apiResource('{module}/{model}', {model}Controller::class)->names('{module}-{model}');
+    Route::apiResource('{module}/{model}', {model}Controller::class)
+        ->names('{module}-{model}');
 });
 ```
 
-6. **Konfigurasi Seeder:**
-
-Tambahkan seeder pada file `{module}/databases/seeders` lalu sesuaikan konfigurasi seeder Anda.
-
-```bash
-{model}::factory()->create();
-```
-
-7. **Seed Module (opsional):**
-
-```bash
-php artisan module:seed {module}
-```
-
-8. **Clear Cache:**
-
-```bash
-php artisan config:clear
-php artisan permission:cache-reset
-php artisan config:cache
-php artisan optimize:clear
-```
-
 ---
 
-# Spatie
+# 🔐 Manajemen Permission
 
-#### Untuk pengelolaan hak akses (permission), program ini menggunakan Spatie. Untuk detail lebih lanjut, silakan kunjungi [Documentation](https://spatie.be/docs/laravel-permission/v7/basic-usage/role-permissions).
+Proyek ini menggunakan **Spatie Laravel Permission**.
 
----
+Contoh:
 
-# Contoh Eksekusi Menggunakan Tinker
-
-1. **Buka tinker:**
-
-```bash
-php artisan tinker
-```
-
-2. **Import:**
-
-```bash
-use Modules\Authentication\Models\User;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-```
-
-3. **Menambahkan User ke Role (Spatie):**
-
-```bash
-$user = User::where('email', 'admin@email.com')->first();
+```php
 $user->assignRole('admin');
-```
-
-4. **Menambahkan Permission ke Role (Spatie):**
-
-```bash
-$role = Role::findByName('admin', 'api');
 $role->givePermissionTo('edit-user');
-$role->givePermissionTo(['create-post', 'delete-post']);
 ```
----
-
-# Dokmentasi API
-
-#### import koleksi file `Laravel.postman_collection.json` di dalam folder `postman/collections/`.
 
 ---
+
+# 📄 Dokumentasi API
+
+Import koleksi Postman dari:
+
+```
+postman/collections/Laravel.postman_collection.json
+```
+
+---
+
+# 🏁 Siklus Status
+
+![Lifecycle Diagram](public/documentation/lifecycle-diagram.png)
+
+---
+
+# 🏢 Dirancang Untuk
+
+* Sistem ERP
+* Aplikasi Enterprise
+* Sistem Keuangan
+* Lingkungan sensitif audit
+* Sistem transaksional multi-user
+
+---
+
+Kalau kamu mau, next level kita bisa bikin:
+
+* 🔥 README versi SaaS Product Style
+* 📊 Diagram arsitektur versi Clean Architecture
+* 🧠 Whitepaper PDF untuk presentasi ke manajemen
+* 🏗 Diagram skema database visual
+
+Kamu mau naik ke level mana sekarang? 🚀

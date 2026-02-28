@@ -22,9 +22,11 @@ class AppServiceProvider extends ServiceProvider
             string $column,
             string $remoteTable,
             string $remoteKey,
-            string $onDelete = 'set null'
+            string $type = 'string', // Optional change on parameter with: integer, uuid, bigInteger, dll
+            string $onDelete = 'set null' // Optional change on parameter with: cascade, restrict, no action
         ) {
-            $this->string($column)->nullable()->index();
+            $this->{$type}($column)->nullable()->index();
+
             return $this->foreign($column)
                 ->references($remoteKey)
                 ->on($remoteTable)

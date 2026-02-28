@@ -13,22 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::createWithTemp('core.company', function (Blueprint $table) {
-            $table->string('company_id')->primary();
-            $table->remoteForeign('province_id', 'core.province', 'province_id');
-            $table->remoteForeign('city_id', 'core.city', 'city_id');
+        Schema::createWithTemp('core.village', function (Blueprint $table) {
+            $table->string('village_id')->primary();
+            $table->string('village_name');
             $table->remoteForeign('district_id', 'core.district', 'district_id');
-            $table->remoteForeign('village_id', 'core.village', 'village_id');
-            $table->string('company_name');
-            $table->string('email')->unique();
-            $table->string('phone');
-            $table->string('address');
-            $table->string('website');
             $table->baseColumn();
 
         });
 
-        Schema::create('history.core_company', function (Blueprint $table) {
+        Schema::create('history.village_history', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
@@ -37,12 +30,12 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_215101_core.procedure_action_company.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130148_core.procedures_village.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
         foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.company", 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => "core.{$action}.village", 'guard_name' => 'api']);
         }
     }
 
@@ -51,8 +44,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_action_company");
-        Schema::dropIfExists('temporary.core_company');
-        Schema::dropIfExists('core.company');
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_village_draft");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_village");
+        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_village");
+        Schema::dropIfExists('history.village_history');
+        Schema::dropIfExists('temporary.core_village');
+        Schema::dropIfExists('core.village');
     }
 };

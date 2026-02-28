@@ -4,13 +4,13 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\VillageRequest;
 use Modules\Core\Models\Village;
+use Illuminate\Http\Request;
 
 class VillageController extends Controller
 {
     /**
-     * Display a listing of the resource with ERP filtering & sorting.
+     * Display a listing of final posted resources.
      */
     public function index()
     {
@@ -20,23 +20,7 @@ class VillageController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage (Draft or Posted).
-     */
-    public function store(VillageRequest $request, BaseStaging $staging)
-    {
-        return $this->erpExecution(function () use ($staging, $request) {
-
-            $staging->executeStaging('core.procedure_action_village', $request->validated());
-
-            return $this->erpResponse(
-                message: "Village {$request->village_name} Successfully Processed."
-            );
-
-        }, "Failed to process Village.");
-    }
-
-    /**
-     * Show the specified resource.
+     * Show the specified final resource.
      */
     public function show($id)
     {
@@ -47,47 +31,38 @@ class VillageController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Action to pull Master data into Draft for revision.
+     * POST /v1/{{model_plural_lower}}/{id}/revise
      */
-    public function update(VillageRequest $request, $id, BaseStaging $staging)
+    public function revise($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($staging, $id) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
+            $staging->executeStaging('core.procedure_revise_village', [
                 'village_id' => $id
             ]);
 
-            $staging->executeStaging('core.procedure_action_village', $payload);
-
             return $this->erpResponse(
-                message: "Village {$id} ready for editing."
+                message: "Village {$id} has been moved to drafts for revision."
             );
-
-        }, 'Failed to update Village.');
+        }, "Failed to initiate revision for Village.");
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (Encapsulated logic in BaseStaging).
+     * DELETE /v1/{{model_plural_lower}}/{id}
      */
-    public function destroy(VillageRequest $request, $id, BaseStaging $staging)
+    public function destroy($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($id, $staging) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
-                'village_id' => $id,
-                'is_removed' => true
-            ]);
-
-            $staging->executeStaging('core.procedure_action_village', $payload);
+            // Logika pengecekan trait & eksekusi SP ada di dalam sini
+            $staging->requestDelete(Village::class, $id, 'core.procedure_upsert_village_draft');
 
             return $this->erpResponse(
-                message: "Village {$id} ready for delete."
+                message: "Delete request for Village {$id} processed according to model policy."
             );
 
-        }, 'Failed to delete Village.');
+        }, "Failed to process delete request for Village.");
     }
 }
