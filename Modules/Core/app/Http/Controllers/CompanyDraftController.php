@@ -42,7 +42,7 @@ class CompanyDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $draft = DB::table('temporary.core_company')
-                ->where('company_id', $id);
+                ->where('temporary_id', $id);
 
             return $this->erpResponse($draft);
         });
@@ -54,7 +54,7 @@ class CompanyDraftController extends Controller
     public function update(CompanyRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
-            $payload = array_merge($request->validated(), ['company_id' => $id]);
+            $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
             $staging->executeStaging('core.procedure_upsert_company_draft', $payload);
 
@@ -69,7 +69,7 @@ class CompanyDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             DB::table('temporary.core_company')
-                ->where('company_id', $id)
+                ->where('temporary_id', $id)
                 ->delete();
 
             return $this->erpResponse(message: "Draft discarded.");
@@ -83,7 +83,10 @@ class CompanyDraftController extends Controller
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
-            $payload = ['company_id' => $id];
+            $payload = [
+                'temporary_id' => $id,
+                'company_id'  => request()->input('company_id')
+            ];
 
             $staging->executeStaging('core.procedure_commit_company', $payload);
 
@@ -92,4 +95,6 @@ class CompanyDraftController extends Controller
             );
         }, "Failed to commit draft.");
     }
+
+
 }

@@ -84,105 +84,146 @@ class ErpModelMakeCommand extends Command
             $sqlFileName = "{$timestamp}_{$schemaLower}.procedures_{$modelLower}.sql";
             $sqlFilePath = $sqlDir . "/" . $sqlFileName;
 
+            $pkName = "{$modelLower}_id";
+
             $sqlContent = <<<SQL
--- 1. PROCEDURE UPSERT DRAFT (Untuk CRUD di Workspace/Sandbox)
+-- 1. PROCEDURE UPSERT DRAFT (Menggunakan temporary_id sebagai PK draf)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_upsert_{$modelLower}_draft;
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_upsert_{$modelLower}_draft(
     p_session_id UUID,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
+DECLARE
+    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
 BEGIN
+    -- Jika payload tidak bawa temporary_id, buat baru (Insert draf baru)
+    IF v_temp_id IS NULL THEN
+        v_temp_id := gen_random_uuid();
+    END IF;
+
     INSERT INTO {$tempTableName} (
-        {$modelLower}_id,
-        {$modelLower}_name,
-        status,
+        temporary_id,
         session_id,
+        master_id,
+        temporary_option,
+        {$pkName},
+        {$modelLower}_name,
         is_removed
     ) VALUES (
-        p_payload ->> '{$modelLower}_id',
-        p_payload ->> '{$modelLower}_name',
-        'DRAFT',
+        v_temp_id,
         p_session_id,
+        p_payload ->> 'master_id',
+        COALESCE(p_payload ->> 'temporary_option', 'I'),
+        p_payload ->> '{$pkName}',
+        p_payload ->> '{$modelLower}_name',
         COALESCE((p_payload ->> 'is_removed')::BOOLEAN, FALSE)
-    ) ON CONFLICT ({$modelLower}_id) DO UPDATE SET
+    ) ON CONFLICT (temporary_id) DO UPDATE SET
         {$modelLower}_name = EXCLUDED.{$modelLower}_name,
         is_removed = EXCLUDED.is_removed,
-        status = 'DRAFT';
+        temporary_option = EXCLUDED.temporary_option,
+        updated_at = NOW();
 END;
 $$;
 
--- 2. PROCEDURE REVISE (Tarik Master ke Temporary)
+-- 2. PROCEDURE REVISE (Check-out dari Master ke Temporary)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_revise_{$modelLower};
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_revise_{$modelLower}(
     p_session_id UUID,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_id TEXT := p_payload ->> '{$modelLower}_id';
+    v_master_id TEXT := p_payload ->> '{$pkName}';
 BEGIN
-    -- Validasi Locking: Cek jika sudah ada draft milik session lain
-    IF EXISTS (SELECT 1 FROM {$tempTableName} WHERE {$modelLower}_id = v_id AND session_id <> p_session_id) THEN
-        RAISE EXCEPTION 'Data is being edited by another user.';
+    -- Validasi Locking (Logical): Jangan biarkan user lain edit data yang sama di temporary
+    IF EXISTS (SELECT 1 FROM {$tempTableName} WHERE master_id = v_master_id AND session_id <> p_session_id) THEN
+        RAISE EXCEPTION 'Data ID % is currently being edited by another session.', v_master_id;
     END IF;
 
-    INSERT INTO {$tempTableName} ({$modelLower}_id, {$modelLower}_name, status, session_id, is_removed)
-    SELECT {$modelLower}_id, {$modelLower}_name, 'DRAFT', p_session_id, FALSE
-    FROM {$fullTableName} WHERE {$modelLower}_id = v_id
-    ON CONFLICT ({$modelLower}_id) DO NOTHING;
+    INSERT INTO {$tempTableName} (
+        temporary_id,
+        session_id,
+        master_id,
+        temporary_option,
+        {$pkName},
+        {$modelLower}_name,
+        is_removed
+    )
+    SELECT
+        gen_random_uuid(),
+        p_session_id,
+        {$pkName},
+        'U', -- Default 'U' (Update) karena narik dari master
+        {$pkName},
+        {$modelLower}_name,
+        is_removed
+    FROM {$fullTableName} WHERE {$pkName} = v_master_id
+    ON CONFLICT (master_id, session_id) DO NOTHING;
 END;
 $$;
 
--- 3. PROCEDURE COMMIT (Finalisasi ke Master + Audit)
+-- 3. PROCEDURE COMMIT (Finalisasi ke Master berdasarkan temporary_option)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_commit_{$modelLower};
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_commit_{$modelLower}(
     p_session_id UUID,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_id TEXT := p_payload ->> '{$modelLower}_id';
+    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
+    v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
-    v_user_id UUID := (p_payload ->> 'user_id')::UUID;
-    v_is_removed BOOLEAN;
 BEGIN
-    -- Ambil flag is_removed dari temporary sebelum dihapus
-    SELECT is_removed INTO v_is_removed FROM {$tempTableName} WHERE {$modelLower}_id = v_id AND session_id = p_session_id;
+    -- Ambil data dari temporary
+    SELECT * INTO v_rec FROM {$tempTableName}
+    WHERE temporary_id = v_temp_id AND session_id = p_session_id;
 
-    -- A. Snapshot Data Lama
-    SELECT to_jsonb(t) INTO v_old_data FROM {$fullTableName} t WHERE t.{$modelLower}_id = v_id;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Draft record not found.';
+    END IF;
 
-    -- B. Move ke Master
-    INSERT INTO {$fullTableName} ({$modelLower}_id, {$modelLower}_name, status, is_removed, created_at, updated_at)
-    SELECT {$modelLower}_id, {$modelLower}_name, 'POSTED', is_removed, NOW(), NOW()
-    FROM {$tempTableName} WHERE {$modelLower}_id = v_id AND session_id = p_session_id
-    ON CONFLICT ({$modelLower}_id) DO UPDATE SET
-        {$modelLower}_name = EXCLUDED.{$modelLower}_name,
-        is_removed = EXCLUDED.is_removed,
-        status = 'POSTED',
-        updated_at = NOW();
+    -- A. Snapshot Data Lama (Jika Update/Delete)
+    IF v_rec.master_id IS NOT NULL THEN
+        SELECT to_jsonb(t) INTO v_old_data FROM {$fullTableName} t WHERE t.{$pkName} = v_rec.master_id;
+    END IF;
 
-    -- C. Snapshot Baru & History
-    SELECT to_jsonb(t) INTO v_new_data FROM {$fullTableName} t WHERE t.{$modelLower}_id = v_id;
+    -- B. Eksekusi ke Master berdasarkan temporary_option
+    IF v_rec.temporary_option = 'D' THEN
+        DELETE FROM {$fullTableName} WHERE {$pkName} = v_rec.master_id;
+    ELSE
+        -- INSERT atau UPDATE
+        INSERT INTO {$fullTableName} ({$pkName}, {$modelLower}_name, status, is_removed, created_at, updated_at)
+        VALUES (v_rec.{$pkName}, v_rec.{$modelLower}_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        ON CONFLICT ({$pkName}) DO UPDATE SET
+            {$modelLower}_name = EXCLUDED.{$modelLower}_name,
+            is_removed = EXCLUDED.is_removed,
+            status = 'POSTED',
+            updated_at = NOW();
+    END IF;
 
-    INSERT INTO history.{$modelLower}_history (history_id, executed_by, action, old_data, new_data, executed_at)
+    -- C. History Logging
+    SELECT to_jsonb(t) INTO v_new_data FROM {$fullTableName} t WHERE t.{$pkName} = v_rec.{$pkName};
+
+    INSERT INTO history.{$schemaLower}_{$modelLower} (history_id, executed_by, action, old_data, new_data, executed_at)
     VALUES (
         gen_random_uuid(),
-        v_user_id,
-        CASE WHEN v_is_removed THEN 'DELETE' WHEN v_old_data IS NULL THEN 'INSERT' ELSE 'UPDATE' END,
+        (p_payload ->> 'executed_by')::UUID,
+        CASE
+            WHEN v_rec.temporary_option = 'D' THEN 'DELETE'
+            WHEN v_old_data IS NULL THEN 'INSERT'
+            ELSE 'UPDATE'
+        END,
         v_old_data,
         v_new_data,
         NOW()
     );
 
     -- D. Cleanup Temporary
-    DELETE FROM {$tempTableName} WHERE {$modelLower}_id = v_id AND session_id = p_session_id;
+    DELETE FROM {$tempTableName} WHERE temporary_id = v_temp_id;
 END;
 $$;
 SQL;
 
             File::put($sqlFilePath, $sqlContent);
-
-            // --- Laravel Migration File Modification ---
 
             if (!str_contains($content, 'use Spatie\Permission\Models\Permission;')) {
                 $content = str_replace(
@@ -197,15 +238,13 @@ SQL;
             $content = preg_replace("/^\s*\\\$table->id\(\);\s*$/m", "", $content);
             $content = preg_replace("/^\s*\\\$table->timestamps\(\);\s*$/m", "", $content);
 
-            // Inject Kolom Standar
             $newColumns = "\n            \$table->string('{$modelLower}_id')->primary();" .
                 "\n            \$table->string('{$modelLower}_name');\n" .
                 "\n            \$table->baseColumn();";
 
             $content = preg_replace("/(function\s*\(Blueprint\s*\\\$table\)\s*\{)/", "$1$newColumns", $content);
 
-            // Schema History
-            $historySchema = "\n        Schema::create('history.{$modelLower}_history', function (Blueprint \$table) {
+            $historySchema = "\n        Schema::create('history.{$schemaLower}_{$modelLower}', function (Blueprint \$table) {
             \$table->uuid('history_id')->primary();
             \$table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             \$table->string('action');
@@ -222,8 +261,7 @@ SQL;
                 $content = str_replace("});\n    }", "});\n{$historySchema}{$sqlInvoke}\n{$permissionCode}\n    }", $content);
             }
 
-            // Update Down Method untuk cleanup 3 procedure
-            $downReplacement = "public function down(): void\n    {\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_upsert_{$modelLower}_draft\");\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_revise_{$modelLower}\");\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_commit_{$modelLower}\");\n        Schema::dropIfExists('history.{$modelLower}_history');\n        Schema::dropIfExists('{$tempTableName}');\n        Schema::dropIfExists('{$fullTableName}');\n    }";
+            $downReplacement = "public function down(): void\n    {\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_upsert_{$modelLower}_draft\");\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_revise_{$modelLower}\");\n        DB::unprepared(\"DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_commit_{$modelLower}\");\n        Schema::dropIfExists('history.{$schemaLower}_{$modelLower}');\n        Schema::dropIfExists('{$tempTableName}');\n        Schema::dropIfExists('{$fullTableName}');\n    }";
 
             $content = preg_replace("/public function down\(\): void\s*\{.*?Schema::dropIfExists\(.*?\);\s*\}/s", $downReplacement, $content);
 
@@ -236,8 +274,6 @@ SQL;
 
     protected function injectRoute($module, $model)
     {
-        // 1. Normalisasi Path: Laravel Modules biasanya pakai 'routes' (huruf kecil)
-        // Kita cek keduanya agar tidak salah sasaran
         $moduleDir = base_path("Modules/{$module}");
         $path = "{$moduleDir}/routes/api.php";
         if (!File::exists($path)) {
@@ -251,40 +287,34 @@ SQL;
             return;
         }
 
-        // 2. Buat file jika belum ada
         if (!File::exists($path)) {
             File::ensureDirectoryExists(dirname($path));
             File::put($path, "<?php\n\nuse Illuminate\Support\Facades\Route;\n");
         }
 
         $modelLower = Str::lower($model);
-        $modelPlural = Str::plural($modelLower);
+        $module_lower = Str::lower($module);
 
-        // 3. Baca konten dan cek duplikasi secara cerdas
         $currentContent = File::get($path);
         if (str_contains($currentContent, "{$model}Controller")) {
             $this->warn("⚠️  Route for {$model} already exists in api.php. Skipping...");
             return;
         }
 
-        // 4. Siapkan Use Statements (Sesuaikan namespace dengan folder 'app' mu)
         $useNamespace = "use Modules\\{$module}\\Http\\Controllers\\{$model}Controller;\n" .
             "use Modules\\{$module}\\Http\\Controllers\\{$model}DraftController;";
 
-        // 5. Replace Placeholders di Stub
         $stub = File::get($stubPath);
         $routeCode = str_replace(
             ['{{model}}', '{{model_lower}}', '{{model_plural_lower}}', '{{module}}'],
-            [$model, $modelLower, $modelPlural, $module],
+            [$model, $modelLower, $module, $module_lower],
             $stub
         );
 
-        // 6. Masukkan Use Statement setelah tag <?php
         if (!str_contains($currentContent, "{$model}Controller")) {
             $currentContent = preg_replace('/<\?php/', "<?php\n\n{$useNamespace}", $currentContent);
         }
 
-        // 7. Gabungkan: Pastikan ada spasi antar route agar rapi
         $finalContent = rtrim($currentContent) . "\n\n" . trim($routeCode) . "\n";
 
         if (File::put($path, $finalContent)) {

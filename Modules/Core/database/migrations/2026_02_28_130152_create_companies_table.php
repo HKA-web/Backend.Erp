@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::createWithTemp('core.company', function (Blueprint $table) {
             $table->string('company_id')->primary();
-            $table->remoteForeign('province_id', 'province.city', 'province_id');
+            $table->remoteForeign('province_id', 'core.province', 'province_id');
             $table->remoteForeign('city_id', 'core.city', 'city_id');
             $table->remoteForeign('district_id', 'core.district', 'district_id');
             $table->remoteForeign('village_id', 'core.village', 'village_id');
@@ -28,7 +28,7 @@ return new class extends Migration
 
         });
 
-        Schema::create('history.company_history', function (Blueprint $table) {
+        Schema::create('history.core_company', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');

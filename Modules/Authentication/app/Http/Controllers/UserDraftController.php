@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Core\Http\Controllers;
+namespace Modules\Authentication\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\DistrictRequest;
+use Modules\Authentication\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\DB;
 
-class DistrictDraftController extends Controller
+class UserDraftController extends Controller
 {
     /**
      * Display all active drafts in the temporary table for current session.
@@ -16,7 +16,7 @@ class DistrictDraftController extends Controller
     {
         return $this->erpExecution(function () {
             // Membaca langsung dari tabel temporary
-            $query = DB::table('temporary.core_district');
+            $query = DB::table('temporary.authentication_user');
             return $this->erpResponse($query);
         });
     }
@@ -24,13 +24,13 @@ class DistrictDraftController extends Controller
     /**
      * Save a new draft.
      */
-    public function store(DistrictRequest $request, BaseStaging $staging)
+    public function store(UserRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_district_draft', $request->validated());
+            $staging->executeStaging('authentication.procedure_upsert_user_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft District saved successfully."
+                message: "Draft User saved successfully."
             );
         });
     }
@@ -41,8 +41,8 @@ class DistrictDraftController extends Controller
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
-            $draft = DB::table('temporary.core_district')
-                ->where('temporary_id', $id);
+            $draft = DB::table('temporary.authentication_user')
+                ->where('user_id', $id);
 
             return $this->erpResponse($draft);
         });
@@ -51,12 +51,12 @@ class DistrictDraftController extends Controller
     /**
      * Update existing draft in temporary table.
      */
-    public function update(DistrictRequest $request, $id, BaseStaging $staging)
+    public function update(UserRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
-            $payload = array_merge($request->validated(), ['temporary_id' => $id]);
+            $payload = array_merge($request->validated(), ['user_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_district_draft', $payload);
+            $staging->executeStaging('authentication.procedure_upsert_user_draft', $payload);
 
             return $this->erpResponse(message: "Draft updated.");
         });
@@ -68,8 +68,8 @@ class DistrictDraftController extends Controller
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
-            DB::table('temporary.core_district')
-                ->where('temporary_id', $id)
+            DB::table('temporary.authentication_user')
+                ->where('user_id', $id)
                 ->delete();
 
             return $this->erpResponse(message: "Draft discarded.");
@@ -78,20 +78,17 @@ class DistrictDraftController extends Controller
 
     /**
      * Final Action: Commit Draft to Master.
-     * POST /v1/district-drafts/{id}/commit
+     * POST /v1/user-drafts/{id}/commit
      */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
-            $payload = [
-                'temporary_id' => $id,
-                'district_id'  => request()->input('district_id')
-            ];
+            $payload = ['user_id' => $id];
 
-            $staging->executeStaging('core.procedure_commit_district', $payload);
+            $staging->executeStaging('authentication.procedure_commit_user', $payload);
 
             return $this->erpResponse(
-                message: "District committed to master successfully."
+                message: "User committed to master successfully."
             );
         }, "Failed to commit draft.");
     }

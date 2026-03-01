@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Helpers\ExpandHelper;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -18,6 +20,22 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Macro untuk Query Builder (DB::table)
+        QueryBuilder::macro('takeSkip', function () {
+            $limit = request()->input('take', 10);
+            $offset = request()->input('skip', 0);
+
+            return $this->limit($limit)->offset($offset);
+        });
+
+        // Macro untuk Eloquent Builder (Model::query)
+        EloquentBuilder::macro('takeSkip', function () {
+            $limit = request()->input('take', 10);
+            $offset = request()->input('skip', 0);
+
+            return $this->limit($limit)->offset($offset);
+        });
+
         Blueprint::macro('remoteForeign', function (
             string $column,
             string $remoteTable,
@@ -30,6 +48,24 @@ class AppServiceProvider extends ServiceProvider
             return $this->foreign($column)
                 ->references($remoteKey)
                 ->on($remoteTable)
+                ->onDelete($onDelete);
+        });
+
+        Blueprint::macro('selfForeign', function (
+            string $column,
+            string $references = 'id',
+            string $type = 'string',
+            string $onDelete = 'set null'
+        ) {
+            $columnExists = collect($this->getColumns())->firstWhere('name', $column);
+
+            if (!$columnExists) {
+                $this->{$type}($column)->nullable()->index();
+            }
+
+            return $this->foreign($column)
+                ->references($references)
+                ->on($this->getTable())
                 ->onDelete($onDelete);
         });
 
@@ -82,12 +118,27 @@ class AppServiceProvider extends ServiceProvider
             $fullTempPath = "{$tempSchema}.{$flatTableName}";
 
             DB::statement("CREATE SCHEMA IF NOT EXISTS {$tempSchema}");
-
             DB::statement("DROP TABLE IF EXISTS {$fullTempPath}");
-            DB::statement("CREATE TABLE {$fullTempPath} (LIKE {$table} INCLUDING ALL)");
+
+            DB::statement("
+                CREATE TABLE {$fullTempPath} AS
+                SELECT
+                    NULL::uuid AS temporary_id,
+                    NULL::uuid AS parent_temporary_id,
+                    NULL::varchar AS master_id,
+                    NULL::uuid AS session_id,
+                    'U'::char(1) AS temporary_option,
+                    m.*
+                FROM {$table} m
+                WHERE 1=0
+            ");
 
             Schema::table($fullTempPath, function (Blueprint $table) {
-                $table->uuid('session_id')->nullable()->index();
+                $table->uuid('temporary_id')->primary()->change();
+                $table->uuid('parent_temporary_id')->nullable()->index()->change();
+                $table->string('master_id')->nullable()->index()->change();
+                $table->uuid('session_id')->index()->change();
+                $table->char('temporary_option', 1)->default('U')->comment('I: Insert, U: Update, D: Delete')->change();
             });
         });
     }

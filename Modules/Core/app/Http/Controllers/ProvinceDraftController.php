@@ -42,7 +42,7 @@ class ProvinceDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $draft = DB::table('temporary.core_province')
-                ->where('province_id', $id);
+                ->where('temporary_id', $id);
 
             return $this->erpResponse($draft);
         });
@@ -54,7 +54,7 @@ class ProvinceDraftController extends Controller
     public function update(ProvinceRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
-            $payload = array_merge($request->validated(), ['province_id' => $id]);
+            $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
             $staging->executeStaging('core.procedure_upsert_province_draft', $payload);
 
@@ -69,7 +69,7 @@ class ProvinceDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             DB::table('temporary.core_province')
-                ->where('province_id', $id)
+                ->where('temporary_id', $id)
                 ->delete();
 
             return $this->erpResponse(message: "Draft discarded.");
@@ -83,7 +83,10 @@ class ProvinceDraftController extends Controller
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
-            $payload = ['province_id' => $id];
+            $payload = [
+                'temporary_id' => $id,
+                'province_id'  => request()->input('province_id')
+            ];
 
             $staging->executeStaging('core.procedure_commit_province', $payload);
 

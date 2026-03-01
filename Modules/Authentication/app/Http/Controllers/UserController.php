@@ -4,15 +4,13 @@ namespace Modules\Authentication\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Modules\Authentication\Http\Requests\UserRequest;
 use Modules\Authentication\Models\User;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource with ERP filtering & sorting.
+     * Display a listing of final posted resources.
      */
     public function index()
     {
@@ -22,34 +20,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage (Draft or Posted).
-     */
-    protected static ?string $password;
-
-    public function store(UserRequest $request, BaseStaging $staging)
-    {
-        return $this->erpExecution(function () use ($staging, $request) {
-
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
-                'user_id' => $request->user_id ?? (string) Str::uuid(),
-                'email_verified_at' => $request->email_verified_at ?? now(),
-                'password' => Hash::make($request->password),
-                'remember_token' => $request->remember_token,
-            ]);
-
-            $staging->executeStaging('authentication.procedure_action_user', $payload);
-
-            return $this->erpResponse(
-                message: "User {$request->user_name} Successfully Processed."
-            );
-
-        }, "Failed to process User.");
-    }
-
-    /**
-     * Show the specified resource.
+     * Show the specified final resource.
      */
     public function show($id)
     {
@@ -60,47 +31,38 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Action to pull Master data into Draft for revision.
+     * POST /v1/{{model_plural_lower}}/{id}/revise
      */
-    public function update(UserRequest $request, $id, BaseStaging $staging)
+    public function revise($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($staging, $id) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
+            $staging->executeStaging('authentication.procedure_revise_user', [
                 'user_id' => $id
             ]);
 
-            $staging->executeStaging('authentication.procedure_action_user', $payload);
-
             return $this->erpResponse(
-                message: "User {$id} ready for editing."
+                message: "User {$id} has been moved to drafts for revision."
             );
-
-        }, 'Failed to update User.');
+        }, "Failed to initiate revision for User.");
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (Encapsulated logic in BaseStaging).
+     * DELETE /v1/{{model_plural_lower}}/{id}
      */
-    public function destroy(UserRequest $request, $id, BaseStaging $staging)
+    public function destroy($id, BaseStaging $staging)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($id, $staging) {
 
-            $validated = $request->validated();
-
-            $payload = array_merge($validated, [
-                'user_id' => $id,
-                'is_removed' => true
-            ]);
-
-            $staging->executeStaging('authentication.procedure_action_user', $payload);
+            // Logika pengecekan trait & eksekusi SP ada di dalam sini
+            $staging->requestDelete(User::class, $id, 'authentication.procedure_upsert_user_draft');
 
             return $this->erpResponse(
-                message: "User {$id} ready for delete."
+                message: "Delete request for User {$id} processed according to model policy."
             );
 
-        }, 'Failed to delete User.');
+        }, "Failed to process delete request for User.");
     }
 }

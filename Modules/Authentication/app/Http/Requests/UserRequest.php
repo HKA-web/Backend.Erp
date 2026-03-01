@@ -3,50 +3,50 @@
 namespace Modules\Authentication\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
-        $status = $this->input('status');
-        $allowed = in_array($status, ['EDIT', 'DELETE']);
+        /**
+         * Logic:
+         * 1. Jika method POST (Store Draft baru), id mungkin optional jika auto-gen di DB,
+         * tapi biasanya required jika UUID ditentukan dari frontend.
+         * 2. Jika method PUT/PATCH (Update Draft), kita hanya validasi field yang dikirim.
+         * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
+         * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
+         */
+
+        $isPost = $this->isMethod('post');
 
         return [
-            'user_id'   => 'required|string',
-            'user_name' => $allowed ? 'nullable|string' : 'required|string|max:255',
-            'email'     => $allowed ? 'nullable|email' : 'required|email|max:255',
-            'status'    => 'required|in:DRAFT,POSTED,EDIT,DELETE',
-            'password'       => 'nullable|string|min:8',
-            'remember_token' => 'nullable|string|max:100',
+            'user_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'user_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
+            // Kita tetap jaga is_removed untuk soft-delete logic di level draft
+            'is_removed'           => 'nullable|boolean',
         ];
     }
 
-    protected function prepareForValidation()
-    {
-        if (!$this->has('password') && $this->input('status') === 'DRAFT') {
-            $this->merge([
-                'password' => Hash::make('#user#'),
-                'remember_token' => Str::random(10),
-            ]);
-        }
-    }
-
+    /**
+     * Custom messages for validation errors.
+     */
     public function messages(): array
     {
         return [
-            'user_id.required'   => 'ID wajib diisi.',
-            'user_name.required' => 'Nama pengguna wajib diisi.',
-            'email.required'     => 'Alamat email wajib diisi.',
-            'email.email'        => 'Format email tidak valid.',
-            'status.required'    => 'Status wajib diisi.',
-            'status.in'          => 'Pilihan status hanya: DRAFT, POSTED, EDIT, atau DELETE.',
+            'user_id.required'   => 'The User ID is required to identify the resource.',
+            'user_name.required' => 'The User name cannot be empty.',
+            'user_name.max'      => 'The name is too long (max 255 characters).',
         ];
     }
 }

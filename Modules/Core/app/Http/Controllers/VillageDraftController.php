@@ -42,7 +42,7 @@ class VillageDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $draft = DB::table('temporary.core_village')
-                ->where('village_id', $id);
+                ->where('temporary_id', $id);
 
             return $this->erpResponse($draft);
         });
@@ -54,7 +54,7 @@ class VillageDraftController extends Controller
     public function update(VillageRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
-            $payload = array_merge($request->validated(), ['village_id' => $id]);
+            $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
             $staging->executeStaging('core.procedure_upsert_village_draft', $payload);
 
@@ -69,7 +69,7 @@ class VillageDraftController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             DB::table('temporary.core_village')
-                ->where('village_id', $id)
+                ->where('temporary_id', $id)
                 ->delete();
 
             return $this->erpResponse(message: "Draft discarded.");
@@ -83,7 +83,10 @@ class VillageDraftController extends Controller
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
-            $payload = ['village_id' => $id];
+            $payload = [
+                'temporary_id' => $id,
+                'village_id'  => request()->input('village_id')
+            ];
 
             $staging->executeStaging('core.procedure_commit_village', $payload);
 

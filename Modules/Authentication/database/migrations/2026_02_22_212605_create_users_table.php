@@ -20,10 +20,19 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->baseColumn();
+            $table->jsonb('properties')->nullable();
+            $table->boolean('enable')->default(true);
+            $table->boolean('readonly')->default(false);
+            $table->boolean('is_removed')->default(false);
+            $table->timestamps();
         });
 
-        Schema::create('history.user_history', function (Blueprint $table) {
+        Schema::table('authentication.user', function (Blueprint $table) {
+            $table->selfForeign('created_by', 'user_id');
+            $table->selfForeign('updated_by', 'user_id');
+        });
+
+        Schema::create('history.authentication_user', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
@@ -47,7 +56,7 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_212605_authentication.procedure_action_user.sql');
+        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_212605_authentication.procedures_user.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -61,9 +70,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_action_user");
-        Schema::dropIfExists('sessions');
-        Schema::dropIfExists('password_reset_tokens');
+        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_upsert_user_draft");
+        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_revise_user");
+        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_commit_user");
+        Schema::dropIfExists('history.user_history');
         Schema::dropIfExists('temporary.authentication_user');
         Schema::dropIfExists('authentication.user');
     }

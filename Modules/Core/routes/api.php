@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 // Routes for Province
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('provinces')->group(function () {
+    Route::prefix('core/province')->group(function () {
         Route::get('/', [ProvinceController::class, 'index']);
         Route::get('/{id}', [ProvinceController::class, 'show']);
         Route::post('/{id}/revise', [ProvinceController::class, 'revise']);
@@ -31,7 +31,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('province-drafts')->group(function () {
+    Route::prefix('core/province-drafts')->group(function () {
         Route::get('/', [ProvinceDraftController::class, 'index']);
         Route::post('/', [ProvinceDraftController::class, 'store']);
         Route::get('/{id}', [ProvinceDraftController::class, 'show']);
@@ -44,7 +44,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Routes for City
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('cities')->group(function () {
+    Route::prefix('core/city')->group(function () {
         Route::get('/', [CityController::class, 'index']);
         Route::get('/{id}', [CityController::class, 'show']);
         Route::post('/{id}/revise', [CityController::class, 'revise']);
@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('city-drafts')->group(function () {
+    Route::prefix('core/city-drafts')->group(function () {
         Route::get('/', [CityDraftController::class, 'index']);
         Route::post('/', [CityDraftController::class, 'store']);
         Route::get('/{id}', [CityDraftController::class, 'show']);
@@ -65,7 +65,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Routes for District
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('districts')->group(function () {
+    Route::prefix('core/district')->group(function () {
         Route::get('/', [DistrictController::class, 'index']);
         Route::get('/{id}', [DistrictController::class, 'show']);
         Route::post('/{id}/revise', [DistrictController::class, 'revise']);
@@ -73,7 +73,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('district-drafts')->group(function () {
+    Route::prefix('core/district-drafts')->group(function () {
         Route::get('/', [DistrictDraftController::class, 'index']);
         Route::post('/', [DistrictDraftController::class, 'store']);
         Route::get('/{id}', [DistrictDraftController::class, 'show']);
@@ -86,7 +86,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Routes for Village
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('villages')->group(function () {
+    Route::prefix('core/village')->group(function () {
         Route::get('/', [VillageController::class, 'index']);
         Route::get('/{id}', [VillageController::class, 'show']);
         Route::post('/{id}/revise', [VillageController::class, 'revise']);
@@ -94,7 +94,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('village-drafts')->group(function () {
+    Route::prefix('core/village-drafts')->group(function () {
         Route::get('/', [VillageDraftController::class, 'index']);
         Route::post('/', [VillageDraftController::class, 'store']);
         Route::get('/{id}', [VillageDraftController::class, 'show']);
@@ -107,7 +107,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Routes for Company
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('companies')->group(function () {
+    Route::prefix('core/company')->group(function () {
         Route::get('/', [CompanyController::class, 'index']);
         Route::get('/{id}', [CompanyController::class, 'show']);
         Route::post('/{id}/revise', [CompanyController::class, 'revise']);
@@ -115,7 +115,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('company-drafts')->group(function () {
+    Route::prefix('core/company-drafts')->group(function () {
         Route::get('/', [CompanyDraftController::class, 'index']);
         Route::post('/', [CompanyDraftController::class, 'store']);
         Route::get('/{id}', [CompanyDraftController::class, 'show']);
@@ -128,7 +128,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 // Routes for Dictionary
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('dictionaries')->group(function () {
+    Route::prefix('core/dictionary')->group(function () {
         Route::get('/', [DictionaryController::class, 'index']);
         Route::get('/{id}', [DictionaryController::class, 'show']);
         Route::post('/{id}/revise', [DictionaryController::class, 'revise']);
@@ -136,7 +136,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     });
 
     // Draft Resource
-    Route::prefix('dictionary-drafts')->group(function () {
+    Route::prefix('core/dictionary-drafts')->group(function () {
         Route::get('/', [DictionaryDraftController::class, 'index']);
         Route::post('/', [DictionaryDraftController::class, 'store']);
         Route::get('/{id}', [DictionaryDraftController::class, 'show']);

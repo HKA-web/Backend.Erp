@@ -21,7 +21,7 @@ return new class extends Migration
 
         });
 
-        Schema::create('history.province_history', function (Blueprint $table) {
+        Schema::create('history.core_province', function (Blueprint $table) {
             $table->uuid('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');

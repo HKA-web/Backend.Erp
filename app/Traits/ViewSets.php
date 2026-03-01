@@ -2,13 +2,23 @@
 
 namespace App\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 trait ViewSets
 {
-    protected function applyFieldsExpand(Builder $query)
+    /**
+     * NOTE: Fungsi ini hanya bekerja untuk Eloquent (Master Data).
+     * Untuk DB::table (Draft), logic ini akan dilewati otomatis.
+     */
+    protected function applyFieldsExpand($query)
     {
+        // Pastikan ini adalah Eloquent Builder sebelum lanjut
+        if (!$query instanceof EloquentBuilder) return;
+
         $fieldsParam = request()->input('fields');
         $expandParam = request()->input('expand');
 
@@ -17,7 +27,6 @@ trait ViewSets
         $fields = $fieldsParam ? array_map('trim', explode(',', $fieldsParam)) : [];
         $expands = $expandParam ? array_map('trim', explode(',', $expandParam)) : [];
 
-        // 1. Kelompokkan fields berdasarkan jalurnya (path)
         $fieldTree = [];
         foreach ($fields as $field) {
             $parts = explode('.', $field);
@@ -26,18 +35,15 @@ trait ViewSets
             $fieldTree[$path][] = $column;
         }
 
-        // 2. Terapkan Select untuk Tabel Utama (path kosong "")
         $mainColumns = $fieldTree[""] ?? [];
         if (!empty($mainColumns)) {
             $model = $query->getModel();
             $primaryKey = $model->getKeyName();
             if (!in_array($primaryKey, $mainColumns)) $mainColumns[] = $primaryKey;
 
-            // AMBIL DAFTAR KOLOM ASLI TABEL INI
             $tableName = $model->getTable();
-            $realColumns = \Illuminate\Support\Facades\Schema::getColumnListing($tableName);
+            $realColumns = Schema::getColumnListing($tableName);
 
-            // Hanya tambahkan FK jika kolomnya memang eksis di tabel ini (untuk belongsTo)
             foreach ($expands as $rel) {
                 $firstPart = explode('.', $rel)[0];
                 $fk = Str::snake($firstPart) . '_id';
@@ -46,50 +52,37 @@ trait ViewSets
                 }
             }
 
-            // Filter agar tidak ada kolom "gaib" masuk ke SQL
             $mainColumns = array_intersect($mainColumns, $realColumns);
             $query->select($mainColumns);
         }
 
-        // 3. Bangun Nested Eager Loading
         $withRelations = [];
         foreach ($expands as $relPath) {
             $withRelations[$relPath] = function ($q) use ($relPath, $fieldTree) {
                 $model = $q->getModel();
                 $tableName = $model->getTable();
-                $realColumns = \Illuminate\Support\Facades\Schema::getColumnListing($tableName);
+                $realColumns = Schema::getColumnListing($tableName);
 
                 if (isset($fieldTree[$relPath])) {
                     $cols = $fieldTree[$relPath];
-
-                    // Selalu sertakan PK relasi
                     $pk = $model->getKeyName();
                     if (!in_array($pk, $cols)) $cols[] = $pk;
 
-                    // Cek Level Dibawahnya (untuk nested)
                     foreach ($fieldTree as $path => $columns) {
                         if (str_starts_with($path, $relPath . '.')) {
                             $subRel = str_replace($relPath . '.', '', $path);
                             $fk = Str::snake($subRel) . '_id';
-
-                            // HANYA tambah kolom jika dia ada di tabel (belongsTo scenario)
                             if (in_array($fk, $realColumns) && !in_array($fk, $cols)) {
                                 $cols[] = $fk;
                             }
                         }
                     }
 
-                    // JIKA ini adalah hasMany, kita butuh FK dari Parent agar Eloquent bisa mapping
-                    // Contoh: Di tabel City, kita butuh 'province_id' agar bisa nyambung ke Province
-                    $parentPath = str_contains($relPath, '.') ? Str::beforeLast($relPath, '.') : null;
-                    // Sederhananya, pastikan semua kolom yang berakhiran _id ikut jika ada di tabel
                     foreach ($realColumns as $col) {
                         if (str_ends_with($col, '_id') && !in_array($col, $cols)) {
-                            // Cek apakah kolom ini mungkin penghubung ke parent/child
                             $cols[] = $col;
                         }
                     }
-
                     $q->select(array_intersect($cols, $realColumns));
                 }
             };
@@ -100,14 +93,13 @@ trait ViewSets
         }
     }
 
-    public function applyFilter(Builder $query, $filter)
+    /**
+     * Menghapus type hint 'Builder' agar bisa menerima Query\Builder
+     */
+    public function applyFilter($query, $filter)
     {
         if (empty($filter)) return $query;
-
-        if (is_string($filter)) {
-            $filter = json_decode($filter, true);
-        }
-
+        if (is_string($filter)) $filter = json_decode($filter, true);
         return $this->buildQuery($query, $filter);
     }
 
@@ -116,7 +108,7 @@ trait ViewSets
         return isset($filter[0]) && !is_array($filter[0]);
     }
 
-    private function applyLeaf(Builder $query, $leaf)
+    private function applyLeaf($query, $leaf)
     {
         $field = $leaf[0];
         $operator = $leaf[1] ?? '=';
@@ -137,7 +129,7 @@ trait ViewSets
         }
     }
 
-    private function buildQuery(Builder $query, $filter)
+    private function buildQuery($query, $filter)
     {
         if ($this->isLeaf($filter)) {
             return $this->applyLeaf($query, $filter);
@@ -145,7 +137,6 @@ trait ViewSets
 
         return $query->where(function ($q) use ($filter) {
             $logic = 'and';
-
             foreach ($filter as $item) {
                 if (is_array($item)) {
                     if ($logic === 'and') {
@@ -155,15 +146,13 @@ trait ViewSets
                     }
                 } else {
                     $item = strtolower($item);
-                    if ($item === 'and' || $item === 'or') {
-                        $logic = $item;
-                    }
+                    if ($item === 'and' || $item === 'or') $logic = $item;
                 }
             }
         });
     }
 
-    protected function applySort(Builder $query, $sort)
+    protected function applySort($query, $sort)
     {
         $sorts = is_string($sort) ? json_decode($sort, true) : $sort;
         if (!is_array($sorts)) return;
@@ -177,7 +166,8 @@ trait ViewSets
 
     protected function erpResponse($data = null, $message = 'Success')
     {
-        if ($data instanceof Builder) {
+        // Support Eloquent (Master) & Query Builder (Temporary/Draft)
+        if ($data instanceof EloquentBuilder || $data instanceof QueryBuilder) {
             $query = $data;
 
             $this->applyFieldsExpand($query);
@@ -191,6 +181,8 @@ trait ViewSets
             }
 
             $totalCount = (clone $query)->count();
+
+            // takeSkip() adalah custom method, pastikan tersedia di Macro atau Trait lain
             $results = $query->takeSkip()->get();
 
             return response()->json([
@@ -199,13 +191,8 @@ trait ViewSets
             ], 200);
         }
 
-        $response = [
-            'message' => $message,
-        ];
-
-        if (!is_null($data)) {
-            $response['data'] = $data;
-        }
+        $response = ['message' => $message];
+        if (!is_null($data)) $response['data'] = $data;
 
         return response()->json($response, 200);
     }
