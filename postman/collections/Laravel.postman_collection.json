@@ -352,6 +352,123 @@
                     }
                   },
                   "response": []
+                },
+                {
+                  "name": "revise",
+                  "id": "74d1f4c3-f20f-4785-b1b7-98e57cb6e98b",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province/9e80b1dc-1374-4482-981a-8211f5b0ad59/revise/",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "province",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                        "revise",
+                        ""
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter",
+                          "value": "[\"is_removed\",\"=\",false]",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fields",
+                          "value": "province_name,city.city_name,city.district.district_name",
+                          "uuid": "8dd2897b-4777-4aba-8a72-b5a6b41727af",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "city,city.district",
+                          "uuid": "e817058e-9755-424f-b422-5af6d1657aee",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "e88414b9-0704-488c-960e-1f7334ac51d4",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province/001",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "province",
+                        "001"
+                      ]
+                    }
+                  },
+                  "response": []
                 }
               ],
               "id": "45f4d8fa-ea5e-4b2b-8e86-f9d4b2bf5295"
@@ -557,7 +674,7 @@
                       }
                     },
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/64ccb115-e45d-41cc-af67-0a160c26a20e",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/c1fb6944-cb41-4724-aa4e-e1ed240a8677",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -571,7 +688,7 @@
                         "v1",
                         "core",
                         "province-drafts",
-                        "64ccb115-e45d-41cc-af67-0a160c26a20e"
+                        "c1fb6944-cb41-4724-aa4e-e1ed240a8677"
                       ]
                     }
                   },
@@ -643,12 +760,12 @@
                       },
                       {
                         "key": "X-Session-ID",
-                        "value": "87cfea61-cf31-40c7-b626-ae25e6556527",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
                         "type": "text"
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/64ccb115-e45d-41cc-af67-0a160c26a20e/commit",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/c1fb6944-cb41-4724-aa4e-e1ed240a8677/commit",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -662,7 +779,7 @@
                         "v1",
                         "core",
                         "province-drafts",
-                        "64ccb115-e45d-41cc-af67-0a160c26a20e",
+                        "c1fb6944-cb41-4724-aa4e-e1ed240a8677",
                         "commit"
                       ]
                     }

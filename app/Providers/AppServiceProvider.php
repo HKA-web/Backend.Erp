@@ -139,6 +139,8 @@ class AppServiceProvider extends ServiceProvider
                 $table->string('master_id')->nullable()->index()->change();
                 $table->uuid('session_id')->index()->change();
                 $table->char('temporary_option', 1)->default('U')->comment('I: Insert, U: Update, D: Delete')->change();
+
+                $table->unique(['master_id', 'session_id'], 'uk_' . str_replace('.', '_', $table) . '_master_session');
             });
         });
     }

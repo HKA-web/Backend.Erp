@@ -56,7 +56,6 @@ class ProvinceController extends Controller
     {
         return $this->erpExecution(function () use ($id, $staging) {
 
-            // Logika pengecekan trait & eksekusi SP ada di dalam sini
             $staging->requestDelete(Province::class, $id, 'core.procedure_upsert_province_draft');
 
             return $this->erpResponse(

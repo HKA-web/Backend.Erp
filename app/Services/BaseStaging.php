@@ -35,19 +35,17 @@ class BaseStaging
         $model = new $modelClass;
         $primaryKey = $model->getKeyName() ?? "{$this->model_lower}_id";
 
-        // CEK: Apakah Model menggunakan Trait SoftDeletesStaging
         $traits = class_uses_recursive($model);
         $hasStagingTrait = in_array(SoftDelete::class, $traits);
 
         if ($hasStagingTrait) {
-            // JIKA PAKAI TRAIT: Masukkan ke Staging (is_removed = true)
             return $this->executeStaging($procedureName, [
-                $primaryKey  => $id,
-                'is_removed' => true
+                $primaryKey        => $id,
+                'master_id'        => $id,
+                'is_removed'       => true,
+                'temporary_option' => 'D'
             ]);
         }
 
-        // JIKA TIDAK PAKAI TRAIT: Hard Delete Langsung di Master
-        return $model->where($primaryKey, $id)->delete();
     }
 }
