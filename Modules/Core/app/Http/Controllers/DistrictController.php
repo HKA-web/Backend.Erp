@@ -57,7 +57,7 @@ class DistrictController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete(District::class, $id, 'core.procedure_upsert_district_draft');
+            $staging->requestDelete(District::class, $id, 'core.procedure_revise_district');
 
             return $this->erpResponse(
                 message: "Delete request for District {$id} processed according to model policy."

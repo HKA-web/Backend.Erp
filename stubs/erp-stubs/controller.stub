@@ -57,7 +57,7 @@ class {{model}}Controller extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete({{model}}::class, $id, '{{module_lower}}.procedure_upsert_{{model_lower}}_draft');
+            $staging->requestDelete({{model}}::class, $id, '{{module_lower}}.procedure_revise_{{model_lower}}');
 
             return $this->erpResponse(
                 message: "Delete request for {{model}} {$id} processed according to model policy."

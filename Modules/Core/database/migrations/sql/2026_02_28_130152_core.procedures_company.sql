@@ -64,10 +64,10 @@ SELECT
     gen_random_uuid(),
     p_session_id,
     company_id,
-    'U', -- Default Update
+    COALESCE(p_payload ->> 'temporary_option', 'U'),
     company_id,
     company_name,
-    is_removed
+    COALESCE((p_payload ->> 'is_removed')::boolean, false)
 FROM core.company WHERE company_id = v_master_id
     ON CONFLICT (master_id, session_id) DO NOTHING;
 END;

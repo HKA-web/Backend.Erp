@@ -57,7 +57,7 @@ class VillageController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete(Village::class, $id, 'core.procedure_upsert_village_draft');
+            $staging->requestDelete(Village::class, $id, 'core.procedure_revise_village');
 
             return $this->erpResponse(
                 message: "Delete request for Village {$id} processed according to model policy."

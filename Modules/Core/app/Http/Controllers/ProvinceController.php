@@ -56,7 +56,7 @@ class ProvinceController extends Controller
     {
         return $this->erpExecution(function () use ($id, $staging) {
 
-            $staging->requestDelete(Province::class, $id, 'core.procedure_upsert_province_draft');
+            $staging->requestDelete(Province::class, $id, 'core.procedure_revise_province');
 
             return $this->erpResponse(
                 message: "Delete request for Province {$id} processed according to model policy."

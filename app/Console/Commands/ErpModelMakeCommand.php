@@ -152,10 +152,10 @@ BEGIN
         gen_random_uuid(),
         p_session_id,
         {$pkName},
-        'U', -- Default 'U' (Update) karena narik dari master
+        COALESCE(p_payload ->> 'temporary_option', 'U'),
         {$pkName},
         {$modelLower}_name,
-        is_removed
+        COALESCE((p_payload ->> 'is_removed')::boolean, false)
     FROM {$fullTableName} WHERE {$pkName} = v_master_id
     ON CONFLICT (master_id, session_id) DO NOTHING;
 END;

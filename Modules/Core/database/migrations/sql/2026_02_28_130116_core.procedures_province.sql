@@ -64,10 +64,10 @@ SELECT
     gen_random_uuid(),
     p_session_id,
     province_id, -- masuk ke master_id
-    'U',         -- Default Update karena narik dari master
+    COALESCE(p_payload ->> 'temporary_option', 'U'),
     province_id,
     province_name,
-    is_removed
+    COALESCE((p_payload ->> 'is_removed')::boolean, false)
 FROM core.province WHERE province_id = v_master_id
     ON CONFLICT (master_id, session_id) DO NOTHING;
 END;

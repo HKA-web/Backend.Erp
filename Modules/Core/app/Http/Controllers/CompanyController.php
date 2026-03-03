@@ -57,7 +57,7 @@ class CompanyController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete(Company::class, $id, 'core.procedure_upsert_company_draft');
+            $staging->requestDelete(Company::class, $id, 'core.procedure_revise_company');
 
             return $this->erpResponse(
                 message: "Delete request for Company {$id} processed according to model policy."

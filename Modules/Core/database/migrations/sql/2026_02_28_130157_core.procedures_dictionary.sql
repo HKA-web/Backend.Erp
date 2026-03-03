@@ -64,10 +64,10 @@ SELECT
     gen_random_uuid(),
     p_session_id,
     dictionary_id,
-    'U', -- Default Update
+    COALESCE(p_payload ->> 'temporary_option', 'U'),
     dictionary_id,
     dictionary_name,
-    is_removed
+    COALESCE((p_payload ->> 'is_removed')::boolean, false)
 FROM core.dictionary WHERE dictionary_id = v_master_id
     ON CONFLICT (master_id, session_id) DO NOTHING;
 END;

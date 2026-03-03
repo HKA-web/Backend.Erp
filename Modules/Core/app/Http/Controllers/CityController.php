@@ -57,7 +57,7 @@ class CityController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete(City::class, $id, 'core.procedure_upsert_city_draft');
+            $staging->requestDelete(City::class, $id, 'core.procedure_revise_city');
 
             return $this->erpResponse(
                 message: "Delete request for City {$id} processed according to model policy."

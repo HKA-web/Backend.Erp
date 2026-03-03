@@ -57,7 +57,7 @@ class DictionaryController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             // Logika pengecekan trait & eksekusi SP ada di dalam sini
-            $staging->requestDelete(Dictionary::class, $id, 'core.procedure_upsert_dictionary_draft');
+            $staging->requestDelete(Dictionary::class, $id, 'core.procedure_revise_dictionary');
 
             return $this->erpResponse(
                 message: "Delete request for Dictionary {$id} processed according to model policy."

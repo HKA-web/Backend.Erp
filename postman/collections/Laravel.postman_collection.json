@@ -373,6 +373,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "7ba338d5-70dd-4af8-9a0a-4bfa30ab91b7"
                       }
                     ],
                     "url": {
@@ -447,10 +453,16 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "48deea5c-e04a-47d3-94a7-b8b83e0cb3f4"
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/province/001",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province/100",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -464,7 +476,7 @@
                         "v1",
                         "core",
                         "province",
-                        "001"
+                        "100"
                       ]
                     }
                   },
@@ -605,6 +617,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "9d959a28-00cc-4d5c-9680-024cbfbf92a5"
                       }
                     ],
                     "body": {
@@ -612,12 +630,12 @@
                       "formdata": [
                         {
                           "key": "province_id",
-                          "value": "3",
+                          "value": "100",
                           "type": "text"
                         },
                         {
                           "key": "province_name",
-                          "value": "coba 3",
+                          "value": "zzzzzzzzzz",
                           "type": "text"
                         }
                       ]
@@ -662,11 +680,17 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "6586e1cd-e76f-4dc1-ad4a-578ffa7c3f1e"
                       }
                     ],
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n    \"province_name\": \"Nama Provinsi\"\n}",
+                      "raw": "{\n    \"province_name\": \"Nama Provinsi zzzzzzzzz\"\n}",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -674,7 +698,7 @@
                       }
                     },
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/c1fb6944-cb41-4724-aa4e-e1ed240a8677",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/e6cf766a-9470-451b-83fa-16be5b1b7540",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -688,7 +712,7 @@
                         "v1",
                         "core",
                         "province-drafts",
-                        "c1fb6944-cb41-4724-aa4e-e1ed240a8677"
+                        "e6cf766a-9470-451b-83fa-16be5b1b7540"
                       ]
                     }
                   },
@@ -714,6 +738,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "09858b2b-1c3c-4e3d-80b0-ac9559b29d42"
                       }
                     ],
                     "url": {
@@ -765,7 +795,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/c1fb6944-cb41-4724-aa4e-e1ed240a8677/commit",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/province-drafts/e6cf766a-9470-451b-83fa-16be5b1b7540/commit",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -779,7 +809,7 @@
                         "v1",
                         "core",
                         "province-drafts",
-                        "c1fb6944-cb41-4724-aa4e-e1ed240a8677",
+                        "e6cf766a-9470-451b-83fa-16be5b1b7540",
                         "commit"
                       ]
                     }
@@ -940,6 +970,135 @@
                     }
                   },
                   "response": []
+                },
+                {
+                  "name": "revise",
+                  "id": "104b7c91-eb21-4cae-b0e3-bd9218574037",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "7ba338d5-70dd-4af8-9a0a-4bfa30ab91b7"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/city/9e80b1dc-1374-4482-981a-8211f5b0ad59/revise/",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "city",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                        "revise",
+                        ""
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter",
+                          "value": "[\"is_removed\",\"=\",false]",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fields",
+                          "value": "province_name,city.city_name,city.district.district_name",
+                          "uuid": "8dd2897b-4777-4aba-8a72-b5a6b41727af",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "city,city.district",
+                          "uuid": "e817058e-9755-424f-b422-5af6d1657aee",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "bc69d59d-8a8c-4080-94f7-5a2dbee14726",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "48deea5c-e04a-47d3-94a7-b8b83e0cb3f4"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/city/100",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "city",
+                        "100"
+                      ]
+                    }
+                  },
+                  "response": []
                 }
               ],
               "id": "d948e0ba-98ca-484d-bb6c-26a49e07e1df"
@@ -1076,6 +1235,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "b3f9d0e3-ec66-414e-9eb2-eac7acccf190"
                       }
                     ],
                     "body": {
@@ -1133,6 +1298,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "b930af32-510e-407f-be84-833829d25192"
                       }
                     ],
                     "body": {
@@ -1185,6 +1356,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "66b65637-b45a-437d-8bb2-eab6ad8aa0b3"
                       }
                     ],
                     "url": {
@@ -1388,6 +1565,135 @@
                     }
                   },
                   "response": []
+                },
+                {
+                  "name": "revise",
+                  "id": "9bcd9c2b-4a57-4e52-8941-ad311cf7e135",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "7ba338d5-70dd-4af8-9a0a-4bfa30ab91b7"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/district/9e80b1dc-1374-4482-981a-8211f5b0ad59/revise/",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "district",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                        "revise",
+                        ""
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter",
+                          "value": "[\"is_removed\",\"=\",false]",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fields",
+                          "value": "province_name,city.city_name,city.district.district_name",
+                          "uuid": "8dd2897b-4777-4aba-8a72-b5a6b41727af",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "city,city.district",
+                          "uuid": "e817058e-9755-424f-b422-5af6d1657aee",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "e0b32e91-1f09-4866-97d0-32e835b187ce",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "48deea5c-e04a-47d3-94a7-b8b83e0cb3f4"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/district/100",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "district",
+                        "100"
+                      ]
+                    }
+                  },
+                  "response": []
                 }
               ],
               "id": "50755af0-9b2b-4e8f-a71b-8a0c5574e789"
@@ -1524,6 +1830,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "6fa68884-b0e4-48c1-a80e-4e9d96d2f01b"
                       }
                     ],
                     "body": {
@@ -1581,6 +1893,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "86de0b23-b15d-476b-bee5-b758360d4660"
                       }
                     ],
                     "body": {
@@ -1636,7 +1954,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/district-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/district-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -1651,6 +1969,14 @@
                         "core",
                         "district-drafts",
                         "1001e5ba-0b38-412e-a1d0-b3aa657be058"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "type": "text",
+                          "uuid": "59f2f73a-3180-49ca-891b-4900864de215"
+                        }
                       ]
                     }
                   },
@@ -1684,7 +2010,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/district-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/district-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850&Accept=application/json",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -1700,6 +2026,19 @@
                         "district-drafts",
                         "862602b8-800b-4e6f-84e9-07fe08ab69d5",
                         "commit"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "uuid": "563b3def-01c0-42cb-96f9-49d4cb8bd407"
+                        },
+                        {
+                          "key": "Accept",
+                          "value": "application/json",
+                          "type": "text",
+                          "uuid": "7cf8b9a4-f265-40a1-8659-039b4d1ee878"
+                        }
                       ]
                     }
                   },
@@ -1832,6 +2171,135 @@
                           "uuid": "b7e635de-821e-4b3a-84dd-6baa72e31a96",
                           "disabled": true
                         }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "revise",
+                  "id": "b7267fca-20c6-4bf4-8129-e827a30fc862",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "7ba338d5-70dd-4af8-9a0a-4bfa30ab91b7"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/village/9e80b1dc-1374-4482-981a-8211f5b0ad59/revise/",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "village",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                        "revise",
+                        ""
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter",
+                          "value": "[\"is_removed\",\"=\",false]",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fields",
+                          "value": "province_name,city.city_name,city.district.district_name",
+                          "uuid": "8dd2897b-4777-4aba-8a72-b5a6b41727af",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "city,city.district",
+                          "uuid": "e817058e-9755-424f-b422-5af6d1657aee",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "74288969-0972-45a7-b70f-16c0bb4954a6",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "48deea5c-e04a-47d3-94a7-b8b83e0cb3f4"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/village/100",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "village",
+                        "100"
                       ]
                     }
                   },
@@ -1972,6 +2440,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "c292b63f-d369-49da-a52b-67ce97291fed"
                       }
                     ],
                     "body": {
@@ -2029,6 +2503,12 @@
                         "key": "Accept",
                         "value": "application/json",
                         "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "ba0c13b0-89a6-46ce-a376-6fcb7a71b5bd"
                       }
                     ],
                     "body": {
@@ -2084,7 +2564,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/village-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/village-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -2099,6 +2579,14 @@
                         "core",
                         "village-drafts",
                         "1001e5ba-0b38-412e-a1d0-b3aa657be058"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "type": "text",
+                          "uuid": "3f346330-b79d-4e78-a7ec-6f34831eb58d"
+                        }
                       ]
                     }
                   },
@@ -2132,7 +2620,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/village-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/village-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -2148,6 +2636,14 @@
                         "village-drafts",
                         "862602b8-800b-4e6f-84e9-07fe08ab69d5",
                         "commit"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "type": "text",
+                          "uuid": "262dbc59-a969-4832-bff7-83f3ea5d28e3"
+                        }
                       ]
                     }
                   },
@@ -2158,6 +2654,609 @@
             }
           ],
           "id": "51b1975a-5620-441d-b45d-d0998dc9335e"
+        },
+        {
+          "name": "Dictionary",
+          "item": [
+            {
+              "name": "Master",
+              "item": [
+                {
+                  "name": "list",
+                  "id": "af220b5f-4615-4966-8a5d-c9e3c9a8558a",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary?expand=district",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary"
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "district",
+                          "uuid": "b7e635de-821e-4b3a-84dd-6baa72e31a96"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "show",
+                  "id": "64488633-f959-463f-82a0-0aa47604b609",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary/9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59"
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "district",
+                          "uuid": "b7e635de-821e-4b3a-84dd-6baa72e31a96",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "revise",
+                  "id": "9ddf27b1-1bf7-442f-927b-f1c2215981a7",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "7ba338d5-70dd-4af8-9a0a-4bfa30ab91b7"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary/9e80b1dc-1374-4482-981a-8211f5b0ad59/revise/",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary",
+                        "9e80b1dc-1374-4482-981a-8211f5b0ad59",
+                        "revise",
+                        ""
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter",
+                          "value": "[\"is_removed\",\"=\",false]",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fields",
+                          "value": "province_name,city.city_name,city.district.district_name",
+                          "uuid": "8dd2897b-4777-4aba-8a72-b5a6b41727af",
+                          "disabled": true
+                        },
+                        {
+                          "key": "expand",
+                          "value": "city,city.district",
+                          "uuid": "e817058e-9755-424f-b422-5af6d1657aee",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "eb486748-bf80-4504-9341-62349541cf9d",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "48deea5c-e04a-47d3-94a7-b8b83e0cb3f4"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary/100",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary",
+                        "100"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ],
+              "id": "f2a18fed-392e-44c0-8c68-11f14f14943d"
+            },
+            {
+              "name": "Temporary",
+              "item": [
+                {
+                  "name": "list",
+                  "id": "825b32d6-b06b-4dd4-9eb3-e1fee4247562",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary-drafts",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary-drafts"
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "show",
+                  "id": "24307d7b-5f28-416f-aba7-a75f60a3efef",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary-drafts",
+                        "862602b8-800b-4e6f-84e9-07fe08ab69d5"
+                      ],
+                      "query": [
+                        {
+                          "key": "take",
+                          "value": "1",
+                          "disabled": true
+                        },
+                        {
+                          "key": "skip",
+                          "value": "1",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "store",
+                  "id": "695f5823-722c-48fe-af61-01677056db61",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "6|CcFJZPjgFlKMBja42pYFZ26AlHAMsxJm6ZNpkidC15209a56",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "c292b63f-d369-49da-a52b-67ce97291fed"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "village_id",
+                          "value": "001",
+                          "type": "text"
+                        },
+                        {
+                          "key": "village_name",
+                          "value": "Data 1",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary-drafts",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary-drafts"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "update",
+                  "id": "cf56c793-fb45-4236-8f88-a9adf34364a7",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                        "type": "text",
+                        "uuid": "ba0c13b0-89a6-46ce-a376-6fcb7a71b5bd"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"village_name\": \"Nama Village\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/village-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "village-drafts",
+                        "862602b8-800b-4e6f-84e9-07fe08ab69d5"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "destroy",
+                  "id": "f3a96d71-a732-4c2d-a97d-88fd6fa00d39",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "6|CcFJZPjgFlKMBja42pYFZ26AlHAMsxJm6ZNpkidC15209a56",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary-drafts",
+                        "1001e5ba-0b38-412e-a1d0-b3aa657be058"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "uuid": "3f346330-b79d-4e78-a7ec-6f34831eb58d"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "commit",
+                  "id": "dccd8553-1e2d-41ba-b858-42533772a6b8",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "X-Session-ID",
+                        "value": "1cda885c-8f94-451e-bf5d-9a1a0b1c436b",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "http://127.0.0.1:8000/api/v1/core/dictionary-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                      "protocol": "http",
+                      "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                      ],
+                      "port": "8000",
+                      "path": [
+                        "api",
+                        "v1",
+                        "core",
+                        "dictionary-drafts",
+                        "862602b8-800b-4e6f-84e9-07fe08ab69d5",
+                        "commit"
+                      ],
+                      "query": [
+                        {
+                          "key": "X-Session-ID",
+                          "value": "dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850",
+                          "uuid": "262dbc59-a969-4832-bff7-83f3ea5d28e3"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ],
+              "id": "ad838fc4-8776-4811-b2b5-ee8af1f25410"
+            }
+          ],
+          "id": "f9f22296-396a-4fc6-944e-208b697fc2c3"
         }
       ],
       "id": "22bf4f46-78d9-4b1f-ae22-5a79c0948ca0"

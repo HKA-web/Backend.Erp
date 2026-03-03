@@ -41,7 +41,11 @@ class BaseStaging
         if ($hasStagingTrait) {
             return $this->executeStaging($procedureName, [
                 $primaryKey        => $id,
-                'master_id'        => $id,
+                'is_removed'       => true
+            ]);
+        } else {
+            return $this->executeStaging($procedureName, [
+                $primaryKey        => $id,
                 'is_removed'       => true,
                 'temporary_option' => 'D'
             ]);

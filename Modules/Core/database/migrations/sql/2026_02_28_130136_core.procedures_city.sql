@@ -70,11 +70,11 @@ SELECT
     gen_random_uuid(),
     p_session_id,
     city_id,
-    'U', -- Default Update
+    COALESCE(p_payload ->> 'temporary_option', 'U'),
     city_id,
     city_name,
     province_id,
-    is_removed
+    COALESCE((p_payload ->> 'is_removed')::boolean, false)
 FROM core.city WHERE city_id = v_master_id
     ON CONFLICT (master_id, session_id) DO NOTHING;
 END;
