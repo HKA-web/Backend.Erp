@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Modules\Core\Models\City;
 use Modules\Core\Models\Company;
 use Modules\Core\Models\District;
+use Modules\Core\Models\Menu;
 use Modules\Core\Models\Province;
 use Modules\Core\Models\Village;
 
@@ -21,5 +22,6 @@ class CoreDatabaseSeeder extends Seeder
         District::factory()->create();
         Village::factory()->create();
         Company::factory()->create();
+        Menu::factory()->create();
     }
 }

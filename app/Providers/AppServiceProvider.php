@@ -20,7 +20,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Macro untuk Query Builder (DB::table)
         QueryBuilder::macro('takeSkip', function () {
             $limit = request()->input('take', 10);
             $offset = request()->input('skip', 0);
@@ -28,7 +27,6 @@ class AppServiceProvider extends ServiceProvider
             return $this->limit($limit)->offset($offset);
         });
 
-        // Macro untuk Eloquent Builder (Model::query)
         EloquentBuilder::macro('takeSkip', function () {
             $limit = request()->input('take', 10);
             $offset = request()->input('skip', 0);
@@ -41,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
             string $remoteTable,
             string $remoteKey,
             string $type = 'string', // Optional change on parameter with: integer, uuid, bigInteger, dll
-            string $onDelete = 'set null' // Optional change on parameter with: cascade, restrict, no action
+            string $onDelete = 'cascade' // Optional change on parameter with: cascade, restrict, no action, set null
         ) {
             $this->{$type}($column)->nullable()->index();
 
@@ -133,14 +131,15 @@ class AppServiceProvider extends ServiceProvider
                 WHERE 1=0
             ");
 
-            Schema::table($fullTempPath, function (Blueprint $table) {
+            Schema::table($fullTempPath, function (Blueprint $table) use ($fullTempPath) {
                 $table->uuid('temporary_id')->primary()->change();
                 $table->uuid('parent_temporary_id')->nullable()->index()->change();
                 $table->string('master_id')->nullable()->index()->change();
                 $table->uuid('session_id')->index()->change();
                 $table->char('temporary_option', 1)->default('U')->comment('I: Insert, U: Update, D: Delete')->change();
 
-                $table->unique(['master_id', 'session_id'], 'uk_' . str_replace('.', '_', $table) . '_master_session');
+                $constraintName = 'uk_' . str_replace('.', '_', $fullTempPath) . '_master_session';
+                $table->unique(['master_id', 'session_id'], $constraintName);
             });
         });
     }

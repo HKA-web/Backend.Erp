@@ -1,5 +1,8 @@
 <?php
 
+use Modules\Core\Http\Controllers\MenuController;
+use Modules\Core\Http\Controllers\MenuDraftController;
+
 use Modules\Core\Http\Controllers\DictionaryController;
 use Modules\Core\Http\Controllers\DictionaryDraftController;
 
@@ -143,5 +146,26 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::put('/{id}', [DictionaryDraftController::class, 'update']);
         Route::delete('/{id}', [DictionaryDraftController::class, 'destroy']);
         Route::post('/{id}/commit', [DictionaryDraftController::class, 'commit']);
+    });
+});
+
+// Routes for core/Menu
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+    // Master Resource
+    Route::prefix('core/menu')->group(function () {
+        Route::get('/', [MenuController::class, 'index']);
+        Route::get('/{id}', [MenuController::class, 'show']);
+        Route::post('/{id}/revise', [MenuController::class, 'revise']);
+        Route::delete('/{id}', [MenuController::class, 'destroy']);
+    });
+
+    // Draft Resource
+    Route::prefix('core/menu-drafts')->group(function () {
+        Route::get('/', [MenuDraftController::class, 'index']);
+        Route::post('/', [MenuDraftController::class, 'store']);
+        Route::get('/{id}', [MenuDraftController::class, 'show']);
+        Route::put('/{id}', [MenuDraftController::class, 'update']);
+        Route::delete('/{id}', [MenuDraftController::class, 'destroy']);
+        Route::post('/{id}/commit', [MenuDraftController::class, 'commit']);
     });
 });

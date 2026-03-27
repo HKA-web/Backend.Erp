@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('enable')->default(true);
             $table->boolean('readonly')->default(false);
             $table->boolean('is_removed')->default(false);
+            $table->boolean('is_admin')->default(false);
             $table->timestamps();
         });
 

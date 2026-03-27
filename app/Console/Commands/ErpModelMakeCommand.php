@@ -292,7 +292,7 @@ SQL;
             File::put($path, "<?php\n\nuse Illuminate\Support\Facades\Route;\n");
         }
 
-        $modelLower = Str::lower($model);
+        $model_lower = Str::lower($model);
         $module_lower = Str::lower($module);
 
         $currentContent = File::get($path);
@@ -306,8 +306,8 @@ SQL;
 
         $stub = File::get($stubPath);
         $routeCode = str_replace(
-            ['{{model}}', '{{model_lower}}', '{{model_plural_lower}}', '{{module}}'],
-            [$model, $modelLower, $module, $module_lower],
+            ['{{model}}', '{{model_lower}}', '{{module}}', '{{module_lower}}'],
+            [$model, $model_lower, $module, $module_lower],
             $stub
         );
 

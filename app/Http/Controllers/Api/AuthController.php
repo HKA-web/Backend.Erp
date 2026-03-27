@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Modules\Authentication\Models\User;
+use Modules\Core\Models\Menu;
 
 class AuthController extends Controller
 {
@@ -60,28 +61,50 @@ class AuthController extends Controller
                 'password' => 'required'
             ]);
 
-            // Cari user berdasarkan email
             $user = User::where('email', $request->email)->first();
 
-            // Validasi Password
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
-            // Generate Sanctum Token
-            $token = $user->createToken('api-token')->plainTextToken;
+            // Reset token
+            $user->tokens()->delete();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            $menus = Menu::where('enable', true)
+                ->where('is_removed', false)
+                ->get();
+
+            $properties = is_array($user->properties)
+                ? $user->properties
+                : json_decode($user->properties, true) ?? [];
+
+            $existingMenus = collect($properties['menus'] ?? []);
+
+            $properties['menus'] = $menus->map(function ($menu) use ($existingMenus) {
+                $existing = $existingMenus->firstWhere('menu_id', $menu->menu_id);
+
+                return array_merge($menu->toArray(),[
+                    'sort_order' => $existing['sort_order'] ?? $menu->sort_order,
+                    // 'favorite'   => $existing['favorite'] ?? false,
+                ]);
+            })->values()->toArray();
+
+            $user->properties = $properties;
+            $user->save();
 
             return response()->json([
                 'access' => $token,
                 'session' => [
-                    'base64pk'        => base64_encode($user->user_id),
-                    'user_id'         => (string) $user->user_id,
-                    'user_name'       => strtoupper($user->user_name),
-                    'real_name'       => $user->user_name,
-                    'email'           => $user->email,
-                    'phone'           => $user->phone ?? '-',
+                    'base64pk'  => base64_encode($user->user_id),
+                    'user_id'   => (string) $user->user_id,
+                    'user_name' => strtoupper($user->user_name),
+                    'real_name' => $user->user_name,
+                    'email'     => $user->email,
+                    'phone'     => $user->phone ?? '-',
+                    'is_admin'  => $user->is_admin,
+                    'properties'=> $properties,
                 ],
-                // Pastikan model User sudah menggunakan trait Spatie HasRoles jika ingin pakai ini
                 'permissions' => method_exists($user, 'getAllPermissions')
                     ? $user->getAllPermissions()->pluck('name')
                     : []
