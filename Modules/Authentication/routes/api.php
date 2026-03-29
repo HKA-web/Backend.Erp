@@ -12,6 +12,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
         Route::post('/{id}/revise', [UserController::class, 'revise']);
+        Route::post('/{id}/reorder', [UserController::class, 'reorder']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 

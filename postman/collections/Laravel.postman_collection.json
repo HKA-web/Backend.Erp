@@ -123,6 +123,60 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Reorder Menu",
+          "id": "5ca02790-6409-41df-805c-6ada775ce126",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "68|b5wuNnIzmY87HuL9x51etqhvZ7hdpPCUabEHu3qf1e93b2c1",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text",
+                "uuid": "9c6f5163-a534-46be-9e4f-3ba059309021"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"menus\": [\n        {\n            \"menu_id\": \"0d93e1f9-2123-4588-a92d-999f613c0eb9\",\n            \"permission_id\": null,\n            \"menu_name\": \"inventory\",\n            \"sort_order\": \"1\",\n            \"action\": \"/inventory\",\n            \"target\": \"-\",\n            \"interface\": \"web\",\n            \"icon\": \"inventory\",\n            \"properties\": null,\n            \"enable\": true,\n            \"readonly\": false,\n            \"is_removed\": false,\n            \"created_by\": null,\n            \"updated_by\": null,\n            \"created_at\": {\n                \"zone\": \"+07:00\",\n                \"utc\": \"2026-03-26T01:34:55.000000Z\",\n                \"date\": \"2026-03-26\",\n                \"time\": \"08:34:55.000000\",\n                \"datetime\": \"2026-03-26T08:34:55+07:00\",\n                \"datetimezone\": \"2026-03-26T08:34:55.000000+07:00\"\n            },\n            \"updated_at\": {\n                \"zone\": \"+07:00\",\n                \"utc\": \"2026-03-26T01:34:55.000000Z\",\n                \"date\": \"2026-03-26\",\n                \"time\": \"08:34:55.000000\",\n                \"datetime\": \"2026-03-26T08:34:55+07:00\",\n                \"datetimezone\": \"2026-03-26T08:34:55.000000+07:00\"\n            },\n            \"status\": \"DRAFT\",\n            \"parent_id\": null\n        },\n        {\n            \"menu_id\": \"0d93e1f9-2123-4588-a92d-999f613d0eb9\",\n            \"permission_id\": null,\n            \"menu_name\": \"pos\",\n            \"sort_order\": \"2\",\n            \"action\": \"/pos\",\n            \"target\": \"-\",\n            \"interface\": \"web\",\n            \"icon\": \"pos\",\n            \"properties\": null,\n            \"enable\": true,\n            \"readonly\": false,\n            \"is_removed\": false,\n            \"created_by\": null,\n            \"updated_by\": null,\n            \"created_at\": {\n                \"zone\": \"+07:00\",\n                \"utc\": \"2026-03-26T01:34:55.000000Z\",\n                \"date\": \"2026-03-26\",\n                \"time\": \"08:34:55.000000\",\n                \"datetime\": \"2026-03-26T08:34:55+07:00\",\n                \"datetimezone\": \"2026-03-26T08:34:55.000000+07:00\"\n            },\n            \"updated_at\": {\n                \"zone\": \"+07:00\",\n                \"utc\": \"2026-03-26T01:34:55.000000Z\",\n                \"date\": \"2026-03-26\",\n                \"time\": \"08:34:55.000000\",\n                \"datetime\": \"2026-03-26T08:34:55+07:00\",\n                \"datetimezone\": \"2026-03-26T08:34:55.000000+07:00\"\n            },\n            \"status\": \"DRAFT\",\n            \"parent_id\": null\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/authentication/user/6e373462-2de3-4407-97cd-011ab94fa5a3/reorder",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "v1",
+                "authentication",
+                "user",
+                "6e373462-2de3-4407-97cd-011ab94fa5a3",
+                "reorder"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "id": "5a147f12-35a0-4e08-b1ce-0724d9d2d6a9"
@@ -180,7 +234,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"admin@email.com\",\n  \"password\": \"password\"\n}\n",
+                  "raw": "{\n  \"email\": \"walter.douglas@example.org\",\n  \"password\": \"#user#\"\n}\n",
                   "options": {
                     "raw": {
                       "language": "json"

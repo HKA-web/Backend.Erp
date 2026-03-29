@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
 use Modules\Authentication\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -65,4 +66,27 @@ class UserController extends Controller
 
         }, "Failed to process delete request for User.");
     }
+
+    public function reorder(Request $request, $id, BaseStaging $staging)
+    {
+        $validated = $request->validate([
+            'menus' => 'required|array'
+        ]);
+        
+        return $this->erpExecution(function () use ($staging, $id, $validated) {
+
+            $user = User::findOrFail($id);
+            $staging->executeStaging('authentication.procedure_quick_update_user', [
+                'user_id'     => $id,
+                'menus'       => $validated['menus'],
+                'executed_by' => auth()->id() 
+            ]);
+
+            return $this->erpResponse(
+                message: "Menu order personal saved successfully."
+            );
+
+        }, "Failed to update menu order for User.");
+    }
+
 }

@@ -51,6 +51,11 @@ class User extends Authenticatable
         'user_name',
         'email',
         'password',
+        'properties',
+    ];
+    
+    protected $casts = [
+        'properties' => 'array',
     ];
 
 }
