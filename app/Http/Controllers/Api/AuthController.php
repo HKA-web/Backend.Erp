@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Modules\Authentication\Models\User;
 use Modules\Core\Models\Menu;
+use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
@@ -67,11 +68,11 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
-            // Reset token
             $user->tokens()->delete();
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            $menus = Menu::where('enable', true)
+            $menus = Menu::with('permission')
+                ->where('enable', true)
                 ->where('is_removed', false)
                 ->get();
 
@@ -83,15 +84,24 @@ class AuthController extends Controller
 
             $properties['menus'] = $menus->map(function ($menu) use ($existingMenus) {
                 $existing = $existingMenus->firstWhere('menu_id', $menu->menu_id);
+                $menuArray = $menu->toArray();
 
-                return array_merge($menu->toArray(),[
-                    'sort_order' => $existing['sort_order'] ?? $menu->sort_order,
-                    // 'favorite'   => $existing['favorite'] ?? false,
+                return array_merge($menuArray, [
+                    'sort_order' => $existing['sort_order'] ?? (string) $menu->sort_order,
                 ]);
             })->values()->toArray();
 
             $user->properties = $properties;
             $user->save();
+
+            $permissions = [];
+            if ($user->is_admin) {
+                $permissions = Permission::pluck('name');
+            } else {
+                $permissions = method_exists($user, 'getAllPermissions')
+                    ? $user->getAllPermissions()->pluck('name')
+                    : [];
+            }
 
             return response()->json([
                 'access' => $token,
@@ -105,9 +115,7 @@ class AuthController extends Controller
                     'is_admin'  => $user->is_admin,
                     'properties'=> $properties,
                 ],
-                'permissions' => method_exists($user, 'getAllPermissions')
-                    ? $user->getAllPermissions()->pluck('name')
-                    : []
+                'permissions' => $permissions
             ]);
         });
     }

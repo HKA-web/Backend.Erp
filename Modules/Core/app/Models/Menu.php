@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Core\Database\Factories\MenuFactory;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Permission;
 
 class Menu extends Model
 {
@@ -28,5 +29,10 @@ class Menu extends Model
     protected static function newFactory()
     {
         return MenuFactory::new();
+    }
+
+    public function permission()
+    {
+        return $this->belongsTo(Permission::class, 'permission_id', 'id');
     }
 }

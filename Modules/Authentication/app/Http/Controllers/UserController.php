@@ -76,7 +76,7 @@ class UserController extends Controller
         return $this->erpExecution(function () use ($staging, $id, $validated) {
 
             $user = User::findOrFail($id);
-            $staging->executeStaging('authentication.procedure_quick_update_user', [
+            $staging->executeStaging('authentication.procedure_reorder_menu_user', [
                 'user_id'     => $id,
                 'menus'       => $validated['menus'],
                 'executed_by' => auth()->id() 

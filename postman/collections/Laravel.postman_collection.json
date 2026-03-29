@@ -3327,7 +3327,7 @@
                       "bearer": [
                         {
                           "key": "token",
-                          "value": "23|g2ByuPxDZ0yX333VG3d2h8wwG6woHlImFPjQjSWR83b432d6",
+                          "value": "81|I0sW16JSYC0NdbT4Zv8LkHud31ll2pR7Iwtl6JCR537c0b2a",
                           "type": "string"
                         }
                       ]
@@ -3341,7 +3341,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "http://127.0.0.1:8000/api/v1/core/menu/?sort=[{\"selector\":\"menu_id\",\"desc\":false}]",
+                      "raw": "http://127.0.0.1:8000/api/v1/core/menu/?expand=permission",
                       "protocol": "http",
                       "host": [
                         "127",
@@ -3370,9 +3370,8 @@
                         },
                         {
                           "key": "expand",
-                          "value": "district",
-                          "uuid": "b7e635de-821e-4b3a-84dd-6baa72e31a96",
-                          "disabled": true
+                          "value": "permission",
+                          "uuid": "b7e635de-821e-4b3a-84dd-6baa72e31a96"
                         },
                         {
                           "key": "filter",
@@ -3383,8 +3382,8 @@
                         {
                           "key": "sort",
                           "value": "[{\"selector\":\"menu_id\",\"desc\":false}]",
-                          "type": "text",
-                          "uuid": "e3f27a93-2c23-43f9-88da-15cb19240339"
+                          "uuid": "e3f27a93-2c23-43f9-88da-15cb19240339",
+                          "disabled": true
                         }
                       ]
                     }
