@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyDraftController extends Controller
 {
-    /**
-     * Display all active drafts in the temporary table for current session.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
@@ -21,9 +18,6 @@ class CompanyDraftController extends Controller
         });
     }
 
-    /**
-     * Save a new draft.
-     */
     public function store(CompanyRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
@@ -35,9 +29,6 @@ class CompanyDraftController extends Controller
         });
     }
 
-    /**
-     * Show draft details from temporary table.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -48,9 +39,6 @@ class CompanyDraftController extends Controller
         });
     }
 
-    /**
-     * Update existing draft in temporary table.
-     */
     public function update(CompanyRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
@@ -62,9 +50,6 @@ class CompanyDraftController extends Controller
         });
     }
 
-    /**
-     * Discard draft (Delete from temporary).
-     */
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -76,10 +61,6 @@ class CompanyDraftController extends Controller
         });
     }
 
-    /**
-     * Final Action: Commit Draft to Master.
-     * POST /v1/company-drafts/{id}/commit
-     */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -91,10 +72,9 @@ class CompanyDraftController extends Controller
             $staging->executeStaging('core.procedure_commit_company', $payload);
 
             return $this->erpResponse(
-                message: "Company committed to master successfully."
+                message: "Company committed to master successfully.",
+                tags: ['company']
             );
         }, "Failed to commit draft.");
     }
-
-
 }

@@ -1,0 +1,13 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/dictionary-drafts/862602b8-800b-4e6f-84e9-07fe08ab69d5/commit?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850
+method: POST
+headers:
+  Accept: application/json
+  X-Session-ID: 1cda885c-8f94-451e-bf5d-9a1a0b1c436b
+queryParams:
+  X-Session-ID: dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850
+auth:
+  type: bearer
+  credentials:
+    token: 4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f
+order: 6000

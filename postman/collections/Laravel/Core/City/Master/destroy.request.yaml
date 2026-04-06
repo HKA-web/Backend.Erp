@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/city/100
+method: DELETE
+headers:
+  Accept: application/json
+  X-Session-ID: dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850
+auth:
+  type: bearer
+  credentials:
+    token: 5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7
+order: 4000

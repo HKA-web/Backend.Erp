@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class UserDraftController extends Controller
 {
-    /**
-     * Display all active drafts in the temporary table for current session.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
@@ -21,9 +18,6 @@ class UserDraftController extends Controller
         });
     }
 
-    /**
-     * Save a new draft.
-     */
     public function store(UserRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
@@ -35,9 +29,6 @@ class UserDraftController extends Controller
         });
     }
 
-    /**
-     * Show draft details from temporary table.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -48,9 +39,6 @@ class UserDraftController extends Controller
         });
     }
 
-    /**
-     * Update existing draft in temporary table.
-     */
     public function update(UserRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
@@ -62,9 +50,6 @@ class UserDraftController extends Controller
         });
     }
 
-    /**
-     * Discard draft (Delete from temporary).
-     */
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -76,16 +61,12 @@ class UserDraftController extends Controller
         });
     }
 
-    /**
-     * Final Action: Commit Draft to Master.
-     * POST /v1/user-drafts/{id}/commit
-     */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = ['user_id' => $id];
 
-            $staging->executeStaging('authentication.procedure_commit_user', $payload);
+            $staging->executeStaging('authentication.procedure_commit_user', $payload, ['user']);
 
             return $this->erpResponse(
                 message: "User committed to master successfully."

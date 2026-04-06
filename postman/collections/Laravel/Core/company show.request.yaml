@@ -1,0 +1,26 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/company/001
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+  - key: filter
+    value: '["is_removed","=",false]'
+    disabled: true
+  - key: fields
+    value: province_name,city.city_name,city.district.district_name
+    disabled: true
+  - key: expand
+    value: city,city.district
+    disabled: true
+auth:
+  type: bearer
+  credentials:
+    token: 15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a
+order: 6000

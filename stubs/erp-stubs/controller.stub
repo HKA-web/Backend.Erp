@@ -9,31 +9,21 @@ use Illuminate\Http\Request;
 
 class {{model}}Controller extends Controller
 {
-    /**
-     * Display a listing of final posted resources.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
-            return $this->erpResponse({{model}}::query());
+            return $this->erpResponse({{model}}::query(), tags: ['{{model_lower}}']);
         });
     }
 
-    /**
-     * Show the specified final resource.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
             $query = {{model}}::where('{{model_lower}}_id', $id);
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, tags: ['{{model_lower}}']);
         });
     }
 
-    /**
-     * Action to pull Master data into Draft for revision.
-     * POST /v1/{{model_plural_lower}}/{id}/revise
-     */
     public function revise($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -48,15 +38,10 @@ class {{model}}Controller extends Controller
         }, "Failed to initiate revision for {{model}}.");
     }
 
-    /**
-     * Remove the specified resource (Encapsulated logic in BaseStaging).
-     * DELETE /v1/{{model_plural_lower}}/{id}
-     */
     public function destroy($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($id, $staging) {
 
-            // Logika pengecekan trait & eksekusi SP ada di dalam sini
             $staging->requestDelete({{model}}::class, $id, '{{module_lower}}.procedure_revise_{{model_lower}}');
 
             return $this->erpResponse(

@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/district-drafts/1001e5ba-0b38-412e-a1d0-b3aa657be058?X-Session-ID=dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850
+method: DELETE
+headers:
+  Accept: application/json
+queryParams:
+  X-Session-ID: dfd9b5b6-e2d8-4f39-a9f8-4ff35b9fa850
+auth:
+  type: bearer
+  credentials:
+    token: 6|CcFJZPjgFlKMBja42pYFZ26AlHAMsxJm6ZNpkidC15209a56
+order: 5000

@@ -1,0 +1,15 @@
+# Use this workspace to collaborate
+workspace:
+  id: 10f3f917-c718-4431-9f98-0be08a03abaa
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Laravel: 12462927-725b08f4-4385-400b-bde7-77dd8ed1e77f
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

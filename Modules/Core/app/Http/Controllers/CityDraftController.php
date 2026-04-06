@@ -9,21 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class CityDraftController extends Controller
 {
-    /**
-     * Display all active drafts in the temporary table for current session.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
-            // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.core_city');
             return $this->erpResponse($query);
         });
     }
 
-    /**
-     * Save a new draft.
-     */
     public function store(CityRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
@@ -35,9 +28,6 @@ class CityDraftController extends Controller
         });
     }
 
-    /**
-     * Show draft details from temporary table.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -48,9 +38,6 @@ class CityDraftController extends Controller
         });
     }
 
-    /**
-     * Update existing draft in temporary table.
-     */
     public function update(CityRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
@@ -62,9 +49,6 @@ class CityDraftController extends Controller
         });
     }
 
-    /**
-     * Discard draft (Delete from temporary).
-     */
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -76,10 +60,6 @@ class CityDraftController extends Controller
         });
     }
 
-    /**
-     * Final Action: Commit Draft to Master.
-     * POST /v1/city-drafts/{id}/commit
-     */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -91,7 +71,8 @@ class CityDraftController extends Controller
             $staging->executeStaging('core.procedure_commit_city', $payload);
 
             return $this->erpResponse(
-                message: "City committed to master successfully."
+                message: "City committed to master successfully.",
+                tags: ['city']
             );
         }, "Failed to commit draft.");
     }

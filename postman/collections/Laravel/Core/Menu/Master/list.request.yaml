@@ -1,0 +1,25 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/menu/?expand=permission
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+  - key: expand
+    value: permission
+  - key: filter
+    value: '[["is_removed","=",false],"and",["enable","=","true"]]'
+    disabled: true
+  - key: sort
+    value: '[{"selector":"menu_id","desc":false}]'
+    disabled: true
+auth:
+  type: bearer
+  credentials:
+    token: 81|I0sW16JSYC0NdbT4Zv8LkHud31ll2pR7Iwtl6JCR537c0b2a
+order: 1000

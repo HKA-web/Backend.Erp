@@ -4,36 +4,33 @@ namespace App\Services;
 
 use App\Traits\SoftDelete;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BaseStaging
 {
-    /**
-     * Menjalankan Stored Procedure dengan otomatisasi session dan user_id.
-     */
-    public function executeStaging(string $procedureName, array $payload)
+    public function executeStaging(string $procedureName, array $payload, array $tags = [])
     {
-        // 1. Ambil Session ID (Misal dari Session Laravel atau Header)
         $sessionId = request()->header('X-Session-ID') ?? Str::uuid()->toString();
-
-        // 2. Suntikkan User ID ke dalam payload untuk audit history di SP
         $payload['user_id'] = Auth::id();
 
-        // 3. Eksekusi Procedure
-        return DB::statement("CALL {$procedureName}(?, ?)", [
+        $result = DB::statement("CALL {$procedureName}(?, ?)", [
             $sessionId,
             json_encode($payload)
         ]);
+
+        if ($result && !empty($tags)) {
+            Cache::tags($tags)->flush();
+        }
+
+        return $result;
     }
 
-    /**
-     * Logika cerdas untuk menghapus data berdasarkan kebijakan model (Trait).
-     */
     public function requestDelete($modelClass, $id, $procedureName)
     {
         $model = new $modelClass;
-        $primaryKey = $model->getKeyName() ?? "{$this->model_lower}_id";
+        $primaryKey = $model->getKeyName();
 
         $traits = class_uses_recursive($model);
         $hasStagingTrait = in_array(SoftDelete::class, $traits);
@@ -50,6 +47,5 @@ class BaseStaging
                 'temporary_option' => 'D'
             ]);
         }
-
     }
 }

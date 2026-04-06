@@ -1,0 +1,85 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/authentication/user/6e373462-2de3-4407-97cd-011ab94fa5a3/reorder
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+        "menus": [
+            {
+                "menu_id": "0d93e1f9-2123-4588-a92d-999f613c0eb9",
+                "permission_id": null,
+                "menu_name": "inventory",
+                "sort_order": "1",
+                "action": "/inventory",
+                "target": "-",
+                "interface": "web",
+                "icon": "inventory",
+                "properties": null,
+                "enable": true,
+                "readonly": false,
+                "is_removed": false,
+                "created_by": null,
+                "updated_by": null,
+                "created_at": {
+                    "zone": "+07:00",
+                    "utc": "2026-03-26T01:34:55.000000Z",
+                    "date": "2026-03-26",
+                    "time": "08:34:55.000000",
+                    "datetime": "2026-03-26T08:34:55+07:00",
+                    "datetimezone": "2026-03-26T08:34:55.000000+07:00"
+                },
+                "updated_at": {
+                    "zone": "+07:00",
+                    "utc": "2026-03-26T01:34:55.000000Z",
+                    "date": "2026-03-26",
+                    "time": "08:34:55.000000",
+                    "datetime": "2026-03-26T08:34:55+07:00",
+                    "datetimezone": "2026-03-26T08:34:55.000000+07:00"
+                },
+                "status": "DRAFT",
+                "parent_id": null
+            },
+            {
+                "menu_id": "0d93e1f9-2123-4588-a92d-999f613d0eb9",
+                "permission_id": null,
+                "menu_name": "pos",
+                "sort_order": "2",
+                "action": "/pos",
+                "target": "-",
+                "interface": "web",
+                "icon": "pos",
+                "properties": null,
+                "enable": true,
+                "readonly": false,
+                "is_removed": false,
+                "created_by": null,
+                "updated_by": null,
+                "created_at": {
+                    "zone": "+07:00",
+                    "utc": "2026-03-26T01:34:55.000000Z",
+                    "date": "2026-03-26",
+                    "time": "08:34:55.000000",
+                    "datetime": "2026-03-26T08:34:55+07:00",
+                    "datetimezone": "2026-03-26T08:34:55.000000+07:00"
+                },
+                "updated_at": {
+                    "zone": "+07:00",
+                    "utc": "2026-03-26T01:34:55.000000Z",
+                    "date": "2026-03-26",
+                    "time": "08:34:55.000000",
+                    "datetime": "2026-03-26T08:34:55+07:00",
+                    "datetimezone": "2026-03-26T08:34:55.000000+07:00"
+                },
+                "status": "DRAFT",
+                "parent_id": null
+            }
+        ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: 68|b5wuNnIzmY87HuL9x51etqhvZ7hdpPCUabEHu3qf1e93b2c1
+order: 3000

@@ -1,0 +1,26 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/company
+method: POST
+headers:
+  Accept: application/json
+  x-session-id: ce4c06dc-4799-40d1-bfbe-37fc18129701
+body:
+  type: formdata
+  content:
+    - type: text
+      key: company_id
+      value: "002"
+      disabled: true
+    - type: text
+      key: company_name
+      value: coba2 update
+      disabled: true
+    - type: text
+      key: status
+      value: POSTED
+      disabled: true
+auth:
+  type: bearer
+  credentials:
+    token: 15|SgL85cd9gROnbnqKu8tWQ8YBdDvnvtk2rJf6fpnk4e505f6a
+order: 5000

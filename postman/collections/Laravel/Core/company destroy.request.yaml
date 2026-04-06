@@ -1,0 +1,34 @@
+$kind: http-request
+url: http://127.0.0.1:8001/api/v1/core/company/002
+method: DELETE
+headers:
+  Accept: application/json
+  x-session-id: ce4c06dc-4799-40d1-bfbe-37fc18129701
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+  - key: filter
+    value: '["is_removed","=",false]'
+    disabled: true
+  - key: fields
+    value: company__name,enable
+    disabled: true
+  - key: expand
+    value: city,city.district
+    disabled: true
+body:
+  type: json
+  content: |-
+    {
+        "status": "DELETE",
+        "is_removed": true
+    }
+auth:
+  type: bearer
+  credentials:
+    token: 16|rxa0NZi0NsrSraGSmWNWJi16nVSDrsftGHLYzTZ1bbb04d75
+order: 8000

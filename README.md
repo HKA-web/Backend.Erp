@@ -1,114 +1,97 @@
-
-# Change Language
-
-[🇮🇩 Indonesia](README.id.md)
-
----
-
-# 🚀 ERP Backend – Enterprise Modular Architecture
-
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 ERP Backend – Arsitektur Modular Enterprise
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <a href="https://laravel.com" target="_blank">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  </a>
 </p>
 
-Enterprise-grade modular backend built with Laravel and PostgreSQL using a **Master–Draft Pattern**, Stored Procedures, and database-driven business logic.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework"></a>
+</p>
 
 ---
 
-# 📚 Table of Contents
+Backend modular kelas enterprise berbasis **Laravel + PostgreSQL** dengan pendekatan:
 
-* [Overview](#-overview)
-* [Installation](#-installation)
-* [Creating New Modules](#-creating-new-modules)
-* [Permission Management](#-permission-management)
-* [Architecture](#-architecture)
-* [Workflow](#-workflow)
-* [API Structure](#-api-structure)
-* [Database Flow](#-database-flow)
-* [Why This Architecture?](#-why-this-architecture)
-* [API Documentation](#-api-documentation)
-* [Temporary Hierarchical](#-temporary-schema)
+- Master–Draft Pattern
+- Database-driven business logic
+- Stored Procedure & Trigger
+- Siap audit & workflow kompleks
 
 ---
 
-# 🧭 Overview
+# 📚 Daftar Isi
 
-This project is built using a [**Laravel Module**](https://laravelmodules.com/docs/12/advanced/artisan-commands).
-
-Core principles:
-
-* Separation between **Master (Posted Data)** and **Draft (Temporary Workspace)**
-* Business logic handled at **database level (Triggers & Stored Procedures)**
-* Laravel acts as:
-
-    * Validator
-    * Orchestrator
-    * API responder
+- Ringkasan
+- Instalasi
+- Membuat Modul
+- Permission
+- Arsitektur
+- Alur Kerja
+- Struktur API
+- Database Flow
+- Cache & Redis
+- Temporary Schema
+- Kenapa Arsitektur Ini
 
 ---
 
-# 🚀 Installation
+# 🧭 Ringkasan
 
-## Requirements
+Proyek ini menggunakan konsep modular dengan pendekatan:
 
-* PHP 8.2+
-* Composer
-* Laravel 12.x
-* PostgreSQL
+- Master (Posted Data)
+- Draft (Workspace)
+- Business logic di database
+
+Laravel hanya berperan sebagai:
+
+- Validator
+- Orchestrator
+- API Response Layer
+
+---
+
+# 🚀 Instalasi
+
+## Kebutuhan
+
+- PHP 8.2+
+- Composer
+- Laravel 12.x
+- PostgreSQL
+- Redis (opsional tapi direkomendasikan)
 
 ---
 
 ## Setup
 
-Clone repository:
-
 ```bash
-git clone https://github.com/HKA-web/Backend.Erp.git {project_name}
+git clone https://github.com/HKA-web/Backend.Erp.git project
+cd project
 ```
 
-Enter project:
-
 ```bash
-cd {project_name}
+composer install
 ```
-
-Install dependencies:
-
-```bash
-composer install --prefer-dist
-```
-
-Setup environment:
 
 ```bash
 cp .env.example .env
-```
-
-Generate key:
-
-```bash
 php artisan key:generate
 ```
-
-Run migration:
 
 ```bash
 php artisan migrate
 ```
 
-Run seed default:
-
 ```bash
 php artisan module:seed Authentication
 php artisan module:seed Core
 ```
-
-Run server:
 
 ```bash
 php artisan serve
@@ -116,27 +99,19 @@ php artisan serve
 
 ---
 
-# 🛠 Creating New Modules
-
-Create module:
+# 🛠 Membuat Modul
 
 ```bash
 php artisan erp:make-module {module}
 ```
 
-Create model:
-
 ```bash
 php artisan erp:make-model {model} {module}
 ```
 
-Run module migration:
-
 ```bash
 php artisan module:migrate {module}
 ```
-
-Run seed the database:
 
 ```bash
 php artisan module:seed {module}
@@ -144,11 +119,9 @@ php artisan module:seed {module}
 
 ---
 
-# 🔐 Permission Management
+# 🔐 Manajemen Permission
 
-This project uses [**Spatie Laravel Permission**.](https://spatie.be/docs/laravel-permission/v7/introduction)
-
-Example:
+Menggunakan Spatie Laravel Permission
 
 ```php
 $user->assignRole('admin');
@@ -157,34 +130,41 @@ $role->givePermissionTo('edit-user');
 
 ---
 
-# 🏗 Architecture
+# 🏗 Arsitektur
 
-## Master–Draft Pattern + remoteForeign Support
+## Master–Draft Pattern
 
-* ✅ Master & Draft schema separation
-* ✅ Cross-schema relationship using `remoteForeign`
-* ✅ All Master modifications via Stored Procedures
-* ✅ Audit-friendly & workflow-ready
-
----
-
-## 🧩 High-Level Architecture Diagram
-
-![Architecture Diagram](public/documentation/arcitecture-diagram.png)
+- Data Master = immutable (tidak bisa diedit langsung)
+- Semua perubahan melalui Draft
+- Commit melalui stored procedure
 
 ---
 
-# 🔄 Workflow
+## Karakteristik
 
-## API Endpoint Example
+- Tidak ada edit langsung ke Master
+- Audit-ready
+- Mendukung approval
+- Aman untuk multi-user
+- Business logic di database
 
-`POST /store`
+---
 
-### Laravel Responsibilities
+# 🔄 Alur Kerja
 
-* Validate input
-* Store validated data into temporary table
-* Execute stored procedure:
+## Flow API
+
+Endpoint:
+
+```
+POST /store
+```
+
+### Laravel
+
+- Validasi
+- Simpan ke temporary table
+- Call procedure
 
 ```sql
 CALL core.procedure_commit();
@@ -192,250 +172,273 @@ CALL core.procedure_commit();
 
 ---
 
-## Database Responsibilities
+### Database
 
-When an `INSERT` or status update occurs:
+Trigger akan:
 
-Trigger automatically executes:
-
-> "New data detected → calculate balance → create journal → update stock."
-
----
-
-## Final Flow
-
-1. Database returns **OK**
-2. Laravel returns JSON success response
+- Hitung saldo
+- Generate jurnal
+- Update stok
 
 ---
 
-# 📦 Example Module
+### Result
 
-Example generated module:
-
-* Module: `Core`
-* Model: `Dictionary`
-* Master Table: `core.dictionary`
-* Temporary Table: `temporary.core_dictionary`
+- DB → OK
+- Laravel → JSON Response
 
 ---
 
-# 🏛 API Structure
+# 📦 Contoh Modul
+
+| Komponen     | Nama                      |
+| ------------ | ------------------------- |
+| Module       | Core                      |
+| Model        | Dictionary                |
+| Master Table | core.dictionary           |
+| Temp Table   | temporary.core_dictionary |
 
 ---
 
-## 1️⃣ Master Resource (Official / Posted Data)
+# 🏛 Struktur API
 
-🔒 No direct edits allowed.
+## Master (Posted)
 
-| Method | Endpoint                          | Description          |
-| ------ |-----------------------------------| -------------------- |
-| GET    | `/v1/core/dictionary`             | List POSTED data     |
-| GET    | `/v1/core/dictionary/{id}`        | View official detail |
-| POST   | `/v1/core/dictionary/{id}/revise` | Lock & copy to Draft |
-| DELETE | `/v1/core/dictionary/{id}`        | Request deletion     |
+| Method | Endpoint                        |
+| ------ | ------------------------------- |
+| GET    | /v1/core/dictionary             |
+| GET    | /v1/core/dictionary/{id}        |
+| POST   | /v1/core/dictionary/{id}/revise |
+| DELETE | /v1/core/dictionary/{id}        |
 
 ---
 
-## 2️⃣ Draft Resource (Workspace / Sandbox)
+## Draft
 
-| Method | Endpoint                                 | Description   |
-| ------ |------------------------------------------| ------------- |
-| GET    | `/v1/core/dictionary-drafts`             | List drafts   |
-| POST   | `/v1/core/dictionary-drafts`             | Create draft  |
-| GET    | `/v1/core/dictionary-drafts/{id}`        | Draft detail  |
-| PUT    | `/v1/core/dictionary-drafts/{id}`        | Update draft  |
-| DELETE | `/v1/core/dictionary-drafts/{id}`        | Discard draft |
-| POST   | `/v1/core/dictionary-drafts/{id}/commit` | Finalize      |
+| Method | Endpoint                               |
+| ------ | -------------------------------------- |
+| GET    | /v1/core/dictionary-drafts             |
+| POST   | /v1/core/dictionary-drafts             |
+| GET    | /v1/core/dictionary-drafts/{id}        |
+| PUT    | /v1/core/dictionary-drafts/{id}        |
+| DELETE | /v1/core/dictionary-drafts/{id}        |
+| POST   | /v1/core/dictionary-drafts/{id}/commit |
 
 ---
 
 # 🧠 Database Flow
 
-## ✏️ Edit Flow
+## Edit Flow
 
-![Edit Flow Diagram](public/documentation/edit-flow-diagram.png)
-
----
-
-## 🗑 Delete Flow
-
-![Delete Flow Diagram](public/documentation/delete-flow-diagram.png)
+1. Data Master dikunci
+2. Disalin ke Draft
+3. User edit di Draft
+4. Commit → Procedure jalan
 
 ---
 
-# 🎯 Why This Architecture?
+## Delete Flow
 
-* ✅ Zero direct edits to Master
-* ✅ Fully auditable
-* ✅ Supports approval workflow
-* ✅ Multi-user safe
-* ✅ Database-driven business rules
-* ✅ No redeploy needed for business logic changes
+1. Tandai delete di Draft
+2. Commit
+3. Database handle logic
 
 ---
 
-# 💼 Real Enterprise Advantage
+# 🧹 Cache & Redis
 
-If your manager says:
+## Kenapa penting?
 
-> “Every time we save a Village, automatically create a Region record.”
+Digunakan untuk:
 
-You DO NOT need to:
-
-* Modify Controller
-* Change Service layer
-* Redeploy the app
-
-You ONLY:
-
-1. Open pgAdmin
-2. Modify Trigger or Procedure
-3. Done.
+- Cache
+- Session
+- Queue
+- Permission cache
 
 ---
 
-# 📄 API Documentation
+## Clear Cache Laravel
 
-Import Postman collection from:
-
-```
-postman/collections/Laravel.postman_collection.json
+```bash
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
 ```
 
 ---
 
-# 🏁 Status Lifecycle
+## Clear Semua Cache (Rekomendasi)
 
-![Lifecycle Diagram](public/documentation/lifecycle-diagram.png)
-
----
-
-# 🗂 Temporary Schema
-
-Below is an example of the final column schema design for a **3-Level Master–Detail–SubDetail** structure inside the `temporary` schema.
-
-This structure supports:
-
-* Multi-level hierarchy
-
----
-
-# 🏗 Hierarchical Structure (3 Levels)
-
-Assume we have:
-
-| Level   | Master Schema Table |
-| ------- | ------------------- |
-| Level 1 | `sales.orders`      |
-| Level 2 | `sales.items`       |
-| Level 3 | `sales.item_taxes`  |
-
-The temporary schema mirrors this structure with additional control columns.
-
----
-
-# 🥇 Level 1 — `temporary.sales_orders`
-
-Root / Master level.
-
-| Column           | Type    | Description                                              |
-| ---------------- | ------- | -------------------------------------------------------- |
-| `temporary_id`        | uuid    | Primary key for temporary table                          |
-| `session_id`     | uuid    | User session ID (login/browser session)                  |
-| `master_id`      | string  | Reference to original `order_id` (NULL if new data)      |
-| `parent_temporary_id` | uuid    | NULL (root level)                                        |
-| `temporary_option`        | char(1) | Operation flag: `I` (Insert), `U` (Update), `D` (Delete) |
-| `order_date`     | date    | Original master column                                   |
-| `customer_id`    | string  | Original master column                                   |
-
----
-
-# 🥈 Level 2 — `temporary.sales_order_items`
-
-Detail level linked to `sales_orders`.
-
-| Column           | Type    | Description                                       |
-| ---------------- | ------- | ------------------------------------------------- |
-| `temporary_id`        | uuid    | Primary key                                       |
-| `session_id`     | uuid    | Same as Level 1                                   |
-| `master_id`      | string  | Reference to original `item_id` (NULL if new row) |
-| `parent_temporary_id` | uuid    | Links to `sales_orders.temporary_id`                   |
-| `temporary_option`        | char(1) | Operation flag for this row                       |
-| `product_id`     | string  | Original column                                   |
-| `qty`            | numeric | Original column                                   |
-
----
-
-# 🥉 Level 3 — `temporary.sales_order_item_taxes`
-
-Sub-detail level linked to order items.
-
-| Column           | Type    | Description                          |
-| ---------------- | ------- | ------------------------------------ |
-| `temporary_id`        | uuid    | Primary key                          |
-| `session_id`     | uuid    | Same as Level 1 & 2                  |
-| `master_id`      | string  | Reference to original `tax_id`       |
-| `parent_temporary_id` | uuid    | Links to `sales_order_items.temporary_id` |
-| `temporary_option`        | char(1) | Operation flag                       |
-| `tax_percent`    | numeric | Original column                      |
-
----
-
-# 🔗 Relationship Flow
-
-```text
-temporary.sales_orders (Level 1)
-        │
-        └── parent_temporary_id
-              ↓
-temporary.sales_order_items (Level 2)
-        │
-        └── parent_temporary_id
-              ↓
-temporary.sales_order_item_taxes (Level 3)
+```bash
+php artisan optimize:clear
 ```
 
 ---
 
-# 🧠 Core Design Principles
+## Cache Ulang (Production)
 
-### 1️⃣ `temporary_id`
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
-Unique identifier inside temporary schema.
+---
 
-### 2️⃣ `session_id`
+## Clear Permission Cache
 
-Ensures data isolation between users.
+```bash
+php artisan permission:cache-reset
+```
 
-### 3️⃣ `master_id`
+---
 
-Links to original Master table record.
+## Redis Clear (Safe)
 
-* NULL → New record
-* NOT NULL → Existing record (Update/Delete)
+```bash
+php artisan cache:clear
+```
 
-### 4️⃣ `parent_temporary_id`
+---
 
-Maintains hierarchical structure inside temporary schema.
+## Redis Flush (Danger)
 
-### 5️⃣ `temporary_option`
+```bash
+php artisan redis:flush
+```
 
-Tracks operation type:
+atau:
+
+```bash
+redis-cli FLUSHALL
+```
+
+⚠️ Akan menghapus semua:
+
+- cache
+- session
+- queue
+
+---
+
+# 🏁 Lifecycle Status
+
+Contoh:
+
+- Draft
+- Submitted
+- Approved
+- Posted
+- Deleted
+
+---
+
+# 🗂 Temporary Schema (3 Level)
+
+## Level 1 – Orders
+
+`temporary.sales_orders`
+
+- temporary_id
+- session_id
+- master_id
+- temporary_option
+
+---
+
+## Level 2 – Items
+
+`temporary.sales_order_items`
+
+- parent_temporary_id → orders
+- qty
+- product_id
+
+---
+
+## Level 3 – Taxes
+
+`temporary.sales_order_item_taxes`
+
+- parent_temporary_id → items
+- tax_percent
+
+---
+
+## Relasi
+
+```
+orders
+ └── items
+      └── taxes
+```
+
+---
+
+# 🧠 Prinsip Desain
+
+### temporary_id
+
+ID unik di temporary
+
+### session_id
+
+Isolasi user
+
+### master_id
+
+Referensi ke data asli
+
+### parent_temporary_id
+
+Relasi antar level
+
+### temporary_option
 
 | Value | Meaning |
 | ----- | ------- |
-| `I`   | Insert  |
-| `U`   | Update  |
-| `D`   | Delete  |
+| I     | Insert  |
+| U     | Update  |
+| D     | Delete  |
 
 ---
 
-# 🏢 Designed For
+# 🎯 Kenapa Arsitektur Ini?
 
-* ERP Systems
-* Enterprise Applications
-* Audit-sensitive environments
-* Multi-user transactional systems
+✅ Tidak ada edit langsung
+✅ Audit ready
+✅ Support workflow
+✅ Multi-user safe
+✅ Flexible tanpa redeploy
+
+---
+
+# 💼 Use Case Nyata
+
+Jika ada perubahan rule:
+
+> “Simpan Village → otomatis buat Region”
+
+Tidak perlu:
+
+- ubah controller
+- ubah service
+- deploy ulang
+
+Cukup:
+
+1. Update stored procedure
+2. Selesai
+
+---
+
+# 🏢 Cocok Untuk
+
+- ERP System
+- Enterprise App
+- Finance System
+- Multi-user transactional system
 
 ---

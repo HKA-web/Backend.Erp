@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class {{model}}DraftController extends Controller
 {
-    /**
-     * Display all active drafts in the temporary table for current session.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
@@ -21,9 +18,6 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    /**
-     * Save a new draft.
-     */
     public function store({{model}}Request $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
@@ -35,9 +29,6 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    /**
-     * Show draft details from temporary table.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -48,9 +39,6 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    /**
-     * Update existing draft in temporary table.
-     */
     public function update({{model}}Request $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
@@ -62,9 +50,6 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    /**
-     * Discard draft (Delete from temporary).
-     */
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -76,10 +61,6 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    /**
-     * Final Action: Commit Draft to Master.
-     * POST /v1/{{model_lower}}-drafts/{id}/commit
-     */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -88,10 +69,11 @@ class {{model}}DraftController extends Controller
                 '{{model_lower}}_id'  => request()->input('{{model_lower}}_id')
             ];
 
-            $staging->executeStaging('{{module_lower}}.procedure_commit_{{model_lower}}', $payload);
+            $staging->executeStaging('{{module_lower}}.procedure_commit_{{model_lower}}', $payload, ['{{model_lower}}']);
 
             return $this->erpResponse(
-                message: "{{model}} committed to master successfully."
+                message: "{{model}} committed to master successfully.",
+                tags: ['{{model_lower}}']
             );
         }, "Failed to commit draft.");
     }

@@ -1,0 +1,24 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/district?expand=city,city.province&fields=district_name,city.city_name,city.province.province_name
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+  - key: filter
+    value: '["is_removed","=",true]'
+    disabled: true
+  - key: expand
+    value: city,city.province
+  - key: fields
+    value: district_name,city.city_name,city.province.province_name
+auth:
+  type: bearer
+  credentials:
+    token: 13|EEadJsUD1w6Qil586g3kYjNSEPKb3HG3VqGz3xLwd27d8643
+order: 3000

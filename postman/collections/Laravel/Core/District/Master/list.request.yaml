@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/district?expand=city
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+  - key: expand
+    value: city
+auth:
+  type: bearer
+  credentials:
+    token: 5|moAfyxAh02kfe9Qbq0R3CUGxLR7aJ2qrPD7Ll3cte0aeaeb7
+order: 1000

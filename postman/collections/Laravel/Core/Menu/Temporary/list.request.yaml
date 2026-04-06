@@ -1,0 +1,17 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/core/menu-drafts
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "1"
+    disabled: true
+  - key: skip
+    value: "1"
+    disabled: true
+auth:
+  type: bearer
+  credentials:
+    token: 4|6QiVf0WLo32GShLKGejO2JTn7IupaIXNhBrqzeHQe7e0de4f
+order: 1000

@@ -5,35 +5,24 @@ namespace Modules\Core\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
 use Modules\Core\Models\City;
-use Illuminate\Http\Request;
 
 class CityController extends Controller
 {
-    /**
-     * Display a listing of final posted resources.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
-            return $this->erpResponse(City::query());
+            return $this->erpResponse(City::query(), tags: ['city']);
         });
     }
 
-    /**
-     * Show the specified final resource.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
             $query = City::where('city_id', $id);
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, tags: ['city']);
         });
     }
 
-    /**
-     * Action to pull Master data into Draft for revision.
-     * POST /v1/{{model_plural_lower}}/{id}/revise
-     */
     public function revise($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -48,21 +37,15 @@ class CityController extends Controller
         }, "Failed to initiate revision for City.");
     }
 
-    /**
-     * Remove the specified resource (Encapsulated logic in BaseStaging).
-     * DELETE /v1/{{model_plural_lower}}/{id}
-     */
     public function destroy($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($id, $staging) {
 
-            // Logika pengecekan trait & eksekusi SP ada di dalam sini
             $staging->requestDelete(City::class, $id, 'core.procedure_revise_city');
 
             return $this->erpResponse(
                 message: "Delete request for City {$id} processed according to model policy."
             );
-
         }, "Failed to process delete request for City.");
     }
 }

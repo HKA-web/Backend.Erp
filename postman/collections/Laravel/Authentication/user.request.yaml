@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/v1/authentication/user
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: 6|6U0WW6nhMTvg3c3GjPF83L7rZEQJcwQzV8ICoR2O1f0cfde9
+order: 1000

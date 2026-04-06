@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class VillageDraftController extends Controller
 {
-    /**
-     * Display all active drafts in the temporary table for current session.
-     */
     public function index()
     {
         return $this->erpExecution(function () {
@@ -21,9 +18,6 @@ class VillageDraftController extends Controller
         });
     }
 
-    /**
-     * Save a new draft.
-     */
     public function store(VillageRequest $request, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request) {
@@ -35,9 +29,6 @@ class VillageDraftController extends Controller
         });
     }
 
-    /**
-     * Show draft details from temporary table.
-     */
     public function show($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -48,9 +39,6 @@ class VillageDraftController extends Controller
         });
     }
 
-    /**
-     * Update existing draft in temporary table.
-     */
     public function update(VillageRequest $request, $id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $request, $id) {
@@ -62,9 +50,6 @@ class VillageDraftController extends Controller
         });
     }
 
-    /**
-     * Discard draft (Delete from temporary).
-     */
     public function destroy($id)
     {
         return $this->erpExecution(function () use ($id) {
@@ -76,10 +61,6 @@ class VillageDraftController extends Controller
         });
     }
 
-    /**
-     * Final Action: Commit Draft to Master.
-     * POST /v1/village-drafts/{id}/commit
-     */
     public function commit($id, BaseStaging $staging)
     {
         return $this->erpExecution(function () use ($staging, $id) {
@@ -91,7 +72,8 @@ class VillageDraftController extends Controller
             $staging->executeStaging('core.procedure_commit_village', $payload);
 
             return $this->erpResponse(
-                message: "Village committed to master successfully."
+                message: "Village committed to master successfully.",
+                tags: ['village']
             );
         }, "Failed to commit draft.");
     }

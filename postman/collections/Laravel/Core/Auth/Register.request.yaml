@@ -1,0 +1,15 @@
+$kind: http-request
+url: http://127.0.0.1:8000/api/register
+method: POST
+body:
+  type: json
+  content: |
+    {
+      "user_id": "root",
+      "user_name": "root",
+      "email": "admin@email.com",
+      "password": "password"
+    }
+auth:
+  type: noauth
+order: 1000

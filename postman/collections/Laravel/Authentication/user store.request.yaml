@@ -1,0 +1,26 @@
+$kind: http-request
+url: http://127.0.0.1:8001/api/v1/authentication/user
+method: POST
+headers:
+  Accept: application/json
+  x-session-id: ce4c06dc-4799-40d1-bfbe-37fc18129701
+body:
+  type: formdata
+  content:
+    - type: text
+      key: user_id
+      value: "001"
+    - type: text
+      key: user_name
+      value: name 001
+    - type: text
+      key: email
+      value: 001@email.com
+    - type: text
+      key: status
+      value: POSTED
+auth:
+  type: bearer
+  credentials:
+    token: 1|WjJe2dJFpjU6vuJGyzOyxwXIgvBybmXhU5zrB4Fi6d56361f
+order: 2000

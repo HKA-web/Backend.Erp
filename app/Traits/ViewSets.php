@@ -4,19 +4,15 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 trait ViewSets
 {
-    /**
-     * NOTE: Fungsi ini hanya bekerja untuk Eloquent (Master Data).
-     * Untuk DB::table (Draft), logic ini akan dilewati otomatis.
-     */
     protected function applyFieldsExpand($query)
     {
-        // Pastikan ini adalah Eloquent Builder sebelum lanjut
         if (!$query instanceof EloquentBuilder) return;
 
         $fieldsParam = request()->input('fields');
@@ -93,9 +89,6 @@ trait ViewSets
         }
     }
 
-    /**
-     * Menghapus type hint 'Builder' agar bisa menerima Query\Builder
-     */
     public function applyFilter($query, $filter)
     {
         if (empty($filter)) return $query;
@@ -115,17 +108,28 @@ trait ViewSets
         $value = $leaf[2] ?? null;
 
         switch ($operator) {
-            case '=':  return ($value === null) ? $query->whereNull($field) : $query->where($field, '=', $value);
-            case '<>': return ($value === null) ? $query->whereNotNull($field) : $query->where($field, '<>', $value);
-            case '>':  return $query->where($field, '>', $value);
-            case '>=': return $query->where($field, '>=', $value);
-            case '<':  return $query->where($field, '<', $value);
-            case '<=': return $query->where($field, '<=', $value);
-            case 'contains':    return $query->where($field, 'LIKE', "%{$value}%");
-            case 'notcontains': return $query->where($field, 'NOT LIKE', "%{$value}%");
-            case 'startswith':  return $query->where($field, 'LIKE', "{$value}%");
-            case 'endswith':    return $query->where($field, 'LIKE', "%{$value}");
-            default: return $query->where($field, '=', $value);
+            case '=':
+                return ($value === null) ? $query->whereNull($field) : $query->where($field, '=', $value);
+            case '<>':
+                return ($value === null) ? $query->whereNotNull($field) : $query->where($field, '<>', $value);
+            case '>':
+                return $query->where($field, '>', $value);
+            case '>=':
+                return $query->where($field, '>=', $value);
+            case '<':
+                return $query->where($field, '<', $value);
+            case '<=':
+                return $query->where($field, '<=', $value);
+            case 'contains':
+                return $query->where($field, 'LIKE', "%{$value}%");
+            case 'notcontains':
+                return $query->where($field, 'NOT LIKE', "%{$value}%");
+            case 'startswith':
+                return $query->where($field, 'LIKE', "{$value}%");
+            case 'endswith':
+                return $query->where($field, 'LIKE', "%{$value}");
+            default:
+                return $query->where($field, '=', $value);
         }
     }
 
@@ -164,31 +168,43 @@ trait ViewSets
         }
     }
 
-    protected function erpResponse($data = null, $message = 'Success')
+    protected function erpResponse($data = null, $message = 'Success', array $tags = [])
     {
-        // Support Eloquent (Master) & Query Builder (Temporary/Draft)
         if ($data instanceof EloquentBuilder || $data instanceof QueryBuilder) {
             $query = $data;
 
-            $this->applyFieldsExpand($query);
+            $url = Request::fullUrl();
+            $cacheKey = 'erp_cache_' . md5($url);
 
-            if (request()->has('filter')) {
-                $this->applyFilter($query, request()->input('filter'));
-            }
+            $callback = function () use ($query) {
+                $this->applyFieldsExpand($query);
 
-            if (request()->has('sort')) {
-                $this->applySort($query, request()->input('sort'));
-            }
+                if (request()->has('filter')) {
+                    $this->applyFilter($query, request()->input('filter'));
+                }
 
-            $totalCount = (clone $query)->count();
+                if (request()->has('sort')) {
+                    $this->applySort($query, request()->input('sort'));
+                }
 
-            // takeSkip() adalah custom method, pastikan tersedia di Macro atau Trait lain
-            $results = $query->takeSkip()->get();
+                $totalCount = (clone $query)->count();
+                $results = $query->takeSkip()->get();
 
-            return response()->json([
-                'totalCount' => $totalCount,
-                'data'       => $results,
-            ], 200);
+                return [
+                    'totalCount' => $totalCount,
+                    'data'       => $results->toArray(),
+                ];
+            };
+
+            $resultData = !empty($tags)
+                ? Cache::tags($tags)->remember($cacheKey, 3600, $callback)
+                : Cache::remember($cacheKey, 3600, $callback);
+
+            return response()->json($resultData, 200);
+        }
+
+        if (!empty($tags)) {
+            Cache::tags($tags)->flush();
         }
 
         $response = ['message' => $message];
