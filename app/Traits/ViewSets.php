@@ -122,6 +122,8 @@ trait ViewSets
                 return $query->where($field, '<=', $value);
             case 'contains':
                 return $query->where($field, 'LIKE', "%{$value}%");
+            case 'icontains':
+                return $query->where($field, 'ILIKE', "%{$value}%");
             case 'notcontains':
                 return $query->where($field, 'NOT LIKE', "%{$value}%");
             case 'startswith':
@@ -130,7 +132,7 @@ trait ViewSets
                 return $query->where($field, 'LIKE', "%{$value}");
             default:
                 return $query->where($field, '=', $value);
-        }
+        }   
     }
 
     private function buildQuery($query, $filter)
