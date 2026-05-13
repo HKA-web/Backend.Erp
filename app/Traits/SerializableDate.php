@@ -20,6 +20,7 @@ trait SerializableDate
         $dt->setTimezone($targetTimezone);
 
         return [
+            'timestamp'    => $dt->timestamp,
             'zone'         => $dt->getOffsetString(),
             'utc'          => $utc->toIso8601ZuluString('microsecond'),
             'date'         => $dt->toDateString(),

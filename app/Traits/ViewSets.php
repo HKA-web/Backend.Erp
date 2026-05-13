@@ -107,19 +107,32 @@ trait ViewSets
         $operator = $leaf[1] ?? '=';
         $value = $leaf[2] ?? null;
 
+        if (str_contains($field, '.')) {
+            $parts = explode('.', $field);
+            if (in_array($parts[0], ['created_at', 'updated_at'])) {
+                if (($parts[1] ?? '') === 'date') {
+                    return $query->whereDate($parts[0], $operator, $value);
+                }
+                $field = $parts[0];
+            } 
+            else {
+                return $query->whereHas($parts[0], function ($q) use ($field, $operator, $value) {
+                    $nestedField = explode('.', $field, 2)[1];
+                    $this->applyLeaf($q, [$nestedField, $operator, $value]);
+                });
+            }
+        }
+
         switch ($operator) {
             case '=':
                 return ($value === null) ? $query->whereNull($field) : $query->where($field, '=', $value);
             case '<>':
                 return ($value === null) ? $query->whereNotNull($field) : $query->where($field, '<>', $value);
             case '>':
-                return $query->where($field, '>', $value);
             case '>=':
-                return $query->where($field, '>=', $value);
             case '<':
-                return $query->where($field, '<', $value);
             case '<=':
-                return $query->where($field, '<=', $value);
+                return $query->where($field, $operator, $value);
             case 'contains':
                 return $query->where($field, 'LIKE', "%{$value}%");
             case 'icontains':
@@ -132,7 +145,7 @@ trait ViewSets
                 return $query->where($field, 'LIKE', "%{$value}");
             default:
                 return $query->where($field, '=', $value);
-        }   
+        }
     }
 
     private function buildQuery($query, $filter)

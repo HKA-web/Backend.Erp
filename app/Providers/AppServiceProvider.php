@@ -78,20 +78,6 @@ class AppServiceProvider extends ServiceProvider
             $this->string('status')->default('DRAFT');
         });
 
-        Builder::macro('takeSkip', function () {
-            if (!request()->has('take')) {
-                return $this;
-            }
-
-            $take = (int) request('take', 10);
-            $skip = (int) request('skip', 0);
-
-            $take = $take < 1 ? 10 : $take;
-            $skip = $skip < 0 ? 0 : $skip;
-
-            return $this->offset($skip)->limit($take);
-        });
-
         Builder::macro('filterSort', function () {
             $filter = request()->input('filter');
             $sort = request()->input('sort');
