@@ -15,10 +15,11 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
+        $uniquePrefix = Str::random(5) . '_' . fake()->unique(true)->userName();
         return [
             'user_id'    => Str::uuid(),
             'user_name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'email'     => $uniquePrefix . '@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('#user#'),
             'remember_token' => Str::random(10),

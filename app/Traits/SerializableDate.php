@@ -15,18 +15,19 @@ trait SerializableDate
 
         $dt = Carbon::instance($date);
 
-        $utc = $dt->copy()->tz('UTC');
+        $utc = $dt->copy()->utc();
 
         $dt->setTimezone($targetTimezone);
 
         return [
-            'timestamp'    => $dt->timestamp,
-            'zone'         => $dt->getOffsetString(),
-            'utc'          => $utc->toIso8601ZuluString('microsecond'),
-            'date'         => $dt->toDateString(),
-            'time'         => $dt->toTimeString('microsecond'),
-            'datetime'     => $dt->toIso8601String('microsecond'),
-            'datetimezone' => $dt->format('Y-m-d\TH:i:s.uP'),
+            'timestamp'     => $dt->timestamp,
+            'zone'          => $dt->getOffsetString(),
+            'timezonename'  => $targetTimezone,
+            'utc'           => $utc->toIso8601ZuluString('microsecond'),
+            'date'          => $dt->toDateString(),
+            'time'          => $dt->toTimeString('microsecond'),
+            'datetime'      => $dt->toIso8601String('microsecond'),
+            'datetimezone'  => $dt->format('Y-m-d\TH:i:s.uP'),
         ];
     }
 }
