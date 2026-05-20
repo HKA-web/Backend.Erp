@@ -15,11 +15,13 @@
 
 ---
 
-Backend modular kelas enterprise berbasis **Laravel + PostgreSQL** dengan pendekatan:
+Backend modular kelas enterprise berbasis **Laravel 13 + PostgreSQL** dengan pendekatan:
 
 - Master–Draft Pattern
 - Database-driven business logic
 - Stored Procedure & Trigger
+- Modular Architecture
+- AI Ready
 - Siap audit & workflow kompleks
 
 ---
@@ -27,7 +29,9 @@ Backend modular kelas enterprise berbasis **Laravel + PostgreSQL** dengan pendek
 # 📚 Daftar Isi
 
 - Ringkasan
+- Fitur
 - Instalasi
+- AI Integration
 - Membuat Modul
 - Permission
 - Arsitektur
@@ -36,23 +40,45 @@ Backend modular kelas enterprise berbasis **Laravel + PostgreSQL** dengan pendek
 - Database Flow
 - Cache & Redis
 - Temporary Schema
-- Kenapa Arsitektur Ini
+- Lifecycle Status
+- Prinsip Desain
+- Use Case
+- Cocok Untuk
 
 ---
 
 # 🧭 Ringkasan
 
-Proyek ini menggunakan konsep modular dengan pendekatan:
+Proyek ini menggunakan konsep modular enterprise dengan pendekatan:
 
 - Master (Posted Data)
 - Draft (Workspace)
 - Business logic di database
+- AI-assisted workflow
 
-Laravel hanya berperan sebagai:
+Laravel berperan sebagai:
 
 - Validator
 - Orchestrator
 - API Response Layer
+- AI Gateway
+- Queue Dispatcher
+
+---
+
+# ✨ Fitur
+
+✅ Laravel 13  
+✅ Modular Architecture  
+✅ PostgreSQL Optimized  
+✅ Stored Procedure Driven  
+✅ Draft–Commit Workflow  
+✅ Redis Ready  
+✅ Queue Ready  
+✅ AI Integration Ready  
+✅ Multi-user Safe  
+✅ Audit Ready  
+✅ Enterprise Workflow  
 
 ---
 
@@ -60,38 +86,74 @@ Laravel hanya berperan sebagai:
 
 ## Kebutuhan
 
-- PHP 8.2+
+- PHP 8.3+
 - Composer
-- Laravel 12.x
+- Laravel 13.x
 - PostgreSQL
 - Redis (opsional tapi direkomendasikan)
+- Node.js (untuk build assets)
 
 ---
 
-## Setup
+## Clone Project
 
 ```bash
 git clone https://github.com/HKA-web/Backend.Erp.git project
 cd project
 ```
 
+---
+
+## Install Dependency
+
 ```bash
 composer install
 ```
+
+---
+
+## Setup Environment
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
+---
+
+## Setup Database
+
+Atur koneksi PostgreSQL di `.env`
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=erp
+DB_USERNAME=postgres
+DB_PASSWORD=password
+```
+
+---
+
+## Migrasi Database
+
 ```bash
 php artisan migrate
 ```
+
+---
+
+## Seeder
 
 ```bash
 php artisan module:seed Authentication
 php artisan module:seed Core
 ```
+
+---
+
+## Jalankan Server
 
 ```bash
 php artisan serve
@@ -99,19 +161,111 @@ php artisan serve
 
 ---
 
+# 🤖 AI Integration (Laravel AI)
+
+Project ini mendukung Laravel AI official integration.
+
+Dokumentasi resmi:
+
+- https://laravel.com/docs/13.x/ai
+
+---
+
+## Install Laravel AI
+
+```bash
+composer require laravel/ai
+```
+
+---
+
+## Publish Config
+
+```bash
+php artisan vendor:publish --tag=ai-config
+```
+
+---
+
+## Setup AI Provider
+
+Contoh OpenAI:
+
+```env
+OPENAI_API_KEY=sk-xxxx
+```
+
+---
+
+## Contoh Penggunaan AI
+
+```php
+use Illuminate\Support\Facades\AI;
+
+$response = AI::prompt(
+    'Buat ringkasan transaksi hari ini'
+);
+
+return $response->text();
+```
+
+---
+
+## Contoh Endpoint AI
+
+```php
+Route::post('/v1/ai/chat', function (Request $request) {
+
+    $response = AI::prompt($request->message);
+
+    return response()->json([
+        'message' => $response->text()
+    ]);
+
+});
+```
+
+---
+
+## AI Use Cases
+
+- AI Dashboard Summary
+- AI Transaction Insight
+- AI OCR Invoice
+- AI Chat Assistant
+- AI Reporting
+- AI Workflow Assistant
+- AI Knowledge Base
+
+---
+
 # 🛠 Membuat Modul
+
+## Generate Module
 
 ```bash
 php artisan erp:make-module {module}
 ```
 
+---
+
+## Generate Model
+
 ```bash
 php artisan erp:make-model {model} {module}
 ```
 
+---
+
+## Migrasi Module
+
 ```bash
 php artisan module:migrate {module}
 ```
+
+---
+
+## Seeder Module
 
 ```bash
 php artisan module:seed {module}
@@ -125,6 +279,7 @@ Menggunakan Spatie Laravel Permission
 
 ```php
 $user->assignRole('admin');
+
 $role->givePermissionTo('edit-user');
 ```
 
@@ -134,7 +289,8 @@ $role->givePermissionTo('edit-user');
 
 ## Master–Draft Pattern
 
-- Data Master = immutable (tidak bisa diedit langsung)
+- Data Master = immutable
+- Tidak ada edit langsung
 - Semua perubahan melalui Draft
 - Commit melalui stored procedure
 
@@ -142,29 +298,42 @@ $role->givePermissionTo('edit-user');
 
 ## Karakteristik
 
-- Tidak ada edit langsung ke Master
 - Audit-ready
-- Mendukung approval
+- Mendukung approval workflow
 - Aman untuk multi-user
 - Business logic di database
+- Minim business logic di controller
 
 ---
 
 # 🔄 Alur Kerja
 
-## Flow API
+# Flow API
 
 Endpoint:
 
-```
+```http
 POST /store
 ```
 
-### Laravel
+---
+
+## Laravel Layer
+
+Laravel melakukan:
 
 - Validasi
-- Simpan ke temporary table
+- Authentication
+- Authorization
+- Simpan temporary data
 - Call procedure
+- Return JSON
+
+---
+
+## Database Layer
+
+Stored Procedure:
 
 ```sql
 CALL core.procedure_commit();
@@ -172,20 +341,24 @@ CALL core.procedure_commit();
 
 ---
 
-### Database
+## Trigger Database
 
-Trigger akan:
+Database akan:
 
 - Hitung saldo
 - Generate jurnal
 - Update stok
+- Generate audit log
+- Validasi relational integrity
 
 ---
 
-### Result
+## Result
 
-- DB → OK
-- Laravel → JSON Response
+```text
+Database -> OK
+Laravel -> JSON Response
+```
 
 ---
 
@@ -202,7 +375,7 @@ Trigger akan:
 
 # 🏛 Struktur API
 
-## Master (Posted)
+# Master (Posted)
 
 | Method | Endpoint                        |
 | ------ | ------------------------------- |
@@ -213,7 +386,7 @@ Trigger akan:
 
 ---
 
-## Draft
+# Draft
 
 | Method | Endpoint                               |
 | ------ | -------------------------------------- |
@@ -228,37 +401,39 @@ Trigger akan:
 
 # 🧠 Database Flow
 
-## Edit Flow
+# Edit Flow
 
-1. Data Master dikunci
-2. Disalin ke Draft
-3. User edit di Draft
-4. Commit → Procedure jalan
+1. Data master dikunci
+2. Data disalin ke draft
+3. User edit di workspace
+4. Commit menjalankan procedure
+5. Trigger melakukan business logic
 
 ---
 
-## Delete Flow
+# Delete Flow
 
-1. Tandai delete di Draft
+1. Tandai delete di draft
 2. Commit
-3. Database handle logic
+3. Database handle relational cleanup
 
 ---
 
 # 🧹 Cache & Redis
 
-## Kenapa penting?
+# Fungsi Redis
 
 Digunakan untuk:
 
 - Cache
-- Session
 - Queue
+- Session
 - Permission cache
+- AI response cache
 
 ---
 
-## Clear Cache Laravel
+# Clear Cache Laravel
 
 ```bash
 php artisan cache:clear
@@ -269,7 +444,7 @@ php artisan view:clear
 
 ---
 
-## Clear Semua Cache (Rekomendasi)
+# Clear Semua Cache
 
 ```bash
 php artisan optimize:clear
@@ -277,7 +452,7 @@ php artisan optimize:clear
 
 ---
 
-## Cache Ulang (Production)
+# Cache Production
 
 ```bash
 php artisan config:cache
@@ -287,7 +462,7 @@ php artisan view:cache
 
 ---
 
-## Clear Permission Cache
+# Reset Permission Cache
 
 ```bash
 php artisan permission:cache-reset
@@ -295,15 +470,7 @@ php artisan permission:cache-reset
 
 ---
 
-## Redis Clear (Safe)
-
-```bash
-php artisan cache:clear
-```
-
----
-
-## Redis Flush (Danger)
+# Redis Flush
 
 ```bash
 php artisan redis:flush
@@ -315,7 +482,7 @@ atau:
 redis-cli FLUSHALL
 ```
 
-⚠️ Akan menghapus semua:
+⚠️ Akan menghapus:
 
 - cache
 - session
@@ -325,19 +492,20 @@ redis-cli FLUSHALL
 
 # 🏁 Lifecycle Status
 
-Contoh:
+Contoh status workflow:
 
 - Draft
 - Submitted
 - Approved
 - Posted
+- Rejected
 - Deleted
 
 ---
 
 # 🗂 Temporary Schema (3 Level)
 
-## Level 1 – Orders
+# Level 1 – Orders
 
 `temporary.sales_orders`
 
@@ -348,28 +516,28 @@ Contoh:
 
 ---
 
-## Level 2 – Items
+# Level 2 – Items
 
 `temporary.sales_order_items`
 
-- parent_temporary_id → orders
+- parent_temporary_id
 - qty
 - product_id
 
 ---
 
-## Level 3 – Taxes
+# Level 3 – Taxes
 
 `temporary.sales_order_item_taxes`
 
-- parent_temporary_id → items
+- parent_temporary_id
 - tax_percent
 
 ---
 
-## Relasi
+# Relasi
 
-```
+```text
 orders
  └── items
       └── taxes
@@ -379,23 +547,31 @@ orders
 
 # 🧠 Prinsip Desain
 
-### temporary_id
+## temporary_id
 
-ID unik di temporary
+ID unik temporary workspace
 
-### session_id
+---
 
-Isolasi user
+## session_id
 
-### master_id
+Isolasi workspace user
 
-Referensi ke data asli
+---
 
-### parent_temporary_id
+## master_id
 
-Relasi antar level
+Referensi data utama
 
-### temporary_option
+---
+
+## parent_temporary_id
+
+Relasi antar level temporary
+
+---
+
+## temporary_option
 
 | Value | Meaning |
 | ----- | ------- |
@@ -407,11 +583,13 @@ Relasi antar level
 
 # 🎯 Kenapa Arsitektur Ini?
 
-✅ Tidak ada edit langsung
-✅ Audit ready
-✅ Support workflow
-✅ Multi-user safe
-✅ Flexible tanpa redeploy
+✅ Tidak ada edit langsung  
+✅ Audit ready  
+✅ Support approval workflow  
+✅ Multi-user safe  
+✅ Flexible tanpa redeploy  
+✅ AI Ready  
+✅ Enterprise scalable  
 
 ---
 
@@ -431,14 +609,3 @@ Cukup:
 
 1. Update stored procedure
 2. Selesai
-
----
-
-# 🏢 Cocok Untuk
-
-- ERP System
-- Enterprise App
-- Finance System
-- Multi-user transactional system
-
----
