@@ -28,22 +28,23 @@ Backend modular kelas enterprise berbasis **Laravel 13 + PostgreSQL** dengan pen
 
 # 📚 Daftar Isi
 
-- Ringkasan
-- Fitur
-- Instalasi
-- AI Integration
-- Membuat Modul
-- Permission
-- Arsitektur
-- Alur Kerja
-- Struktur API
-- Database Flow
-- Cache & Redis
-- Temporary Schema
-- Lifecycle Status
-- Prinsip Desain
-- Use Case
-- Cocok Untuk
+- [Ringkasan](#-ringkasan)
+- [Fitur](#-fitur)
+- [Instalasi](#-instalasi)
+- [API Documentation](#-api-documentation)
+- [AI Integration](#-ai-integration-laravel-ai)
+- [Membuat Modul](#-membuat-modul)
+- [Permission](#-manajemen-permission)
+- [Arsitektur](#-arsitektur)
+- [Alur Kerja](#-alur-kerja)
+- [Struktur API](#-struktur-api)
+- [Database Flow](#-database-flow)
+- [Cache & Redis](#-cache--redis)
+- [Temporary Schema](#-temporary-schema-3-level)
+- [Lifecycle Status](#-lifecycle-status)
+- [Prinsip Desain](#-prinsip-desain)
+- [Use Case](#-use-case-nyata)
+- [Cocok Untuk](#-cocok-untuk)
 
 ---
 
@@ -96,11 +97,6 @@ Laravel berperan sebagai:
 ---
 
 ## Clone Project
-
-```bash
-git clone https://github.com/HKA-web/Backend.Erp.git project
-cd project
-```
 
 ---
 
@@ -158,6 +154,70 @@ php artisan module:seed Core
 ```bash
 php artisan serve
 ```
+
+---
+
+# 📖 API Documentation
+
+Project ini menggunakan Swagger UI untuk dokumentasi API. Dokumentasi di-generate secara otomatis dari routes file di setiap module.
+
+## Generate Documentation
+
+### Generate untuk Semua Module
+
+```bash
+php artisan api:docs:generate --all
+```
+
+### Generate untuk Module Tertentu
+
+```bash
+php artisan api:docs:generate --module={module_name}
+```
+
+## Akses Swagger UI
+
+Buka browser dan akses:
+
+```
+http://localhost:8000/api/docs
+```
+
+## Endpoint Documentation
+
+- **Swagger UI**: `http://localhost:8000/api/docs`
+- **JSON All Modules**: `http://localhost:8000/api/docs/json`
+- **JSON Per Module**: `http://localhost:8000/api/docs/{module}`
+
+Contoh:
+- `http://localhost:8000/api/docs/Authentication`
+- `http://localhost:8000/api/docs/Core`
+
+## Lokasi File Generated
+
+Dokumentasi JSON di-generate di:
+
+```
+Modules/{module_name}/docs/api.json
+```
+
+Contoh:
+- `Modules/Authentication/docs/api.json`
+- `Modules/Core/docs/api.json`
+
+## Parameter Default untuk GET Methods
+
+Semua endpoint GET otomatis memiliki parameter query:
+
+- **take**: Number of records to return (default: 10)
+- **skip**: Number of records to skip (default: 0)
+- **filter**: Filter criteria (JSON string)
+- **expand**: Related resources to expand (comma-separated)
+- **fields**: Fields to return (comma-separated)
+
+## Security
+
+Endpoint dengan middleware `auth:sanctum` otomatis ditandai sebagai secured di Swagger UI.
 
 ---
 
