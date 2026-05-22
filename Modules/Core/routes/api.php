@@ -1,27 +1,20 @@
 <?php
 
-use Modules\Core\Http\Controllers\MenuController;
-use Modules\Core\Http\Controllers\MenuDraftController;
-
-use Modules\Core\Http\Controllers\DictionaryController;
-use Modules\Core\Http\Controllers\DictionaryDraftController;
-
-use Modules\Core\Http\Controllers\CompanyController;
-use Modules\Core\Http\Controllers\CompanyDraftController;
-
-use Modules\Core\Http\Controllers\VillageController;
-use Modules\Core\Http\Controllers\VillageDraftController;
-
-use Modules\Core\Http\Controllers\DistrictController;
-use Modules\Core\Http\Controllers\DistrictDraftController;
-
+use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\CityController;
 use Modules\Core\Http\Controllers\CityDraftController;
-
+use Modules\Core\Http\Controllers\CompanyController;
+use Modules\Core\Http\Controllers\CompanyDraftController;
+use Modules\Core\Http\Controllers\DictionaryController;
+use Modules\Core\Http\Controllers\DictionaryDraftController;
+use Modules\Core\Http\Controllers\DistrictController;
+use Modules\Core\Http\Controllers\DistrictDraftController;
+use Modules\Core\Http\Controllers\MenuController;
+use Modules\Core\Http\Controllers\MenuDraftController;
 use Modules\Core\Http\Controllers\ProvinceController;
 use Modules\Core\Http\Controllers\ProvinceDraftController;
-
-use Illuminate\Support\Facades\Route;
+use Modules\Core\Http\Controllers\VillageController;
+use Modules\Core\Http\Controllers\VillageDraftController;
 
 // Routes for Province
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {

@@ -13,7 +13,7 @@ class ProvinceFactory extends Factory
     public function definition(): array
     {
         return [
-            'province_id'   => Str::uuid(),
+            'province_id' => Str::uuid(),
             'province_name' => fake()->name(),
         ];
     }

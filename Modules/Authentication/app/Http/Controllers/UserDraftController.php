@@ -4,8 +4,8 @@ namespace Modules\Authentication\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Authentication\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Authentication\Http\Requests\UserRequest;
 
 class UserDraftController extends Controller
 {
@@ -14,6 +14,7 @@ class UserDraftController extends Controller
         return $this->erpExecution(function () {
             // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.authentication_user');
+
             return $this->erpResponse($query);
         });
     }
@@ -24,7 +25,7 @@ class UserDraftController extends Controller
             $staging->executeStaging('authentication.procedure_upsert_user_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft User saved successfully."
+                message: 'Draft User saved successfully.'
             );
         });
     }
@@ -46,7 +47,7 @@ class UserDraftController extends Controller
 
             $staging->executeStaging('authentication.procedure_upsert_user_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -57,7 +58,7 @@ class UserDraftController extends Controller
                 ->where('user_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -69,8 +70,8 @@ class UserDraftController extends Controller
             $staging->executeStaging('authentication.procedure_commit_user', $payload, ['user']);
 
             return $this->erpResponse(
-                message: "User committed to master successfully."
+                message: 'User committed to master successfully.'
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

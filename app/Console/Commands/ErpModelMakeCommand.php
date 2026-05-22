@@ -17,16 +17,16 @@ class ErpModelMakeCommand extends Command
         $module = Str::studly($this->argument('module'));
 
         $vars = [
-            '{{model}}'        => $model,
-            '{{module}}'       => $module,
+            '{{model}}' => $model,
+            '{{module}}' => $module,
             '{{module_lower}}' => Str::lower($module),
-            '{{model_lower}}'  => Str::lower($model),
-            '{{schema}}'       => Str::lower($module),
+            '{{model_lower}}' => Str::lower($model),
+            '{{schema}}' => Str::lower($module),
         ];
 
         $this->info("🚀 Generating ERP Components for {$model}...");
 
-        Artisan::call("module:make-migration create_".Str::snake(Str::plural($model))."_table {$module}");
+        Artisan::call('module:make-migration create_'.Str::snake(Str::plural($model))."_table {$module}");
 
         $this->generateFromStub('erp-stubs/controller', base_path("Modules/{$module}/app/Http/Controllers/{$model}Controller.php"), $vars);
         $this->generateFromStub('erp-stubs/controller_draft', base_path("Modules/{$module}/app/Http/Controllers/{$model}DraftController.php"), $vars);
@@ -37,15 +37,16 @@ class ErpModelMakeCommand extends Command
 
         $this->injectMigration($module, $vars['{{schema}}'], $model);
 
-        $this->info("✅ Success! Files created exactly as requested.");
+        $this->info('✅ Success! Files created exactly as requested.');
     }
 
     protected function generateFromStub($stubName, $dest, $vars)
     {
         $stubPath = base_path("stubs/{$stubName}.stub");
 
-        if (!File::exists($stubPath)) {
+        if (! File::exists($stubPath)) {
             $this->error("Stub not found: {$stubPath}");
+
             return;
         }
 
@@ -64,25 +65,29 @@ class ErpModelMakeCommand extends Command
     protected function injectMigration($module, $schema, $model)
     {
         $dir = base_path("Modules/{$module}/Database/Migrations");
-        if (!File::isDirectory($dir)) $dir = base_path("Modules/{$module}/database/migrations");
+        if (! File::isDirectory($dir)) {
+            $dir = base_path("Modules/{$module}/database/migrations");
+        }
 
-        $latestFile = collect(File::files($dir))->sortByDesc(fn($f) => $f->getMTime())->first();
+        $latestFile = collect(File::files($dir))->sortByDesc(fn ($f) => $f->getMTime())->first();
 
         if ($latestFile) {
             $content = File::get($latestFile->getRealPath());
 
-            $modelLower  = Str::lower($model);
+            $modelLower = Str::lower($model);
             $schemaLower = Str::lower($schema);
             $fullTableName = "{$schemaLower}.{$modelLower}";
             $tempTableName = "temporary.{$schemaLower}_{$modelLower}";
 
-            $sqlDir = $dir . "/sql";
-            if (!File::isDirectory($sqlDir)) File::makeDirectory($sqlDir, 0755, true);
+            $sqlDir = $dir.'/sql';
+            if (! File::isDirectory($sqlDir)) {
+                File::makeDirectory($sqlDir, 0755, true);
+            }
 
-            $timestamp   = date('Y_m_d_His');
+            $timestamp = date('Y_m_d_His');
             // File SQL sekarang menampung 3 procedure sekaligus
             $sqlFileName = "{$timestamp}_{$schemaLower}.procedures_{$modelLower}.sql";
-            $sqlFilePath = $sqlDir . "/" . $sqlFileName;
+            $sqlFilePath = $sqlDir.'/'.$sqlFileName;
 
             $pkName = "{$modelLower}_id";
 
@@ -225,7 +230,7 @@ SQL;
 
             File::put($sqlFilePath, $sqlContent);
 
-            if (!str_contains($content, 'use Spatie\Permission\Models\Permission;')) {
+            if (! str_contains($content, 'use Spatie\Permission\Models\Permission;')) {
                 $content = str_replace(
                     "use Illuminate\Support\Facades\Schema;",
                     "use Illuminate\Support\Facades\Schema;\nuse Illuminate\Support\Facades\DB;\nuse Spatie\Permission\Models\Permission;",
@@ -235,11 +240,11 @@ SQL;
 
             // Ganti Schema::create standar dengan custom helper mu
             $content = preg_replace("/Schema::create\(['\"][^'\"]+['\"]/", "Schema::createWithTemp('{$fullTableName}'", $content);
-            $content = preg_replace("/^\s*\\\$table->id\(\);\s*$/m", "", $content);
-            $content = preg_replace("/^\s*\\\$table->timestamps\(\);\s*$/m", "", $content);
+            $content = preg_replace("/^\s*\\\$table->id\(\);\s*$/m", '', $content);
+            $content = preg_replace("/^\s*\\\$table->timestamps\(\);\s*$/m", '', $content);
 
-            $newColumns = "\n            \$table->string('{$modelLower}_id')->primary();" .
-                "\n            \$table->string('{$modelLower}_name');\n" .
+            $newColumns = "\n            \$table->string('{$modelLower}_id')->primary();".
+                "\n            \$table->string('{$modelLower}_name');\n".
                 "\n            \$table->baseColumn();";
 
             $content = preg_replace("/(function\s*\(Blueprint\s*\\\$table\)\s*\{)/", "$1$newColumns", $content);
@@ -257,7 +262,7 @@ SQL;
 
             $permissionCode = "\n        \$actions = ['lookup', 'view', 'add', 'edit', 'delete'];\n        foreach (\$actions as \$action) {\n            Permission::firstOrCreate(['name' => \"{$schemaLower}.{\$action}.{$modelLower}\", 'guard_name' => 'api']);\n        }";
 
-            if (!str_contains($content, 'Permission::firstOrCreate')) {
+            if (! str_contains($content, 'Permission::firstOrCreate')) {
                 $content = str_replace("});\n    }", "});\n{$historySchema}{$sqlInvoke}\n{$permissionCode}\n    }", $content);
             }
 
@@ -276,18 +281,19 @@ SQL;
     {
         $moduleDir = base_path("Modules/{$module}");
         $path = "{$moduleDir}/routes/api.php";
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             $path = "{$moduleDir}/Routes/api.php";
         }
 
-        $stubPath = base_path("stubs/erp-stubs/route.stub");
+        $stubPath = base_path('stubs/erp-stubs/route.stub');
 
-        if (!File::exists($stubPath)) {
+        if (! File::exists($stubPath)) {
             $this->error("Stub not found: {$stubPath}");
+
             return;
         }
 
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             File::ensureDirectoryExists(dirname($path));
             File::put($path, "<?php\n\nuse Illuminate\Support\Facades\Route;\n");
         }
@@ -298,10 +304,11 @@ SQL;
         $currentContent = File::get($path);
         if (str_contains($currentContent, "{$model}Controller")) {
             $this->warn("⚠️  Route for {$model} already exists in api.php. Skipping...");
+
             return;
         }
 
-        $useNamespace = "use Modules\\{$module}\\Http\\Controllers\\{$model}Controller;\n" .
+        $useNamespace = "use Modules\\{$module}\\Http\\Controllers\\{$model}Controller;\n".
             "use Modules\\{$module}\\Http\\Controllers\\{$model}DraftController;";
 
         $stub = File::get($stubPath);
@@ -311,11 +318,11 @@ SQL;
             $stub
         );
 
-        if (!str_contains($currentContent, "{$model}Controller")) {
+        if (! str_contains($currentContent, "{$model}Controller")) {
             $currentContent = preg_replace('/<\?php/', "<?php\n\n{$useNamespace}", $currentContent);
         }
 
-        $finalContent = rtrim($currentContent) . "\n\n" . trim($routeCode) . "\n";
+        $finalContent = rtrim($currentContent)."\n\n".trim($routeCode)."\n";
 
         if (File::put($path, $finalContent)) {
             $this->line("Injected: <info>Routes into {$path}</info>");

@@ -13,7 +13,7 @@ class MenuFactory extends Factory
     public function definition(): array
     {
         return [
-            'menu_id'   => Str::uuid(),
+            'menu_id' => Str::uuid(),
             'menu_name' => 'inventory',
             'sort_order' => 'A',
             'action' => '/inventory',

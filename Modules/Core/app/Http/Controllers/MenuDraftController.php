@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\MenuRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\MenuRequest;
 
 class MenuDraftController extends Controller
 {
@@ -13,6 +13,7 @@ class MenuDraftController extends Controller
     {
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_menu');
+
             return $this->erpResponse($query);
         });
     }
@@ -23,7 +24,7 @@ class MenuDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_menu_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft Menu saved successfully."
+                message: 'Draft Menu saved successfully.'
             );
         });
     }
@@ -45,7 +46,7 @@ class MenuDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_menu_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -56,7 +57,7 @@ class MenuDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -65,15 +66,15 @@ class MenuDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'menu_id'  => request()->input('menu_id')
+                'menu_id' => request()->input('menu_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_menu', $payload);
 
             return $this->erpResponse(
-                message: "Menu committed to master successfully.",
+                message: 'Menu committed to master successfully.',
                 tags: ['menu']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

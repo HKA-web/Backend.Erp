@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use DateTimeInterface;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Support\Facades\Auth;
 
 trait SerializableDate
@@ -20,14 +20,14 @@ trait SerializableDate
         $dt->setTimezone($targetTimezone);
 
         return [
-            'timestamp'     => $dt->timestamp,
-            'zone'          => $dt->getOffsetString(),
-            'timezonename'  => $targetTimezone,
-            'utc'           => $utc->toIso8601ZuluString('microsecond'),
-            'date'          => $dt->toDateString(),
-            'time'          => $dt->toTimeString('microsecond'),
-            'datetime'      => $dt->toIso8601String('microsecond'),
-            'datetimezone'  => $dt->format('Y-m-d\TH:i:s.uP'),
+            'timestamp' => $dt->timestamp,
+            'zone' => $dt->getOffsetString(),
+            'timezonename' => $targetTimezone,
+            'utc' => $utc->toIso8601ZuluString('microsecond'),
+            'date' => $dt->toDateString(),
+            'time' => $dt->toTimeString('microsecond'),
+            'datetime' => $dt->toIso8601String('microsecond'),
+            'datetimezone' => $dt->format('Y-m-d\TH:i:s.uP'),
         ];
     }
 }

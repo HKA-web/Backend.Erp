@@ -27,14 +27,13 @@ class CompanyRequest extends FormRequest
          * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
          * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
          */
-
         $isPost = $this->isMethod('post');
 
         return [
-            'company_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'company_id' => $isPost ? 'required|string' : 'nullable|string',
             'company_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed' => 'nullable|boolean',
         ];
     }
 
@@ -44,9 +43,9 @@ class CompanyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'company_id.required'   => 'The Company ID is required to identify the resource.',
+            'company_id.required' => 'The Company ID is required to identify the resource.',
             'company_name.required' => 'The Company name cannot be empty.',
-            'company_name.max'      => 'The name is too long (max 255 characters).',
+            'company_name.max' => 'The name is too long (max 255 characters).',
         ];
     }
 }

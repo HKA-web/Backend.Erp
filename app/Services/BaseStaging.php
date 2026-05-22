@@ -17,10 +17,10 @@ class BaseStaging
 
         $result = DB::statement("CALL {$procedureName}(?, ?)", [
             $sessionId,
-            json_encode($payload)
+            json_encode($payload),
         ]);
 
-        if ($result && !empty($tags)) {
+        if ($result && ! empty($tags)) {
             Cache::tags($tags)->flush();
         }
 
@@ -37,14 +37,14 @@ class BaseStaging
 
         if ($hasStagingTrait) {
             return $this->executeStaging($procedureName, [
-                $primaryKey        => $id,
-                'is_removed'       => true
+                $primaryKey => $id,
+                'is_removed' => true,
             ]);
         } else {
             return $this->executeStaging($procedureName, [
-                $primaryKey        => $id,
-                'is_removed'       => true,
-                'temporary_option' => 'D'
+                $primaryKey => $id,
+                'is_removed' => true,
+                'temporary_option' => 'D',
             ]);
         }
     }

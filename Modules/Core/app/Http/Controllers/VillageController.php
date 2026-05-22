@@ -19,6 +19,7 @@ class VillageController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $query = Village::where('village_id', $id);
+
             return $this->erpResponse($query, tags: ['village']);
         });
     }
@@ -28,13 +29,13 @@ class VillageController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
 
             $staging->executeStaging('core.procedure_revise_village', [
-                'village_id' => $id
+                'village_id' => $id,
             ]);
 
             return $this->erpResponse(
                 message: "Village {$id} has been moved to drafts for revision."
             );
-        }, "Failed to initiate revision for Village.");
+        }, 'Failed to initiate revision for Village.');
     }
 
     public function destroy($id, BaseStaging $staging)
@@ -46,6 +47,6 @@ class VillageController extends Controller
             return $this->erpResponse(
                 message: "Delete request for Village {$id} processed according to model policy."
             );
-        }, "Failed to process delete request for Village.");
+        }, 'Failed to process delete request for Village.');
     }
 }

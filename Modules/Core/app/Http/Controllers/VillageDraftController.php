@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\VillageRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\VillageRequest;
 
 class VillageDraftController extends Controller
 {
@@ -14,6 +14,7 @@ class VillageDraftController extends Controller
         return $this->erpExecution(function () {
             // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.core_village');
+
             return $this->erpResponse($query);
         });
     }
@@ -24,7 +25,7 @@ class VillageDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_village_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft Village saved successfully."
+                message: 'Draft Village saved successfully.'
             );
         });
     }
@@ -46,7 +47,7 @@ class VillageDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_village_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -57,7 +58,7 @@ class VillageDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -66,15 +67,15 @@ class VillageDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'village_id'  => request()->input('village_id')
+                'village_id' => request()->input('village_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_village', $payload);
 
             return $this->erpResponse(
-                message: "Village committed to master successfully.",
+                message: 'Village committed to master successfully.',
                 tags: ['village']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

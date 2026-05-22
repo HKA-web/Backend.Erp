@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\CityRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\CityRequest;
 
 class CityDraftController extends Controller
 {
@@ -13,6 +13,7 @@ class CityDraftController extends Controller
     {
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_city');
+
             return $this->erpResponse($query);
         });
     }
@@ -23,7 +24,7 @@ class CityDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_city_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft City saved successfully."
+                message: 'Draft City saved successfully.'
             );
         });
     }
@@ -45,7 +46,7 @@ class CityDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_city_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -56,7 +57,7 @@ class CityDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -65,15 +66,15 @@ class CityDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'city_id'  => request()->input('city_id')
+                'city_id' => request()->input('city_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_city', $payload);
 
             return $this->erpResponse(
-                message: "City committed to master successfully.",
+                message: 'City committed to master successfully.',
                 tags: ['city']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

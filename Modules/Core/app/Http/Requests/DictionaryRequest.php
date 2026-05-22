@@ -27,14 +27,13 @@ class DictionaryRequest extends FormRequest
          * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
          * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
          */
-
         $isPost = $this->isMethod('post');
 
         return [
-            'dictionary_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'dictionary_id' => $isPost ? 'required|string' : 'nullable|string',
             'dictionary_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed' => 'nullable|boolean',
         ];
     }
 
@@ -44,9 +43,9 @@ class DictionaryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'dictionary_id.required'   => 'The Dictionary ID is required to identify the resource.',
+            'dictionary_id.required' => 'The Dictionary ID is required to identify the resource.',
             'dictionary_name.required' => 'The Dictionary name cannot be empty.',
-            'dictionary_name.max'      => 'The name is too long (max 255 characters).',
+            'dictionary_name.max' => 'The name is too long (max 255 characters).',
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Helpers\ExpandHelper;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
@@ -24,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
             $limit = request()->input('take', 10);
             $offset = request()->input('skip', 0);
 
+            /** @var QueryBuilder $this */
             return $this->limit($limit)->offset($offset);
         });
 
@@ -31,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
             $limit = request()->input('take', 10);
             $offset = request()->input('skip', 0);
 
+            /** @var EloquentBuilder $this */
             return $this->limit($limit)->offset($offset);
         });
 
@@ -57,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
         ) {
             $columnExists = collect($this->getColumns())->firstWhere('name', $column);
 
-            if (!$columnExists) {
+            if (! $columnExists) {
                 $this->{$type}($column)->nullable()->index();
             }
 
@@ -78,19 +79,57 @@ class AppServiceProvider extends ServiceProvider
             $this->string('status')->default('DRAFT');
         });
 
-        Builder::macro('filterSort', function () {
+        EloquentBuilder::macro('filterSort', function () {
             $filter = request()->input('filter');
             $sort = request()->input('sort');
+
             return $this;
         });
 
-        Builder::macro('expand', function () {
+        EloquentBuilder::macro('expand', function () {
             $expand = request()->input('expand');
             if ($expand) {
                 $tree = ExpandHelper::parse($expand);
                 $with = ExpandHelper::toWith($tree);
-                return $this->with($with);
+
+                /** @var EloquentBuilder $this */
+                $model = $this->getModel();
+                $validWith = [];
+
+                foreach ((array) $with as $relation) {
+                    $parts = explode('.', $relation);
+                    $currentModel = $model;
+                    $isValid = true;
+
+                    foreach ($parts as $part) {
+                        if (! method_exists($currentModel, $part)) {
+                            $isValid = false;
+                            break;
+                        }
+
+                        try {
+                            $relationObj = $currentModel->$part();
+                            if ($relationObj instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
+                                $currentModel = new ($relationObj->getRelated()::class);
+                            } else {
+                                $isValid = false;
+                                break;
+                            }
+                        } catch (\Exception $e) {
+                            $isValid = false;
+                            break;
+                        }
+                    }
+
+                    if ($isValid) {
+                        $validWith[] = $relation;
+                    }
+                }
+
+                return $this->with($validWith);
             }
+
+            /** @var EloquentBuilder $this */
             return $this;
         });
 
@@ -124,7 +163,7 @@ class AppServiceProvider extends ServiceProvider
                 $table->uuid('session_id')->index()->change();
                 $table->char('temporary_option', 1)->default('U')->comment('I: Insert, U: Update, D: Delete')->change();
 
-                $constraintName = 'uk_' . str_replace('.', '_', $fullTempPath) . '_master_session';
+                $constraintName = 'uk_'.str_replace('.', '_', $fullTempPath).'_master_session';
                 $table->unique(['master_id', 'session_id'], $constraintName);
             });
         });

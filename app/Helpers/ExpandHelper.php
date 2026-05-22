@@ -6,7 +6,9 @@ class ExpandHelper
 {
     public static function parse(?string $expand): array
     {
-        if (!$expand) return [];
+        if (! $expand) {
+            return [];
+        }
 
         $result = [];
 
@@ -15,7 +17,7 @@ class ExpandHelper
             $current = &$result;
 
             foreach ($levels as $level) {
-                if (!isset($current[$level])) {
+                if (! isset($current[$level])) {
                     $current[$level] = [];
                 }
                 $current = &$current[$level];
@@ -33,7 +35,7 @@ class ExpandHelper
             $path = $prefix ? "$prefix.$key" : $key;
             $with[] = $path;
 
-            if (!empty($children)) {
+            if (! empty($children)) {
                 $with = array_merge($with, self::toWith($children, $path));
             }
         }

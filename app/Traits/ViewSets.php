@@ -13,12 +13,16 @@ trait ViewSets
 {
     protected function applyFieldsExpand($query)
     {
-        if (!$query instanceof EloquentBuilder) return;
+        if (! $query instanceof EloquentBuilder) {
+            return;
+        }
 
         $fieldsParam = request()->input('fields');
         $expandParam = request()->input('expand');
 
-        if (!$fieldsParam && !$expandParam) return;
+        if (! $fieldsParam && ! $expandParam) {
+            return;
+        }
 
         $fields = $fieldsParam ? array_map('trim', explode(',', $fieldsParam)) : [];
         $expands = $expandParam ? array_map('trim', explode(',', $expandParam)) : [];
@@ -31,19 +35,21 @@ trait ViewSets
             $fieldTree[$path][] = $column;
         }
 
-        $mainColumns = $fieldTree[""] ?? [];
-        if (!empty($mainColumns)) {
+        $mainColumns = $fieldTree[''] ?? [];
+        if (! empty($mainColumns)) {
             $model = $query->getModel();
             $primaryKey = $model->getKeyName();
-            if (!in_array($primaryKey, $mainColumns)) $mainColumns[] = $primaryKey;
+            if (! in_array($primaryKey, $mainColumns)) {
+                $mainColumns[] = $primaryKey;
+            }
 
             $tableName = $model->getTable();
             $realColumns = Schema::getColumnListing($tableName);
 
             foreach ($expands as $rel) {
                 $firstPart = explode('.', $rel)[0];
-                $fk = Str::snake($firstPart) . '_id';
-                if (in_array($fk, $realColumns) && !in_array($fk, $mainColumns)) {
+                $fk = Str::snake($firstPart).'_id';
+                if (in_array($fk, $realColumns) && ! in_array($fk, $mainColumns)) {
                     $mainColumns[] = $fk;
                 }
             }
@@ -54,51 +60,85 @@ trait ViewSets
 
         $withRelations = [];
         foreach ($expands as $relPath) {
-            $withRelations[$relPath] = function ($q) use ($relPath, $fieldTree) {
-                $model = $q->getModel();
-                $tableName = $model->getTable();
-                $realColumns = Schema::getColumnListing($tableName);
+            // Check all levels of the nested relationship
+            $parts = explode('.', $relPath);
+            $currentModel = $query->getModel();
+            $isValid = true;
 
-                if (isset($fieldTree[$relPath])) {
-                    $cols = $fieldTree[$relPath];
-                    $pk = $model->getKeyName();
-                    if (!in_array($pk, $cols)) $cols[] = $pk;
+            foreach ($parts as $part) {
+                if (! method_exists($currentModel, $part)) {
+                    $isValid = false;
+                    break;
+                }
 
-                    foreach ($fieldTree as $path => $columns) {
-                        if (str_starts_with($path, $relPath . '.')) {
-                            $subRel = str_replace($relPath . '.', '', $path);
-                            $fk = Str::snake($subRel) . '_id';
-                            if (in_array($fk, $realColumns) && !in_array($fk, $cols)) {
-                                $cols[] = $fk;
+                try {
+                    $relationObj = $currentModel->$part();
+                    if ($relationObj instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
+                        $currentModel = new ($relationObj->getRelated()::class);
+                    } else {
+                        $isValid = false;
+                        break;
+                    }
+                } catch (\Exception $e) {
+                    $isValid = false;
+                    break;
+                }
+            }
+
+            if ($isValid) {
+                $withRelations[$relPath] = function ($q) use ($relPath, $fieldTree) {
+                    $model = $q->getModel();
+                    $tableName = $model->getTable();
+                    $realColumns = Schema::getColumnListing($tableName);
+
+                    if (isset($fieldTree[$relPath])) {
+                        $cols = $fieldTree[$relPath];
+                        $pk = $model->getKeyName();
+                        if (! in_array($pk, $cols)) {
+                            $cols[] = $pk;
+                        }
+
+                        foreach ($fieldTree as $path => $columns) {
+                            if (str_starts_with($path, $relPath.'.')) {
+                                $subRel = str_replace($relPath.'.', '', $path);
+                                $fk = Str::snake($subRel).'_id';
+                                if (in_array($fk, $realColumns) && ! in_array($fk, $cols)) {
+                                    $cols[] = $fk;
+                                }
                             }
                         }
-                    }
 
-                    foreach ($realColumns as $col) {
-                        if (str_ends_with($col, '_id') && !in_array($col, $cols)) {
-                            $cols[] = $col;
+                        foreach ($realColumns as $col) {
+                            if (str_ends_with($col, '_id') && ! in_array($col, $cols)) {
+                                $cols[] = $col;
+                            }
                         }
+                        $q->select(array_intersect($cols, $realColumns));
                     }
-                    $q->select(array_intersect($cols, $realColumns));
-                }
-            };
+                };
+            }
         }
 
-        if (!empty($withRelations)) {
+        if (! empty($withRelations)) {
             $query->with($withRelations);
         }
     }
 
     public function applyFilter($query, $filter)
     {
-        if (empty($filter)) return $query;
-        if (is_string($filter)) $filter = json_decode($filter, true);
+        if (empty($filter)) {
+            return $query;
+        }
+        if (is_string($filter)) {
+            $filter = json_decode($filter, true);
+        }
+
         return $this->buildQuery($query, $filter);
     }
 
     private function isLeaf($filter)
     {
-        return isset($filter[0]) && !is_array($filter[0]);
+        return isset($filter[0]) && ! is_array($filter[0]);
     }
 
     private function applyLeaf($query, $leaf)
@@ -114,8 +154,7 @@ trait ViewSets
                     return $query->whereDate($parts[0], $operator, $value);
                 }
                 $field = $parts[0];
-            } 
-            else {
+            } else {
                 return $query->whereHas($parts[0], function ($q) use ($field, $operator, $value) {
                     $nestedField = explode('.', $field, 2)[1];
                     $this->applyLeaf($q, [$nestedField, $operator, $value]);
@@ -159,13 +198,15 @@ trait ViewSets
             foreach ($filter as $item) {
                 if (is_array($item)) {
                     if ($logic === 'and') {
-                        $q->where(fn($sub) => $this->buildQuery($sub, $item));
+                        $q->where(fn ($sub) => $this->buildQuery($sub, $item));
                     } else {
-                        $q->orWhere(fn($sub) => $this->buildQuery($sub, $item));
+                        $q->orWhere(fn ($sub) => $this->buildQuery($sub, $item));
                     }
                 } else {
                     $item = strtolower($item);
-                    if ($item === 'and' || $item === 'or') $logic = $item;
+                    if ($item === 'and' || $item === 'or') {
+                        $logic = $item;
+                    }
                 }
             }
         });
@@ -174,12 +215,16 @@ trait ViewSets
     protected function applySort($query, $sort)
     {
         $sorts = is_string($sort) ? json_decode($sort, true) : $sort;
-        if (!is_array($sorts)) return;
+        if (! is_array($sorts)) {
+            return;
+        }
 
         foreach ($sorts as $s) {
             $field = $s['selector'] ?? $s['field'] ?? null;
             $direction = ($s['desc'] ?? false) ? 'desc' : 'asc';
-            if ($field) $query->orderBy($field, $direction);
+            if ($field) {
+                $query->orderBy($field, $direction);
+            }
         }
     }
 
@@ -189,7 +234,7 @@ trait ViewSets
             $query = $data;
 
             $url = Request::fullUrl();
-            $cacheKey = 'erp_cache_' . md5($url);
+            $cacheKey = 'erp_cache_'.md5($url);
 
             $callback = function () use ($query) {
                 $this->applyFieldsExpand($query);
@@ -207,23 +252,25 @@ trait ViewSets
 
                 return [
                     'totalCount' => $totalCount,
-                    'data'       => $results->toArray(),
+                    'data' => $results->toArray(),
                 ];
             };
 
-            $resultData = !empty($tags)
+            $resultData = ! empty($tags)
                 ? Cache::tags($tags)->remember($cacheKey, 3600, $callback)
                 : Cache::remember($cacheKey, 3600, $callback);
 
             return response()->json($resultData, 200);
         }
 
-        if (!empty($tags)) {
+        if (! empty($tags)) {
             Cache::tags($tags)->flush();
         }
 
         $response = ['message' => $message];
-        if (!is_null($data)) $response['data'] = $data;
+        if (! is_null($data)) {
+            $response['data'] = $data;
+        }
 
         return response()->json($response, 200);
     }

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
 return new class extends Migration
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130141_core.procedures_district.sql');
+        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130141_core.procedures_district.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -44,9 +44,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_district_draft");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_district");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_district");
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_district_draft');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_district');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_district');
         Schema::dropIfExists('history.district_history');
         Schema::dropIfExists('temporary.core_district');
         Schema::dropIfExists('core.district');

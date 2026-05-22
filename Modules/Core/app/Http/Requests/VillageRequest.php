@@ -27,14 +27,13 @@ class VillageRequest extends FormRequest
          * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
          * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
          */
-
         $isPost = $this->isMethod('post');
 
         return [
-            'village_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'village_id' => $isPost ? 'required|string' : 'nullable|string',
             'village_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed' => 'nullable|boolean',
         ];
     }
 
@@ -44,9 +43,9 @@ class VillageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'village_id.required'   => 'The Village ID is required to identify the resource.',
+            'village_id.required' => 'The Village ID is required to identify the resource.',
             'village_name.required' => 'The Village name cannot be empty.',
-            'village_name.max'      => 'The name is too long (max 255 characters).',
+            'village_name.max' => 'The name is too long (max 255 characters).',
         ];
     }
 }

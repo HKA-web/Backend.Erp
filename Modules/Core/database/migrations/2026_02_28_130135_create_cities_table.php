@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
 return new class extends Migration
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130136_core.procedures_city.sql');
+        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130136_core.procedures_city.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -44,9 +44,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_city_draft");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_city");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_city");
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_city_draft');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_city');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_city');
         Schema::dropIfExists('history.city_history');
         Schema::dropIfExists('temporary.core_city');
         Schema::dropIfExists('core.city');

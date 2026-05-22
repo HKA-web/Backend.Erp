@@ -19,6 +19,7 @@ class CityController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $query = City::where('city_id', $id);
+
             return $this->erpResponse($query, tags: ['city']);
         });
     }
@@ -28,13 +29,13 @@ class CityController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
 
             $staging->executeStaging('core.procedure_revise_city', [
-                'city_id' => $id
+                'city_id' => $id,
             ]);
 
             return $this->erpResponse(
                 message: "City {$id} has been moved to drafts for revision."
             );
-        }, "Failed to initiate revision for City.");
+        }, 'Failed to initiate revision for City.');
     }
 
     public function destroy($id, BaseStaging $staging)
@@ -46,6 +47,6 @@ class CityController extends Controller
             return $this->erpResponse(
                 message: "Delete request for City {$id} processed according to model policy."
             );
-        }, "Failed to process delete request for City.");
+        }, 'Failed to process delete request for City.');
     }
 }

@@ -27,14 +27,13 @@ class DistrictRequest extends FormRequest
          * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
          * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
          */
-
         $isPost = $this->isMethod('post');
 
         return [
-            'district_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'district_id' => $isPost ? 'required|string' : 'nullable|string',
             'district_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed' => 'nullable|boolean',
         ];
     }
 
@@ -44,9 +43,9 @@ class DistrictRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'district_id.required'   => 'The District ID is required to identify the resource.',
+            'district_id.required' => 'The District ID is required to identify the resource.',
             'district_name.required' => 'The District name cannot be empty.',
-            'district_name.max'      => 'The name is too long (max 255 characters).',
+            'district_name.max' => 'The name is too long (max 255 characters).',
         ];
     }
 }

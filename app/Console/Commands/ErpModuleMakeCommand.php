@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class ErpModuleMakeCommand extends Command
 {
     protected $signature = 'erp:make-module {name}';
+
     protected $description = 'Create a new ERP module with PostgreSQL Schema & Permissions';
 
     public function handle()
@@ -19,7 +21,7 @@ class ErpModuleMakeCommand extends Command
         $this->info("Building ERP Module: {$name}...");
 
         Artisan::call("module:make {$name}");
-        $this->line("Standard module structure created.");
+        $this->line('Standard module structure created.');
 
         $this->generateSchemaMigration($name, $lowerName);
 
@@ -35,7 +37,7 @@ class ErpModuleMakeCommand extends Command
             $path = $pathKecil;
         } else {
             $path = $pathKapital;
-            if (!File::isDirectory($path)) {
+            if (! File::isDirectory($path)) {
                 File::makeDirectory($path, 0755, true);
             }
         }
@@ -46,7 +48,7 @@ class ErpModuleMakeCommand extends Command
         $template = $this->getSchemaTemplate($lowerName);
         File::put($fullPath, $template);
 
-        $this->line("Schema migration created in: <info>" . ($path === $pathKecil ? 'database' : 'Database') . "</info>");
+        $this->line('Schema migration created in: <info>'.($path === $pathKecil ? 'database' : 'Database').'</info>');
     }
 
     protected function getSchemaTemplate($lowerName)

@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\DictionaryRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\DictionaryRequest;
 
 class DictionaryDraftController extends Controller
 {
@@ -13,6 +13,7 @@ class DictionaryDraftController extends Controller
     {
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_dictionary');
+
             return $this->erpResponse($query);
         });
     }
@@ -23,7 +24,7 @@ class DictionaryDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_dictionary_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft Dictionary saved successfully."
+                message: 'Draft Dictionary saved successfully.'
             );
         });
     }
@@ -45,7 +46,7 @@ class DictionaryDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_dictionary_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -56,7 +57,7 @@ class DictionaryDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -65,15 +66,15 @@ class DictionaryDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'dictionary_id'  => request()->input('dictionary_id')
+                'dictionary_id' => request()->input('dictionary_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_dictionary', $payload);
 
             return $this->erpResponse(
-                message: "Dictionary committed to master successfully.",
+                message: 'Dictionary committed to master successfully.',
                 tags: ['dictionary']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

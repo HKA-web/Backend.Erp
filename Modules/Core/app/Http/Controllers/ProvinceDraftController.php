@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\ProvinceRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\ProvinceRequest;
 
 class ProvinceDraftController extends Controller
 {
@@ -13,6 +13,7 @@ class ProvinceDraftController extends Controller
     {
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_province');
+
             return $this->erpResponse($query);
         });
     }
@@ -23,7 +24,7 @@ class ProvinceDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_province_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft Province saved successfully."
+                message: 'Draft Province saved successfully.'
             );
         });
     }
@@ -45,7 +46,7 @@ class ProvinceDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_province_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -56,7 +57,7 @@ class ProvinceDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -65,15 +66,15 @@ class ProvinceDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'province_id'  => request()->input('province_id')
+                'province_id' => request()->input('province_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_province', $payload);
 
             return $this->erpResponse(
-                message: "Province committed to master successfully.",
+                message: 'Province committed to master successfully.',
                 tags: ['province']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

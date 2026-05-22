@@ -4,8 +4,8 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
-use Modules\Core\Http\Requests\DistrictRequest;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Requests\DistrictRequest;
 
 class DistrictDraftController extends Controller
 {
@@ -13,6 +13,7 @@ class DistrictDraftController extends Controller
     {
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_district');
+
             return $this->erpResponse($query);
         });
     }
@@ -23,7 +24,7 @@ class DistrictDraftController extends Controller
             $staging->executeStaging('core.procedure_upsert_district_draft', $request->validated());
 
             return $this->erpResponse(
-                message: "Draft District saved successfully."
+                message: 'Draft District saved successfully.'
             );
         });
     }
@@ -45,7 +46,7 @@ class DistrictDraftController extends Controller
 
             $staging->executeStaging('core.procedure_upsert_district_draft', $payload);
 
-            return $this->erpResponse(message: "Draft updated.");
+            return $this->erpResponse(message: 'Draft updated.');
         });
     }
 
@@ -56,7 +57,7 @@ class DistrictDraftController extends Controller
                 ->where('temporary_id', $id)
                 ->delete();
 
-            return $this->erpResponse(message: "Draft discarded.");
+            return $this->erpResponse(message: 'Draft discarded.');
         });
     }
 
@@ -65,15 +66,15 @@ class DistrictDraftController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
             $payload = [
                 'temporary_id' => $id,
-                'district_id'  => request()->input('district_id')
+                'district_id' => request()->input('district_id'),
             ];
 
             $staging->executeStaging('core.procedure_commit_district', $payload);
 
             return $this->erpResponse(
-                message: "District committed to master successfully.",
+                message: 'District committed to master successfully.',
                 tags: ['district']
             );
-        }, "Failed to commit draft.");
+        }, 'Failed to commit draft.');
     }
 }

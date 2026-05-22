@@ -14,7 +14,7 @@ class VillageFactory extends Factory
     public function definition(): array
     {
         return [
-            'village_id'   => Str::uuid(),
+            'village_id' => Str::uuid(),
             'village_name' => fake()->name(),
             'district_id' => DB::table('core.district')->inRandomOrder()->value('district_id'),
         ];

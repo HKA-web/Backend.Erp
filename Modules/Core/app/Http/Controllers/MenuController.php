@@ -19,6 +19,7 @@ class MenuController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $query = Menu::where('menu_id', $id);
+
             return $this->erpResponse($query, tags: ['menu']);
         });
     }
@@ -28,13 +29,13 @@ class MenuController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
 
             $staging->executeStaging('core.procedure_revise_menu', [
-                'menu_id' => $id
+                'menu_id' => $id,
             ]);
 
             return $this->erpResponse(
                 message: "Menu {$id} has been moved to drafts for revision."
             );
-        }, "Failed to initiate revision for Menu.");
+        }, 'Failed to initiate revision for Menu.');
     }
 
     public function destroy($id, BaseStaging $staging)
@@ -46,6 +47,6 @@ class MenuController extends Controller
             return $this->erpResponse(
                 message: "Delete request for Menu {$id} processed according to model policy."
             );
-        }, "Failed to process delete request for Menu.");
+        }, 'Failed to process delete request for Menu.');
     }
 }

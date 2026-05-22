@@ -13,7 +13,7 @@ class DictionaryFactory extends Factory
     public function definition(): array
     {
         return [
-            'dictionary_id'   => Str::uuid(),
+            'dictionary_id' => Str::uuid(),
             'dictionary_name' => fake()->name(),
         ];
     }

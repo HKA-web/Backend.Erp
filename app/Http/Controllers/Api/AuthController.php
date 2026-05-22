@@ -28,15 +28,15 @@ class AuthController extends Controller
                     'email',
                     Rule::unique('pgsql.authentication.user', 'email'),
                 ],
-                'password'  => 'required|min:6'
+                'password' => 'required|min:6',
             ]);
 
             // Create User dengan UUID
             $user = User::create([
-                'user_id'    => (string) Str::uuid(),
-                'user_name'  => $request->user_name,
-                'email'      => $request->email,
-                'password'   => Hash::make($request->password)
+                'user_id' => (string) Str::uuid(),
+                'user_name' => $request->user_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
             ]);
 
             // createToken() sekarang aman karena Model sudah Authenticatable
@@ -44,8 +44,8 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'User registered successfully',
-                'access'  => $token,
-                'user'    => $user
+                'access' => $token,
+                'user' => $user,
             ], 201);
         });
     }
@@ -58,13 +58,13 @@ class AuthController extends Controller
     {
         return $this->erpExecution(function () use ($request) {
             $request->validate([
-                'email'    => 'required|email',
-                'password' => 'required'
+                'email' => 'required|email',
+                'password' => 'required',
             ]);
 
             $user = User::where('email', $request->email)->first();
 
-            if (!$user || !Hash::check($request->password, $user->password)) {
+            if (! $user || ! Hash::check($request->password, $user->password)) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
@@ -106,16 +106,16 @@ class AuthController extends Controller
             return response()->json([
                 'access' => $token,
                 'session' => [
-                    'base64pk'  => base64_encode($user->user_id),
-                    'user_id'   => (string) $user->user_id,
+                    'base64pk' => base64_encode($user->user_id),
+                    'user_id' => (string) $user->user_id,
                     'user_name' => strtoupper($user->user_name),
                     'real_name' => $user->user_name,
-                    'email'     => $user->email,
-                    'phone'     => $user->phone ?? '-',
-                    'is_admin'  => $user->is_admin,
-                    'properties'=> $properties,
+                    'email' => $user->email,
+                    'phone' => $user->phone ?? '-',
+                    'is_admin' => $user->is_admin,
+                    'properties' => $properties,
                 ],
-                'permissions' => $permissions
+                'permissions' => $permissions,
             ]);
         });
     }
@@ -130,7 +130,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Logged out successfully',
         ]);
     }
 

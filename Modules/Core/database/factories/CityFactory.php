@@ -14,7 +14,7 @@ class CityFactory extends Factory
     public function definition(): array
     {
         return [
-            'city_id'   => Str::uuid(),
+            'city_id' => Str::uuid(),
             'city_name' => fake()->name(),
             'province_id' => DB::table('core.province')->inRandomOrder()->value('province_id'),
         ];

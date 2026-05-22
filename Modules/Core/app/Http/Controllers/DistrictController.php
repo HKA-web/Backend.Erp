@@ -19,6 +19,7 @@ class DistrictController extends Controller
     {
         return $this->erpExecution(function () use ($id) {
             $query = District::where('district_id', $id);
+
             return $this->erpResponse($query, tags: ['district']);
         });
     }
@@ -28,13 +29,13 @@ class DistrictController extends Controller
         return $this->erpExecution(function () use ($staging, $id) {
 
             $staging->executeStaging('core.procedure_revise_district', [
-                'district_id' => $id
+                'district_id' => $id,
             ]);
 
             return $this->erpResponse(
                 message: "District {$id} has been moved to drafts for revision."
             );
-        }, "Failed to initiate revision for District.");
+        }, 'Failed to initiate revision for District.');
     }
 
     public function destroy($id, BaseStaging $staging)
@@ -46,6 +47,6 @@ class DistrictController extends Controller
             return $this->erpResponse(
                 message: "Delete request for District {$id} processed according to model policy."
             );
-        }, "Failed to process delete request for District.");
+        }, 'Failed to process delete request for District.');
     }
 }

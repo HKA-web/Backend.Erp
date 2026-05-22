@@ -27,14 +27,13 @@ class CityRequest extends FormRequest
          * 3. Field 'status' tidak lagi wajib dikirim dari Frontend karena SP
          * sudah tahu mana yang DRAFT dan mana yang COMMIT berdasarkan Route.
          */
-
         $isPost = $this->isMethod('post');
 
         return [
-            'city_id'   => $isPost ? 'required|string' : 'nullable|string',
+            'city_id' => $isPost ? 'required|string' : 'nullable|string',
             'city_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed' => 'nullable|boolean',
         ];
     }
 
@@ -44,9 +43,9 @@ class CityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'city_id.required'   => 'The City ID is required to identify the resource.',
+            'city_id.required' => 'The City ID is required to identify the resource.',
             'city_name.required' => 'The City name cannot be empty.',
-            'city_name.max'      => 'The name is too long (max 255 characters).',
+            'city_name.max' => 'The name is too long (max 255 characters).',
         ];
     }
 }

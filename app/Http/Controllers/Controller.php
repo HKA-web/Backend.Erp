@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, ViewSets;
+
     protected function erpExecution(callable $callback)
     {
         try {
@@ -19,5 +20,4 @@ class Controller extends BaseController
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 }

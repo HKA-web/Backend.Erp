@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
 return new class extends Migration
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_28_130152_core.procedures_company.sql');
+        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130152_core.procedures_company.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -51,9 +51,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_upsert_company_draft");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_revise_company");
-        DB::unprepared("DROP PROCEDURE IF EXISTS core.procedure_commit_company");
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_company_draft');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_company');
+        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_company');
         Schema::dropIfExists('history.company_history');
         Schema::dropIfExists('temporary.core_company');
         Schema::dropIfExists('core.company');

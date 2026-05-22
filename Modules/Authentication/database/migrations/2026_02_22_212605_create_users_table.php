@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
 return new class extends Migration
@@ -57,7 +57,7 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
-        $sql = file_get_contents(__DIR__ . '/sql/2026_02_22_212605_authentication.procedures_user.sql');
+        $sql = file_get_contents(__DIR__.'/sql/2026_02_22_212605_authentication.procedures_user.sql');
         DB::unprepared($sql);
 
         $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
@@ -71,9 +71,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_upsert_user_draft");
-        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_revise_user");
-        DB::unprepared("DROP PROCEDURE IF EXISTS authentication.procedure_commit_user");
+        DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_upsert_user_draft');
+        DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_revise_user');
+        DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_commit_user');
         Schema::dropIfExists('history.user_history');
         Schema::dropIfExists('temporary.authentication_user');
         Schema::dropIfExists('authentication.user');
