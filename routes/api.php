@@ -13,4 +13,3 @@ Route::middleware('auth:sanctum')->group(function () {
 // API Documentation
 Route::get('docs', [ApiDocumentationController::class, 'index']);
 Route::get('docs/json', [ApiDocumentationController::class, 'json']);
-Route::get('docs/{module}', [ApiDocumentationController::class, 'moduleJson']);

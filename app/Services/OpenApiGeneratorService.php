@@ -100,7 +100,7 @@ class OpenApiGeneratorService
             'openapi' => '3.0.0',
             'info' => [
                 'title' => $moduleName . ' API',
-                'version' => '1.0.0',
+                'version' => 'V.1',
                 'description' => 'API endpoints for ' . $moduleName . ' module',
             ],
             'tags' => $tags,
@@ -182,9 +182,31 @@ class OpenApiGeneratorService
                 ]
             ];
 
+            // Extract path parameters (e.g., {id}, {slug})
+            preg_match_all('/\{([^}]+)\}/', $path, $pathParams);
+            if (!empty($pathParams[1])) {
+                if (!isset($operation['parameters'])) {
+                    $operation['parameters'] = [];
+                }
+                foreach ($pathParams[1] as $param) {
+                    $operation['parameters'][] = [
+                        'name' => $param,
+                        'in' => 'path',
+                        'description' => ucfirst($param) . ' parameter',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string'
+                        ]
+                    ];
+                }
+            }
+
             // Add default query parameters for GET methods
             if ($method === 'get') {
-                $operation['parameters'] = [
+                if (!isset($operation['parameters'])) {
+                    $operation['parameters'] = [];
+                }
+                $operation['parameters'] = array_merge($operation['parameters'], [
                     [
                         'name' => 'take',
                         'in' => 'query',
@@ -232,11 +254,174 @@ class OpenApiGeneratorService
                             'type' => 'string'
                         ]
                     ]
+                ]);
+            }
+
+            // Add X-Session-ID header for commit, destroy, update, store, and revise methods
+            if (in_array($methodName, ['commit', 'destroy', 'update', 'store', 'revise'])) {
+                if (!isset($operation['parameters'])) {
+                    $operation['parameters'] = [];
+                }
+                $operation['parameters'][] = [
+                    'name' => 'X-Session-ID',
+                    'in' => 'header',
+                    'description' => 'Session ID for temporary workspace isolation',
+                    'required' => true,
+                    'schema' => [
+                        'type' => 'string'
+                    ]
+                ];
+            }
+
+            // Add request body for POST/PUT/PATCH methods (except excluded methods)
+            $excludedMethodsForBody = ['commit', 'revise', 'destroy'];
+            if (in_array($method, ['post', 'put', 'patch']) && !in_array($methodName, $excludedMethodsForBody)) {
+                // Try to extract validation rules from Request class
+                $requestSchema = $this->extractRequestSchema($controller, $methodName, $moduleName);
+
+                $operation['requestBody'] = [
+                    'required' => true,
+                    'content' => [
+                        'multipart/form-data' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => $requestSchema
+                            ]
+                        ]
+                    ]
                 ];
             }
 
             $paths[$path][$method] = $operation;
         }
+    }
+
+    /**
+     * Extract request schema from Request class validation rules
+     *
+     * @param string $controller
+     * @param string $methodName
+     * @param string $moduleName
+     * @return array
+     */
+    protected function extractRequestSchema(string $controller, string $methodName, string $moduleName): array
+    {
+        $schema = [];
+
+        // Extract controller class name (remove @method if present)
+        $controllerClass = strpos($controller, '@') !== false ? explode('@', $controller)[0] : $controller;
+
+        // Try to find the Request class
+        // Pattern: Modules/{ModuleName}/app/Http/Requests/{Resource}Request.php
+        try {
+            $controllerClass = new \ReflectionClass($controllerClass);
+            $controllerShortName = $controllerClass->getShortName();
+            $resourceName = str_replace('Controller', '', $controllerShortName);
+
+            // Try multiple patterns for Request class name
+            $possibleRequestClasses = [
+                "Modules\\{$moduleName}\\Http\\Requests\\{$resourceName}Request",
+                "Modules\\{$moduleName}\\Http\\Requests\\" . str_replace('Draft', '', $resourceName) . 'Request', // Remove 'Draft' suffix
+                "Modules\\{$moduleName}\\Http\\Requests\\" . str_replace('Drafts', '', $resourceName) . 'Request', // Remove 'Drafts' suffix
+            ];
+
+            $requestClass = null;
+            foreach ($possibleRequestClasses as $class) {
+                if (class_exists($class)) {
+                    $requestClass = $class;
+                    break;
+                }
+            }
+
+            if (!$requestClass) {
+                // Fallback to generic schema
+                return [
+                    'data' => [
+                        'type' => 'object',
+                        'description' => 'Request data'
+                    ]
+                ];
+            }
+
+            $requestInstance = new $requestClass();
+            $rules = $requestInstance->rules();
+
+            foreach ($rules as $field => $rule) {
+                $schema[$field] = $this->convertLaravelRuleToOpenApi($rule);
+            }
+        } catch (\Exception $e) {
+            // Fallback to generic schema if parsing fails
+            return [
+                'data' => [
+                    'type' => 'object',
+                    'description' => 'Request data'
+                ]
+            ];
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Convert Laravel validation rule to OpenAPI schema
+     *
+     * @param string $rule
+     * @return array
+     */
+    protected function convertLaravelRuleToOpenApi(string $rule): array
+    {
+        $schema = [
+            'type' => 'string',
+            'description' => $rule
+        ];
+
+        // Parse Laravel validation rules
+        if (is_string($rule)) {
+            $rules = explode('|', $rule);
+        } elseif (is_array($rule)) {
+            $rules = $rule;
+        } else {
+            return $schema;
+        }
+
+        foreach ($rules as $r) {
+            if (is_string($r)) {
+                // Check for type rules
+                if (str_starts_with($r, 'required')) {
+                    // This will be handled at the required array level
+                } elseif (str_starts_with($r, 'string')) {
+                    $schema['type'] = 'string';
+                } elseif (str_starts_with($r, 'integer') || str_starts_with($r, 'numeric')) {
+                    $schema['type'] = 'integer';
+                } elseif (str_starts_with($r, 'boolean')) {
+                    $schema['type'] = 'boolean';
+                } elseif (str_starts_with($r, 'array')) {
+                    $schema['type'] = 'array';
+                } elseif (str_starts_with($r, 'email')) {
+                    $schema['type'] = 'string';
+                    $schema['format'] = 'email';
+                } elseif (str_starts_with($r, 'date')) {
+                    $schema['type'] = 'string';
+                    $schema['format'] = 'date';
+                } elseif (str_starts_with($r, 'max:')) {
+                    $maxValue = substr($r, 4);
+                    if ($schema['type'] === 'string') {
+                        $schema['maxLength'] = (int)$maxValue;
+                    } else {
+                        $schema['maximum'] = (int)$maxValue;
+                    }
+                } elseif (str_starts_with($r, 'min:')) {
+                    $minValue = substr($r, 3);
+                    if ($schema['type'] === 'string') {
+                        $schema['minLength'] = (int)$minValue;
+                    } else {
+                        $schema['minimum'] = (int)$minValue;
+                    }
+                }
+            }
+        }
+
+        return $schema;
     }
 
     /**
@@ -428,8 +613,8 @@ class OpenApiGeneratorService
             'openapi' => '3.0.0',
             'info' => [
                 'title' => 'ERP Backend API',
-                'description' => 'API documentation for all modules',
-                'version' => '1.0.0',
+                'description' => 'API documentation',
+                'version' => 'V.1',
             ],
             'servers' => [
                 [
@@ -575,7 +760,7 @@ class OpenApiGeneratorService
             'openapi' => '3.0.0',
             'info' => [
                 'title' => 'ERP Backend API',
-                'description' => 'API documentation for all modules',
+                'description' => 'API documentation',
                 'version' => '1.0.0',
             ],
             'servers' => [

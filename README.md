@@ -187,11 +187,6 @@ http://localhost:8000/api/docs
 
 - **Swagger UI**: `http://localhost:8000/api/docs`
 - **JSON All Modules**: `http://localhost:8000/api/docs/json`
-- **JSON Per Module**: `http://localhost:8000/api/docs/{module}`
-
-Contoh:
-- `http://localhost:8000/api/docs/Authentication`
-- `http://localhost:8000/api/docs/Core`
 
 ## Lokasi File Generated
 

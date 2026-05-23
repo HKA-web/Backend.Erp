@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Core API",
-        "version": "1.0.0",
+        "version": "V.1",
         "description": "API endpoints for Core module"
     },
     "tags": [
@@ -138,6 +138,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -224,6 +233,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -265,6 +294,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -394,6 +443,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "province_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "province_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -436,6 +521,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -523,6 +617,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "province_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "province_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -562,6 +701,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -603,6 +762,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -736,6 +915,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -822,6 +1010,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -863,6 +1071,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -992,6 +1220,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "city_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "city_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -1034,6 +1298,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -1121,6 +1394,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "city_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "city_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -1160,6 +1478,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1201,6 +1539,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1334,6 +1692,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -1420,6 +1787,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1461,6 +1848,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1590,6 +1997,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "district_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "district_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -1632,6 +2075,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -1719,6 +2171,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "district_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "district_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -1758,6 +2255,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1799,6 +2316,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -1932,6 +2469,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -2018,6 +2564,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2059,6 +2625,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2188,6 +2774,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "village_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "village_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -2230,6 +2852,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -2317,6 +2948,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "village_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "village_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -2356,6 +3032,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2397,6 +3093,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2530,6 +3246,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -2616,6 +3341,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2657,6 +3402,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2786,6 +3551,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "company_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -2828,6 +3629,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -2915,6 +3725,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "company_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -2954,6 +3809,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -2995,6 +3870,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3128,6 +4023,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -3214,6 +4118,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3255,6 +4179,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3384,6 +4328,42 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "dictionary_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "dictionary_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -3426,6 +4406,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -3513,6 +4502,51 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "dictionary_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "dictionary_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -3552,6 +4586,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3593,6 +4647,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3726,6 +4800,15 @@
                 },
                 "parameters": [
                     {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "take",
                         "in": "query",
                         "description": "Number of records to return",
@@ -3812,6 +4895,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3853,6 +4956,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -3982,6 +5105,62 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "menu_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "menu_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "sort_order": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "target": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "interface": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -4024,6 +5203,15 @@
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "name": "take",
                         "in": "query",
@@ -4111,6 +5299,71 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "menu_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "menu_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "sort_order": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "target": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "interface": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "sanctum": []
@@ -4150,6 +5403,26 @@
                         "description": "Not found"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "security": [
                     {
                         "sanctum": []
@@ -4191,478 +5464,21 @@
                         "description": "Not found"
                     }
                 },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/cores": {
-            "get": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Get cores",
-                "description": "Get cores resource",
-                "operationId": "getcores",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
                 "parameters": [
                     {
-                        "name": "take",
-                        "in": "query",
-                        "description": "Number of records to return",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "skip",
-                        "in": "query",
-                        "description": "Number of records to skip",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 0
-                        }
-                    },
-                    {
-                        "name": "filter",
-                        "in": "query",
-                        "description": "Filter criteria (JSON string)",
-                        "required": false,
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
-                        "name": "expand",
-                        "in": "query",
-                        "description": "Related resources to expand (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fields",
-                        "in": "query",
-                        "description": "Fields to return (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Create cores",
-                "description": "Create cores resource",
-                "operationId": "postcores",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/cores/create": {
-            "get": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Get create",
-                "description": "Get create resource",
-                "operationId": "getcorescreate",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "take",
-                        "in": "query",
-                        "description": "Number of records to return",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "skip",
-                        "in": "query",
-                        "description": "Number of records to skip",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 0
-                        }
-                    },
-                    {
-                        "name": "filter",
-                        "in": "query",
-                        "description": "Filter criteria (JSON string)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "description": "Related resources to expand (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fields",
-                        "in": "query",
-                        "description": "Fields to return (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/cores/{core}": {
-            "get": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Get {core}",
-                "description": "Get {core} resource",
-                "operationId": "getcorescore",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "take",
-                        "in": "query",
-                        "description": "Number of records to return",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "skip",
-                        "in": "query",
-                        "description": "Number of records to skip",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 0
-                        }
-                    },
-                    {
-                        "name": "filter",
-                        "in": "query",
-                        "description": "Filter criteria (JSON string)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "description": "Related resources to expand (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fields",
-                        "in": "query",
-                        "description": "Fields to return (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Update {core}",
-                "description": "Update {core} resource",
-                "operationId": "putcorescore",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Delete {core}",
-                "description": "Delete {core} resource",
-                "operationId": "deletecorescore",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/cores/{core}/edit": {
-            "get": {
-                "tags": [
-                    "Core"
-                ],
-                "summary": "Get edit",
-                "description": "Get edit resource",
-                "operationId": "getcorescoreedit",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "take",
-                        "in": "query",
-                        "description": "Number of records to return",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "skip",
-                        "in": "query",
-                        "description": "Number of records to skip",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 0
-                        }
-                    },
-                    {
-                        "name": "filter",
-                        "in": "query",
-                        "description": "Filter criteria (JSON string)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "expand",
-                        "in": "query",
-                        "description": "Related resources to expand (comma-separated)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fields",
-                        "in": "query",
-                        "description": "Fields to return (comma-separated)",
-                        "required": false,
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
