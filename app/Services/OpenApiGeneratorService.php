@@ -790,6 +790,34 @@ class OpenApiGeneratorService
             'summary' => 'Register new user',
             'description' => 'Create a new user account',
             'operationId' => 'postregister',
+            'requestBody' => [
+                'required' => true,
+                'content' => [
+                    'multipart/form-data' => [
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'user_name' => [
+                                    'type' => 'string',
+                                    'maxLength' => 255,
+                                    'description' => 'User name'
+                                ],
+                                'email' => [
+                                    'type' => 'string',
+                                    'format' => 'email',
+                                    'description' => 'User email address'
+                                ],
+                                'password' => [
+                                    'type' => 'string',
+                                    'minLength' => 6,
+                                    'description' => 'User password (minimum 6 characters)'
+                                ]
+                            ],
+                            'required' => ['user_name', 'email', 'password']
+                        ]
+                    ]
+                ]
+            ],
             'responses' => [
                 '200' => [
                     'description' => 'User registered successfully',
@@ -817,6 +845,28 @@ class OpenApiGeneratorService
             'summary' => 'Login user',
             'description' => 'Authenticate user and return token',
             'operationId' => 'postlogin',
+            'requestBody' => [
+                'required' => true,
+                'content' => [
+                    'multipart/form-data' => [
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'email' => [
+                                    'type' => 'string',
+                                    'format' => 'email',
+                                    'description' => 'User email address'
+                                ],
+                                'password' => [
+                                    'type' => 'string',
+                                    'description' => 'User password'
+                                ]
+                            ],
+                            'required' => ['email', 'password']
+                        ]
+                    ]
+                ]
+            ],
             'responses' => [
                 '200' => [
                     'description' => 'Login successful',
