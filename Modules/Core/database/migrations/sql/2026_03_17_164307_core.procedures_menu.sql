@@ -1,15 +1,15 @@
 -- 1. PROCEDURE UPSERT DRAFT (Menggunakan temporary_id sebagai PK draf)
 DROP PROCEDURE IF EXISTS core.procedure_upsert_menu_draft;
 CREATE OR REPLACE PROCEDURE core.procedure_upsert_menu_draft(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
 BEGIN
     -- Jika payload tidak bawa temporary_id, buat baru (Insert draf baru)
     IF v_temp_id IS NULL THEN
-        v_temp_id := gen_random_uuid();
+        v_temp_id := gen_random_uuid()::TEXT;
     END IF;
 
     INSERT INTO temporary.core_menu (
@@ -39,7 +39,7 @@ $$;
 -- 2. PROCEDURE REVISE (Check-out dari Master ke Temporary)
 DROP PROCEDURE IF EXISTS core.procedure_revise_menu;
 CREATE OR REPLACE PROCEDURE core.procedure_revise_menu(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
@@ -60,7 +60,7 @@ BEGIN
         is_removed
     )
     SELECT
-        gen_random_uuid(),
+        gen_random_uuid()::TEXT,
         p_session_id,
         menu_id,
         COALESCE(p_payload ->> 'temporary_option', 'U'),
@@ -75,11 +75,11 @@ $$;
 -- 3. PROCEDURE COMMIT (Finalisasi ke Master berdasarkan temporary_option)
 DROP PROCEDURE IF EXISTS core.procedure_commit_menu;
 CREATE OR REPLACE PROCEDURE core.procedure_commit_menu(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
@@ -116,8 +116,8 @@ BEGIN
 
     INSERT INTO history.core_menu (history_id, executed_by, action, old_data, new_data, executed_at)
     VALUES (
-        gen_random_uuid(),
-        (p_payload ->> 'executed_by')::UUID,
+        gen_random_uuid()::TEXT,
+        (p_payload ->> 'executed_by'),
         CASE
             WHEN v_rec.temporary_option = 'D' THEN 'DELETE'
             WHEN v_old_data IS NULL THEN 'INSERT'

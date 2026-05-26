@@ -17,8 +17,8 @@ trait ViewSets
             return;
         }
 
-        $fieldsParam = request()->input('fields');
-        $expandParam = request()->input('expand');
+        $fieldsParam = Request::input('fields');
+        $expandParam = Request::input('expand');
 
         if (! $fieldsParam && ! $expandParam) {
             return;
@@ -239,12 +239,12 @@ trait ViewSets
             $callback = function () use ($query) {
                 $this->applyFieldsExpand($query);
 
-                if (request()->has('filter')) {
-                    $this->applyFilter($query, request()->input('filter'));
+                if (Request::has('filter')) {
+                    $this->applyFilter($query, Request::input('filter'));
                 }
 
-                if (request()->has('sort')) {
-                    $this->applySort($query, request()->input('sort'));
+                if (Request::has('sort')) {
+                    $this->applySort($query, Request::input('sort'));
                 }
 
                 $totalCount = (clone $query)->count();

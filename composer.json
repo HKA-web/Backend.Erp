@@ -13,6 +13,7 @@
         "nwidart/laravel-modules": "^12.0",
         "predis/predis": "^3.4",
         "spatie/laravel-permission": "^7.2",
+        "stancl/tenancy": "^3.10",
         "zircote/swagger-php": "^6.1"
     },
     "require-dev": {

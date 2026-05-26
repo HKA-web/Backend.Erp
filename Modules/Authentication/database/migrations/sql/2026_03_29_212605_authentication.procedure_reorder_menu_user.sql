@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE authentication.procedure_reorder_menu_user(
-    IN p_session_id UUID,
+    IN p_session_id VARCHAR,
     IN p_payload JSONB
 )
     LANGUAGE plpgsql
@@ -8,7 +8,7 @@ DECLARE
     v_user_id_text TEXT := p_payload ->> 'user_id';
     v_input_menus JSONB := p_payload -> 'menus';
     v_final_menus JSONB;
-    v_executed_by UUID := (p_payload ->> 'executed_by')::UUID;
+    v_executed_by VARCHAR := (p_payload ->> 'executed_by');
     v_old_data JSONB;
     v_new_data JSONB;
 BEGIN
@@ -72,7 +72,7 @@ BEGIN
         executed_at
     )
     VALUES (
-               gen_random_uuid(),
+               gen_random_uuid()::TEXT,
                v_executed_by,
                'UPDATE',
                v_old_data,
@@ -84,4 +84,4 @@ END;
 $$;
 
 -- Pastikan owner sesuai dengan environment kamu
-ALTER PROCEDURE authentication.procedure_reorder_menu_user(UUID, JSONB) OWNER TO postgres;
+ALTER PROCEDURE authentication.procedure_reorder_menu_user(VARCHAR, JSONB) OWNER TO postgres;

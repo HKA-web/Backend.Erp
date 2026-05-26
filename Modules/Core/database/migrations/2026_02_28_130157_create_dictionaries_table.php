@@ -22,7 +22,7 @@ return new class extends Migration
         });
 
         Schema::create('history.core_dictionary', function (Blueprint $table) {
-            $table->uuid('history_id')->primary();
+            $table->string('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
             $table->jsonb('old_data')->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_dictionary_draft');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_dictionary');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_dictionary');
-        Schema::dropIfExists('history.dictionary_history');
+        Schema::dropIfExists('history.core_dictionary');
         Schema::dropIfExists('temporary.core_dictionary');
         Schema::dropIfExists('core.dictionary');
     }

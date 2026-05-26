@@ -24,6 +24,10 @@ class CompanyFactory extends Factory
             'city_id' => DB::table('core.city')->inRandomOrder()->value('city_id'),
             'district_id' => DB::table('core.district')->inRandomOrder()->value('district_id'),
             'village_id' => DB::table('core.village')->inRandomOrder()->value('village_id'),
+            'enable' => true,
+            'readonly' => false,
+            'is_removed' => false,
+            'status' => 'DRAFT',
         ];
     }
 }

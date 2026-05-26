@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\CompanyRequest;
+use Modules\Core\Models\Company;
+use Modules\Core\Services\TenantRegistrationService;
 
 class CompanyDraftController extends Controller
 {
@@ -62,9 +64,9 @@ class CompanyDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id, BaseStaging $staging, TenantRegistrationService $tenantService)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($staging, $id, $tenantService) {
             $payload = [
                 'temporary_id' => $id,
                 'company_id' => request()->input('company_id'),
@@ -72,10 +74,28 @@ class CompanyDraftController extends Controller
 
             $staging->executeStaging('core.procedure_commit_company', $payload);
 
-            return $this->erpResponse(
-                message: 'Company committed to master successfully.',
-                tags: ['company']
-            );
-        }, 'Failed to commit draft.');
+            // $company = Company::where('company_id', $payload['company_id'])->first();
+
+            // if ($company && $company->status === 'POSTED') {
+            //     $domains = request()->input('domains', []);
+            //     $runSeeder = request()->input('run_seeder', false);
+
+            //     $tenantService->createTenant(
+            //         companyData: $company->toArray(),
+            //         domainData: $domains,
+            //         runSeeder: $runSeeder,
+            //     );
+
+            //     return $this->erpResponse(
+            //         message: 'Company committed to master and tenant created successfully.',
+            //         tags: ['company']
+            //     );
+            // }
+
+            // return $this->erpResponse(
+            //     message: 'Company committed to master but tenant creation skipped (status is not POSTED).',
+            //     tags: ['company']
+            // );
+        }, 'Failed to commit draft and create tenant.');
     }
 }

@@ -13,6 +13,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop custom schemas untuk memastikan migrate:fresh berjalan bersih
+        DB::statement('DROP SCHEMA IF EXISTS core CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS history CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS temporary CASCADE');
+
+        // Recreate schemas
+        DB::statement('CREATE SCHEMA IF NOT EXISTS core');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS history');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS temporary');
+
         Schema::createWithTemp('authentication.user', function (Blueprint $table) {
             $table->string('user_id')->primary();
             $table->string('user_name');
@@ -34,7 +44,7 @@ return new class extends Migration
         });
 
         Schema::create('history.authentication_user', function (Blueprint $table) {
-            $table->uuid('history_id')->primary();
+            $table->string('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
             $table->jsonb('old_data')->nullable();
@@ -74,7 +84,7 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_upsert_user_draft');
         DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_revise_user');
         DB::unprepared('DROP PROCEDURE IF EXISTS authentication.procedure_commit_user');
-        Schema::dropIfExists('history.user_history');
+        Schema::dropIfExists('history.authentication_user');
         Schema::dropIfExists('temporary.authentication_user');
         Schema::dropIfExists('authentication.user');
     }

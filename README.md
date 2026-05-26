@@ -32,6 +32,7 @@ Backend modular kelas enterprise berbasis **Laravel 13 + PostgreSQL** dengan pen
 - [Fitur](#-fitur)
 - [Instalasi](#-instalasi)
 - [API Documentation](#-api-documentation)
+- [Multi-Tenancy SaaS](#-multi-tenancy-saas-stancl-tenancy)
 - [AI Integration](#-ai-integration-laravel-ai)
 - [Membuat Modul](#-membuat-modul)
 - [Permission](#-manajemen-permission)
@@ -80,6 +81,7 @@ Laravel berperan sebagai:
 ✅ Multi-user Safe  
 ✅ Audit Ready  
 ✅ Enterprise Workflow  
+✅ Multi-Tenancy SaaS (Stancl Tenancy v3.10.0)  
 
 ---
 
@@ -213,6 +215,195 @@ Semua endpoint GET otomatis memiliki parameter query:
 ## Security
 
 Endpoint dengan middleware `auth:sanctum` otomatis ditandai sebagai secured di Swagger UI.
+
+---
+
+# 🏢 Multi-Tenancy SaaS (Stancl Tenancy)
+
+Project ini menggunakan **Stancl Tenancy v3.10.0** untuk sistem multi-tenancy dengan database terpisah per tenant.
+
+## Teknologi Tenancy
+
+- **Package**: Stancl Tenancy v3.10.0
+- **Architecture**: Multi-database tenancy (database terpisah per tenant)
+- **Tenant Model**: `Modules\Core\Models\Company` (mengimplement `TenantWithDatabase`)
+- **Tenant Identifier**: `company_id` (UUID)
+- **Database Manager**: PostgreSQLDatabaseManager
+- **Bootstrappers**: DatabaseTenancyBootstrapper (untuk switch database connection)
+
+## Fitur Multi-Tenancy
+
+✅ Database terpisah per tenant  
+✅ Tenant identifier menggunakan `company_id` (UUID)  
+✅ Auto-scan migration & seeder tenant  
+✅ Tenant-specific commands  
+✅ PostgreSQL compatible  
+
+## Struktur Database
+
+- **Database Central**: Menyimpan data tenant (company) dan data global
+- **Database Tenant**: Database terpisah per tenant dengan nama `db_{company_id}`
+- **Schema Tenant**: Menggunakan schema `core` untuk tabel tenant
+
+## Tenant Identifier
+
+Tenant diidentifikasi menggunakan `company_id` (UUID) dari tabel `core.company`.
+
+Contoh:
+- Company ID: `a7c50a73-f6a2-4869-9635-d66d075ba075`
+- Database Name: `db_a7c50a73-f6a2-4869-9635-d66d075ba075`
+
+## Command Tenant
+
+### List Semua Tenant
+
+```bash
+php artisan tenants:list
+```
+
+### Migrate Tenant
+
+```bash
+# Migrate semua tenant
+php artisan tenants:migrate
+
+# Migrate tenant spesifik (gunakan company_id)
+php artisan tenants:migrate --tenants=a7c50a73-f6a2-4869-9635-d66d075ba075
+
+# Preview migration (tanpa eksekusi)
+php artisan tenants:migrate --pretend
+```
+
+### Rollback Migration
+
+```bash
+# Rollback semua tenant
+php artisan tenants:rollback
+
+# Rollback tenant spesifik
+php artisan tenants:rollback --tenants=a7c50a73-f6a2-4869-9635-d66d075ba075
+
+# Rollback dengan step
+php artisan tenants:rollback --step=1
+```
+
+### Seed Tenant
+
+```bash
+# Seed semua tenant
+php artisan tenants:seed
+
+# Seed tenant spesifik
+php artisan tenants:seed --tenants=a7c50a73-f6a2-4869-9635-d66d075ba075
+```
+
+### Migrate Fresh (Drop & Re-migrate)
+
+```bash
+php artisan tenants:migrate-fresh
+```
+
+## Struktur File Tenant
+
+### Migration Tenant
+
+Migration tenant diletakkan di:
+- `Modules/Core/database/migrations/tenant/` (module)
+- `database/migrations/tenant/` (root)
+
+Contoh migration:
+```php
+// Modules/Core/database/migrations/tenant/2026_05_26_000000_create_demo_tables.php
+DB::statement('CREATE SCHEMA IF NOT EXISTS core');
+
+Schema::create('core.province', function (Blueprint $table) {
+    $table->string('province_id', 50)->primary();
+    $table->string('province_name', 100);
+    $table->timestamps();
+});
+```
+
+### Seeder Tenant
+
+Seeder tenant diletakkan di:
+- `Modules/Core/database/seeders/tenant/` (module)
+- `Modules/Core/database/seeders/TenantDatabaseSeeder.php` (main seeder)
+
+TenantDatabaseSeeder otomatis scan folder tenant dan menjalankan semua seeder yang ditemukan.
+
+Contoh seeder:
+```php
+// Modules/Core/database/seeders/tenant/ProvinceSeeder.php
+namespace Modules\Core\Database\Seeders\Tenant;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class ProvinceSeeder extends Seeder
+{
+    public function run(): void
+    {
+        DB::table('core.province')->insert([
+            ['province_id' => 'ID-JK', 'province_name' => 'DKI Jakarta'],
+        ]);
+    }
+}
+```
+
+**Catatan Penting:**
+- Nama file seeder harus sama dengan nama class
+- Auto scan menggunakan nama file untuk menentukan class name
+- Contoh: `ProvinceSeeder.php` → class `ProvinceSeeder`
+
+## Konfigurasi
+
+Konfigurasi tenancy ada di `config/tenancy.php`:
+
+```php
+'tenant_model' => Modules\Core\Models\Company::class,
+
+'migration_parameters' => [
+    '--path' => [
+        database_path('migrations/tenant'),
+        base_path('Modules/Core/database/migrations/tenant'),
+    ],
+    '--realpath' => true,
+],
+
+'seeder_parameters' => [
+    '--class' => 'Modules\\Core\\Database\\Seeders\\TenantDatabaseSeeder',
+    '--force' => true,
+],
+```
+
+## Model Tenant
+
+Model `Company` mengimplement `TenantWithDatabase` dan override method tenant:
+
+```php
+class Company extends Tenant implements TenantWithDatabase
+{
+    use HasDatabase;
+
+    public function getTenantKeyName(): string
+    {
+        return 'company_id';
+    }
+
+    public function getTenantKey()
+    {
+        return $this->company_id;
+    }
+}
+```
+
+## Use Case SaaS
+
+Sistem ini cocok untuk:
+- SaaS multi-tenant
+- ERP perusahaan
+- Aplikasi dengan data terisolasi per client
+- Sistem dengan kebutuhan data security tinggi
 
 ---
 

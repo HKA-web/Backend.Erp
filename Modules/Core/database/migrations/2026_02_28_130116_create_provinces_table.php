@@ -22,7 +22,7 @@ return new class extends Migration
         });
 
         Schema::create('history.core_province', function (Blueprint $table) {
-            $table->uuid('history_id')->primary();
+            $table->string('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
             $table->jsonb('old_data')->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_province_draft');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_province');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_province');
-        Schema::dropIfExists('history.province_history');
+        Schema::dropIfExists('history.core_province');
         Schema::dropIfExists('temporary.core_province');
         Schema::dropIfExists('core.province');
     }

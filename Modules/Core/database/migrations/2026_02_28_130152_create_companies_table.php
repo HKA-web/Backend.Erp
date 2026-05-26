@@ -24,12 +24,13 @@ return new class extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('website');
+            $table->jsonb('data')->nullable();
             $table->baseColumn();
 
         });
 
         Schema::create('history.core_company', function (Blueprint $table) {
-            $table->uuid('history_id')->primary();
+            $table->string('history_id')->primary();
             $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             $table->string('action');
             $table->jsonb('old_data')->nullable();
@@ -54,7 +55,7 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_company_draft');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_company');
         DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_company');
-        Schema::dropIfExists('history.company_history');
+        Schema::dropIfExists('history.core_company');
         Schema::dropIfExists('temporary.core_company');
         Schema::dropIfExists('core.company');
     }
