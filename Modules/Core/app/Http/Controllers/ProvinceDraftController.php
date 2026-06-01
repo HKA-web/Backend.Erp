@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\ProvinceRequest;
+use Modules\Core\Models\Province;
 
 class ProvinceDraftController extends Controller
 {
@@ -14,7 +16,7 @@ class ProvinceDraftController extends Controller
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_province');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -35,7 +37,7 @@ class ProvinceDraftController extends Controller
             $draft = DB::table('temporary.core_province')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -70,6 +72,12 @@ class ProvinceDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_province', $payload);
+
+            // Clear cache - auto scan relations & tenant aware
+            $province = Province::find(request()->input('province_id'));
+            if ($province) {
+                CacheService::clearCache($province);
+            }
 
             return $this->erpResponse(
                 message: 'Province committed to master successfully.',

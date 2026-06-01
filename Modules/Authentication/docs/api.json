@@ -7,15 +7,15 @@
     },
     "tags": [
         {
-            "name": "Authentication",
-            "description": "Authentication endpoints"
+            "name": "Authentication - User",
+            "description": "User endpoints in Authentication module"
         }
     ],
     "paths": {
         "/v1/authentication/user": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Get user",
                 "description": "Get user resource",
@@ -105,7 +105,7 @@
         "/v1/authentication/user/{id}": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -202,7 +202,7 @@
             },
             "delete": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -261,13 +261,13 @@
             }
         },
         "/v1/authentication/user/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1authenticationuseridrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1authenticationuseridrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -324,7 +324,7 @@
         "/v1/authentication/user/{id}/reorder": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Create reorder",
                 "description": "Create reorder resource",
@@ -401,7 +401,7 @@
         "/v1/authentication/user-drafts": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Get user-drafts",
                 "description": "Get user-drafts resource",
@@ -489,7 +489,7 @@
             },
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Create user-drafts",
                 "description": "Create user-drafts resource",
@@ -566,7 +566,7 @@
         "/v1/authentication/user-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -663,7 +663,7 @@
             },
             "put": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -747,7 +747,7 @@
             },
             "delete": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -808,7 +808,7 @@
         "/v1/authentication/user-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Authentication - User"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -877,5 +877,13 @@
             }
         }
     },
-    "x-module": "Authentication"
+    "x-module": "Authentication",
+    "x-tagGroups": [
+        {
+            "name": "Authentication",
+            "tags": [
+                "Authentication - User"
+            ]
+        }
+    ]
 }

@@ -20,8 +20,9 @@ class BaseStaging
             json_encode($payload),
         ]);
 
-        if ($result && ! empty($tags)) {
-            Cache::tags($tags)->flush();
+        if ($result) {
+            $cacheTags = ! empty($tags) ? array_merge($tags, ['all']) : ['all'];
+            Cache::tags($cacheTags)->flush();
         }
 
         return $result;

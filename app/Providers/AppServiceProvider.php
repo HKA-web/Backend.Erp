@@ -73,8 +73,8 @@ class AppServiceProvider extends ServiceProvider
             $this->boolean('enable')->default(true);
             $this->boolean('readonly')->default(false);
             $this->boolean('is_removed')->default(false);
-            $this->remoteForeign('created_by', 'authentication.user', 'user_id');
-            $this->remoteForeign('updated_by', 'authentication.user', 'user_id');
+            $this->jsonb('created_by')->nullable();
+            $this->jsonb('updated_by')->nullable();
             $this->timestamps();
             $this->string('status')->default('DRAFT');
         });
@@ -146,8 +146,8 @@ class AppServiceProvider extends ServiceProvider
             DB::statement("
                 CREATE TABLE {$fullTempPath} AS
                 SELECT
-                    NULL::uuid AS temporary_id,
-                    NULL::uuid AS parent_temporary_id,
+                    NULL::varchar AS temporary_id,
+                    NULL::varchar AS parent_temporary_id,
                     NULL::varchar AS master_id,
                     NULL::varchar AS session_id,
                     'I'::char(1) AS temporary_option,
@@ -157,8 +157,8 @@ class AppServiceProvider extends ServiceProvider
             ");
 
             Schema::table($fullTempPath, function (Blueprint $table) use ($fullTempPath) {
-                $table->uuid('temporary_id')->primary()->change();
-                $table->uuid('parent_temporary_id')->nullable()->index()->change();
+                $table->string('temporary_id')->primary()->change();
+                $table->string('parent_temporary_id')->nullable()->index()->change();
                 $table->string('master_id')->nullable()->index()->change();
                 $table->char('session_id')->index()->change();
                 $table->char('temporary_option', 1)->default('U')->comment('I: Insert, U: Update, D: Delete')->change();

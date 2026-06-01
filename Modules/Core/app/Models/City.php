@@ -13,14 +13,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Core\Database\Factories\CityFactory;
 use Spatie\Permission\Traits\HasRoles;
+use Modules\Authentication\Models\User;
 
 #[Table(name: 'core.city', key: 'city_id', keyType: 'string', incrementing: false)]
 #[ScopedBy([ActiveOnlyScope::class])]
 class City extends Model
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, SerializableDate, SoftDelete;
-
-    protected $connection = 'pgsql';
 
     protected $guard_name = 'api';
 
@@ -37,5 +36,15 @@ class City extends Model
     public function district()
     {
         return $this->hasMany(District::class, 'city_id', 'city_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'user_id');
     }
 }

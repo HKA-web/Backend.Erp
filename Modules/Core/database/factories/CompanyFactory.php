@@ -15,6 +15,7 @@ class CompanyFactory extends Factory
     {
         return [
             'company_id' => Str::uuid(),
+            'tenant_id' => null,
             'company_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->phoneNumber(),
@@ -24,6 +25,7 @@ class CompanyFactory extends Factory
             'city_id' => DB::table('core.city')->inRandomOrder()->value('city_id'),
             'district_id' => DB::table('core.district')->inRandomOrder()->value('district_id'),
             'village_id' => DB::table('core.village')->inRandomOrder()->value('village_id'),
+            'properties' => json_encode([]),
             'enable' => true,
             'readonly' => false,
             'is_removed' => false,

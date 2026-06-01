@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Modules\Core\Models\Menu;
 
 class MenuController extends Controller
@@ -11,7 +12,7 @@ class MenuController extends Controller
     public function index()
     {
         return $this->erpExecution(function () {
-            return $this->erpResponse(Menu::query(), tags: ['menu']);
+            return $this->erpResponse(Menu::query(), tags: ['core.menu']);
         });
     }
 
@@ -20,7 +21,7 @@ class MenuController extends Controller
         return $this->erpExecution(function () use ($id) {
             $query = Menu::where('menu_id', $id);
 
-            return $this->erpResponse($query, tags: ['menu']);
+            return $this->erpResponse($query, tags: ['core.menu']);
         });
     }
 
@@ -31,6 +32,12 @@ class MenuController extends Controller
             $staging->executeStaging('core.procedure_revise_menu', [
                 'menu_id' => $id,
             ]);
+
+            // Clear cache - auto scan relations & tenant aware
+            $menu = Menu::find($id);
+            if ($menu) {
+                CacheService::clearCache($menu);
+            }
 
             return $this->erpResponse(
                 message: "Menu {$id} has been moved to drafts for revision."
@@ -43,6 +50,12 @@ class MenuController extends Controller
         return $this->erpExecution(function () use ($id, $staging) {
 
             $staging->requestDelete(Menu::class, $id, 'core.procedure_revise_menu');
+
+            // Clear cache - auto scan relations & tenant aware
+            $menu = Menu::find($id);
+            if ($menu) {
+                CacheService::clearCache($menu);
+            }
 
             return $this->erpResponse(
                 message: "Delete request for Menu {$id} processed according to model policy."

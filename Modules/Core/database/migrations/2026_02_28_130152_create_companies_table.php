@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::createWithTemp('core.company', function (Blueprint $table) {
             $table->string('company_id')->primary();
+            $table->string('tenant_id')->nullable(); // Reference ke tabel tenants (Stancl Tenancy)
             $table->remoteForeign('province_id', 'core.province', 'province_id');
             $table->remoteForeign('city_id', 'core.city', 'city_id');
             $table->remoteForeign('district_id', 'core.district', 'district_id');
@@ -24,7 +25,6 @@ return new class extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('website');
-            $table->jsonb('data')->nullable();
             $table->baseColumn();
 
         });
@@ -40,11 +40,6 @@ return new class extends Migration
 
         $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130152_core.procedures_company.sql');
         DB::unprepared($sql);
-
-        $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
-        foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.company", 'guard_name' => 'api']);
-        }
     }
 
     /**

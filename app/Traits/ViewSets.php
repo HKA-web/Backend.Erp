@@ -4,10 +4,10 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Services\CacheService;
 
 trait ViewSets
 {
@@ -228,13 +228,21 @@ trait ViewSets
         }
     }
 
-    protected function erpResponse($data = null, $message = 'Success', array $tags = [])
+    protected function erpResponse($data = null, $message = 'Success', array $tags = [], bool $cache = true)
     {
         if ($data instanceof EloquentBuilder || $data instanceof QueryBuilder) {
             $query = $data;
 
-            $url = Request::fullUrl();
-            $cacheKey = 'erp_cache_'.md5($url);
+            $cacheParams = [
+                'filter' => Request::input('filter'),
+                'sort' => Request::input('sort'),
+                'take' => Request::input('take', 10),
+                'skip' => Request::input('skip', 0),
+                'fields' => Request::input('fields'),
+                'expand' => Request::input('expand'),
+            ];
+            
+            $cacheKey = 'erp_cache_' . md5(json_encode($cacheParams));
 
             $callback = function () use ($query) {
                 $this->applyFieldsExpand($query);
@@ -256,15 +264,21 @@ trait ViewSets
                 ];
             };
 
-            $resultData = ! empty($tags)
-                ? Cache::tags($tags)->remember($cacheKey, 3600, $callback)
-                : Cache::remember($cacheKey, 3600, $callback);
+            // Always use tags for cache, add 'all' tag for global cache clearing
+            $usedTags = ! empty($tags) ? array_merge($tags, ['all']) : ['all'];
+            
+            if ($cache) {
+                $resultData = CacheService::remember($cacheKey, $usedTags, $callback, 3600);
+            } else {
+                $resultData = $callback();
+            }
 
             return response()->json($resultData, 200);
         }
 
+        // For non-query responses (messages, etc), clear cache by tags if provided
         if (! empty($tags)) {
-            Cache::tags($tags)->flush();
+            CacheService::clearTags(array_merge($tags, ['all']));
         }
 
         $response = ['message' => $message];

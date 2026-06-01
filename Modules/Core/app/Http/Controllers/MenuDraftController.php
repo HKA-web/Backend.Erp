@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\MenuRequest;
+use Modules\Core\Models\Menu;
 
 class MenuDraftController extends Controller
 {
@@ -14,7 +16,7 @@ class MenuDraftController extends Controller
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_menu');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -35,7 +37,7 @@ class MenuDraftController extends Controller
             $draft = DB::table('temporary.core_menu')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -70,6 +72,12 @@ class MenuDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_menu', $payload);
+
+            // Clear cache for menu model
+            $menu = Menu::find(request()->input('menu_id'));
+            if ($menu) {
+                CacheService::clearCache($menu);
+            }
 
             return $this->erpResponse(
                 message: 'Menu committed to master successfully.',

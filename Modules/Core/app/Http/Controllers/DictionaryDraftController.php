@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\DictionaryRequest;
+use Modules\Core\Models\Dictionary;
 
 class DictionaryDraftController extends Controller
 {
@@ -14,7 +16,7 @@ class DictionaryDraftController extends Controller
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_dictionary');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -35,7 +37,7 @@ class DictionaryDraftController extends Controller
             $draft = DB::table('temporary.core_dictionary')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -70,6 +72,12 @@ class DictionaryDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_dictionary', $payload);
+
+            // Clear cache for dictionary model
+            $dictionary = Dictionary::find(request()->input('dictionary_id'));
+            if ($dictionary) {
+                CacheService::clearCache($dictionary);
+            }
 
             return $this->erpResponse(
                 message: 'Dictionary committed to master successfully.',

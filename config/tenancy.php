@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-use Modules\Core\Models\Company;
 use Stancl\Tenancy\Database\Models\Domain;
 
 return [
     /**
-     * Custom Tenant Model yang menggunakan tabel 'core.company' di database central
-     * Identifier unik adalah kolom 'website' yang di-transform menjadi tenant_id
+     * Tenant Model menggunakan custom Tenant yang mengimplementasikan TenantWithDatabase
+     * Company dan Tenant dipisahkan untuk separation of concerns
+     * - Company = business data (di tabel core.company)
+     * - Tenant = infrastructure (di tabel tenants)
      */
-    'tenant_model' => Company::class,
+    'tenant_model' => \App\Models\Tenant::class,
     
     /**
      * ID Generator menggunakan Custom String Generator (website diubah menjadi db_xxx_xxx)
@@ -29,6 +30,12 @@ return [
         '127.0.0.1',
         'localhost',
     ],
+
+    /**
+     * Header name untuk tenant identification via InitializeTenancyByRequestData
+     * Default: X-Tenant
+     */
+    'identification_header' => 'X-Tenant',
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
@@ -54,13 +61,22 @@ return [
      */
     'database' => [
         // Koneksi database central yang menampung tabel 'core.company', 'domains', dll
-        'central_connection' => env('DB_CONNECTION', 'central'),
+        'central_connection' => 'central',
 
         /**
          * Connection template untuk dynamically create tenant database connection.
          * Biarkan null agar package menggunakan setting default dari config/database.php
          */
         'template_tenant_connection' => null,
+
+        /**
+         * Tables that should not be tenant-aware
+         * These tables will always use the central connection
+         */
+        'central_tables' => [
+            'personal_access_tokens',
+            'users',
+        ],
 
         /**
          * Tenant database names are created like this:
@@ -203,23 +219,24 @@ return [
      * 
      * Migration files tenant harus diletakkan di folder database/migrations/tenant
      * di root Laravel atau di dalam module yang sesuai
+     * 
+     * NOTE: Path migration di-set secara dinamis oleh TenantMigrationServiceProvider
+     * untuk auto-discover semua module yang memiliki folder database/migrations/tenant
      */
     'migration_parameters' => [
         '--force' => true, // Perlu true untuk production migration
-        '--path' => [
-            // Migrasi tenant dari root Laravel (jika ada)
-            database_path('migrations/tenant'),
-            // Migrasi tenant dari Modules/Core (sesuai struktur modular Anda)
-            base_path('Modules/Core/database/migrations/tenant'),
-        ],
+        '--path' => [], // Diisi otomatis oleh TenantMigrationServiceProvider
         '--realpath' => true,
     ],
 
     /**
      * Parameters used by the tenants:seed command.
+     * 
+     * NOTE: Seeder class di-set secara dinamis oleh TenantMigrationServiceProvider
+     * untuk auto-discover semua module yang memiliki TenantDatabaseSeeder
      */
     'seeder_parameters' => [
-        '--class' => 'Modules\\Core\\Database\\Seeders\\TenantDatabaseSeeder',
+        '--class' => 'Modules\\Core\\Database\\Seeders\\TenantDatabaseSeeder', // Default, bisa di-override oleh service provider
         '--force' => true,
     ],
 ];

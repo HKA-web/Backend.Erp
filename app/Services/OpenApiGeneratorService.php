@@ -37,12 +37,103 @@ class OpenApiGeneratorService
                 $data['info']['title'] = $moduleName . ' API';
             }
 
+            // Process tags to add nested structure if tags exist
+            if (isset($data['tags']) && !empty($data['tags'])) {
+                $data = $this->processTagsForModule($data, $moduleName);
+            }
+
+            // Check if module uses tenant identification middleware and add tenant headers
+            $routesFile = $modulePath . '/routes/api.php';
+            if (file_exists($routesFile)) {
+                $routesContent = file_get_contents($routesFile);
+                $hasTenantMiddleware = strpos($routesContent, 'InitializeTenancyByRequestData') !== false;
+
+                if ($hasTenantMiddleware && isset($data['paths'])) {
+                    foreach ($data['paths'] as $path => $methods) {
+                        foreach ($methods as $method => $details) {
+                            // Add tenant headers as parameters
+                            if (!isset($data['paths'][$path][$method]['parameters'])) {
+                                $data['paths'][$path][$method]['parameters'] = [];
+                            }
+                            // Add X-Tenant header (default header name)
+                            $data['paths'][$path][$method]['parameters'][] = [
+                                'name' => 'X-Tenant',
+                                'in' => 'header',
+                                'description' => 'Tenant ID for multi-tenancy (default header name)',
+                                'required' => true,
+                                'schema' => [
+                                    'type' => 'string'
+                                ]
+                            ];
+                        }
+                    }
+                }
+            }
+
             return $data;
         } catch (\Throwable $e) {
             // If generation fails, try manual approach
             error_log("API Docs generation failed for {$moduleName}: " . $e->getMessage());
             return $this->generateManualForModule($moduleName);
         }
+    }
+
+    /**
+     * Process tags to add nested structure for a module
+     *
+     * @param array $data
+     * @param string $moduleName
+     * @return array
+     */
+    protected function processTagsForModule(array $data, string $moduleName): array
+    {
+        $tags = $data['tags'] ?? [];
+        $tagGroups = [];
+
+        // Group tags by module prefix
+        $moduleTags = [];
+        foreach ($tags as $tag) {
+            $tagName = $tag['name'];
+            // If tag doesn't already have module prefix, add it
+            if (strpos($tagName, $moduleName . ' - ') !== 0) {
+                $newTagName = "{$moduleName} - {$tagName}";
+                $tag['name'] = $newTagName;
+                $tag['description'] = ($tag['description'] ?? '') . " in {$moduleName} module";
+                $moduleTags[] = $tag;
+                
+                // Update operation tags in paths
+                if (isset($data['paths'])) {
+                    foreach ($data['paths'] as $path => $methods) {
+                        foreach ($methods as $method => $details) {
+                            if (isset($details['tags'])) {
+                                $data['paths'][$path][$method]['tags'] = array_map(
+                                    fn($t) => $t === $tagName ? $newTagName : $t,
+                                    $details['tags']
+                                );
+                            }
+                        }
+                    }
+                }
+            } else {
+                $moduleTags[] = $tag;
+            }
+        }
+
+        // Create tag group
+        if (!empty($moduleTags)) {
+            $tagGroups[] = [
+                'name' => ucfirst($moduleName),
+                'tags' => array_column($moduleTags, 'name')
+            ];
+        }
+
+        $data['tags'] = $moduleTags;
+        
+        if (!empty($tagGroups)) {
+            $data['x-tagGroups'] = $tagGroups;
+        }
+
+        return $data;
     }
 
     /**
@@ -62,13 +153,14 @@ class OpenApiGeneratorService
 
         $paths = [];
         $tags = [];
+        $tagGroups = [];
         $securitySchemes = [];
 
         // Parse the routes file to extract route definitions with prefixes
         $routesContent = file_get_contents($routesFile);
 
         // Parse routes by tracking prefix stack
-        $this->parseRoutesByTrackingPrefixes($routesContent, $paths, $moduleName);
+        $this->parseRoutesByTrackingPrefixes($routesContent, $paths, $moduleName, $tags);
 
         // Check if route has auth middleware
         $hasAuth = strpos($routesContent, 'auth:sanctum') !== false;
@@ -78,15 +170,45 @@ class OpenApiGeneratorService
             foreach ($paths as $path => $methods) {
                 foreach ($methods as $method => $details) {
                     $paths[$path][$method]['security'] = [['sanctum' => []]];
+
+                    // Add tenant headers only if the specific route has tenant middleware
+                    if ($this->isTenantRoute($path, $method, $moduleName)) {
+                        if (!isset($paths[$path][$method]['parameters'])) {
+                            $paths[$path][$method]['parameters'] = [];
+                        }
+                        // Add X-Tenant header (default header name)
+                        $paths[$path][$method]['parameters'][] = [
+                            'name' => 'X-Tenant',
+                            'in' => 'header',
+                            'description' => 'Tenant ID for multi-tenancy (default header name)',
+                            'required' => true,
+                            'schema' => [
+                                'type' => 'string'
+                            ]
+                        ];
+                    }
                 }
             }
         }
 
-        // Add tag for module
-        $tags[] = [
-            'name' => $moduleName,
-            'description' => $moduleName . ' endpoints'
-        ];
+        // Create tag groups for nested structure
+        if (!empty($tags)) {
+            // Group tags by their prefix (module name)
+            $moduleTags = [];
+            foreach ($tags as $tag) {
+                $tagName = $tag['name'];
+                if (strpos($tagName, $moduleName . ' - ') === 0) {
+                    $moduleTags[] = $tagName;
+                }
+            }
+
+            if (!empty($moduleTags)) {
+                $tagGroups[] = [
+                    'name' => ucfirst($moduleName),
+                    'tags' => $moduleTags
+                ];
+            }
+        }
 
         // Add security scheme if any endpoint has security
         $securitySchemes['sanctum'] = [
@@ -96,7 +218,7 @@ class OpenApiGeneratorService
             'description' => 'Laravel Sanctum authentication'
         ];
 
-        return [
+        $result = [
             'openapi' => '3.0.0',
             'info' => [
                 'title' => $moduleName . ' API',
@@ -110,6 +232,47 @@ class OpenApiGeneratorService
             ],
             'x-module' => $moduleName,
         ];
+
+        // Add x-tagGroups if available
+        if (!empty($tagGroups)) {
+            $result['x-tagGroups'] = $tagGroups;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check if a route is tenant-specific (requires X-Tenant header)
+     *
+     * @param string $path
+     * @param string $method
+     * @param string $moduleName
+     * @return bool
+     */
+    protected function isTenantRoute(string $path, string $method, string $moduleName): bool
+    {
+        // Get the actual route from Laravel's route collection
+        $routes = \Illuminate\Support\Facades\Route::getRoutes();
+        
+        foreach ($routes as $route) {
+            $routeMethod = strtolower($route->methods[0]);
+            $routePath = '/' . ltrim(str_replace('api/', '', $route->uri), '/');
+            
+            // Match the route by path and method
+            if ($routePath === $path && $routeMethod === $method) {
+                // Check if route has tenant middleware
+                $middleware = $route->gatherMiddleware();
+                foreach ($middleware as $m) {
+                    if (str_contains($m, 'InitializeTenancyByRequestData') || 
+                        str_contains($m, 'tenancy.header')) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        
+        return false;
     }
 
     /**
@@ -118,12 +281,16 @@ class OpenApiGeneratorService
      * @param string $content
      * @param array &$paths
      * @param string $moduleName
+     * @param array &$tags
      * @return void
      */
-    protected function parseRoutesByTrackingPrefixes(string $content, array &$paths, string $moduleName): void
+    protected function parseRoutesByTrackingPrefixes(string $content, array &$paths, string $moduleName, array &$tags): void
     {
         // Use Laravel's route collection to get actual registered routes
         $routes = \Illuminate\Support\Facades\Route::getRoutes();
+
+        // Track unique groups to avoid duplicate tags
+        $uniqueGroups = [];
 
         foreach ($routes as $route) {
             // Only include routes that belong to this module
@@ -153,8 +320,21 @@ class OpenApiGeneratorService
             // Extract method name from controller
             $methodName = $route->getActionMethod();
 
+            // Extract group name from path (e.g., /v1/core/province -> Province)
+            $groupName = $this->extractGroupNameFromPath($path, $moduleName);
+            $tagName = $groupName ? "{$moduleName} - {$groupName}" : $moduleName;
+
+            // Add tag if not already added
+            if ($groupName && !isset($uniqueGroups[$tagName])) {
+                $tags[] = [
+                    'name' => $tagName,
+                    'description' => "{$groupName} endpoints in {$moduleName} module"
+                ];
+                $uniqueGroups[$tagName] = true;
+            }
+
             $operation = [
-                'tags' => [$moduleName],
+                'tags' => [$tagName],
                 'summary' => $this->generateSummary($method, $path, $methodName),
                 'description' => $this->generateDescription($method, $path, $methodName),
                 'operationId' => $method . str_replace(['/', '{', '}'], '', $path),
@@ -470,6 +650,33 @@ class OpenApiGeneratorService
     }
 
     /**
+     * Extract group name from path (e.g., /v1/core/province -> Province)
+     *
+     * @param string $path
+     * @param string $moduleName
+     * @return string|null
+     */
+    protected function extractGroupNameFromPath(string $path, string $moduleName): ?string
+    {
+        $segments = explode('/', trim($path, '/'));
+        
+        // Look for the module name in the path segments
+        $moduleIndex = array_search(strtolower($moduleName), array_map('strtolower', $segments));
+        
+        if ($moduleIndex !== false && isset($segments[$moduleIndex + 1])) {
+            $groupSegment = $segments[$moduleIndex + 1];
+            
+            // Remove 'drafts' suffix if present (e.g., province-drafts -> province)
+            $groupSegment = preg_replace('/-drafts$/', '', $groupSegment);
+            
+            // Convert to title case
+            return ucfirst($groupSegment);
+        }
+        
+        return null;
+    }
+
+    /**
      * Convert HTTP method to action name
      *
      * @param string $method
@@ -571,6 +778,7 @@ class OpenApiGeneratorService
             'securitySchemes' => [],
         ];
         $tags = [];
+        $tagGroups = [];
 
         foreach ($modules as $modulePath) {
             $moduleName = basename($modulePath);
@@ -607,9 +815,14 @@ class OpenApiGeneratorService
             if (isset($moduleDocs['tags'])) {
                 $tags = array_merge($tags, $moduleDocs['tags']);
             }
+
+            // Merge tag groups
+            if (isset($moduleDocs['x-tagGroups'])) {
+                $tagGroups = array_merge($tagGroups, $moduleDocs['x-tagGroups']);
+            }
         }
 
-        return [
+        $result = [
             'openapi' => '3.0.0',
             'info' => [
                 'title' => 'ERP Backend API',
@@ -626,6 +839,13 @@ class OpenApiGeneratorService
             'paths' => $paths,
             'components' => $components,
         ];
+
+        // Add x-tagGroups if available
+        if (!empty($tagGroups)) {
+            $result['x-tagGroups'] = $tagGroups;
+        }
+
+        return $result;
     }
 
     /**
@@ -708,6 +928,7 @@ class OpenApiGeneratorService
             'securitySchemes' => [],
         ];
         $tags = [];
+        $tagGroups = [];
 
         // Add Auth tag first so it appears at the top
         $tags[] = [
@@ -750,13 +971,18 @@ class OpenApiGeneratorService
             if (isset($moduleDocs['tags'])) {
                 $tags = array_merge($tags, $moduleDocs['tags']);
             }
+
+            // Merge tag groups
+            if (isset($moduleDocs['x-tagGroups'])) {
+                $tagGroups = array_merge($tagGroups, $moduleDocs['x-tagGroups']);
+            }
         }
 
         // Add main app routes (login, register, logout)
         $mainAppPaths = $this->generateMainAppRoutes();
         $paths = array_merge($paths, $mainAppPaths);
 
-        return [
+        $result = [
             'openapi' => '3.0.0',
             'info' => [
                 'title' => 'ERP Backend API',
@@ -773,6 +999,13 @@ class OpenApiGeneratorService
             'paths' => $paths,
             'components' => $components,
         ];
+
+        // Add x-tagGroups if available
+        if (!empty($tagGroups)) {
+            $result['x-tagGroups'] = $tagGroups;
+        }
+
+        return $result;
     }
 
     /**

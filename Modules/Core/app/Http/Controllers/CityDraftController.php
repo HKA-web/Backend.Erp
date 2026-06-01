@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\CityRequest;
+use Modules\Core\Models\City;
 
 class CityDraftController extends Controller
 {
@@ -14,7 +16,7 @@ class CityDraftController extends Controller
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_city');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -35,7 +37,7 @@ class CityDraftController extends Controller
             $draft = DB::table('temporary.core_city')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -70,6 +72,12 @@ class CityDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_city', $payload);
+
+            // Clear cache - auto scan relations & tenant aware
+            $city = City::find(request()->input('city_id'));
+            if ($city) {
+                CacheService::clearCache($city);
+            }
 
             return $this->erpResponse(
                 message: 'City committed to master successfully.',

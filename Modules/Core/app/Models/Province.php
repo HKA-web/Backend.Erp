@@ -13,14 +13,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Core\Database\Factories\ProvinceFactory;
 use Spatie\Permission\Traits\HasRoles;
+use Modules\Authentication\Models\User;
 
 #[Table(name: 'core.province', key: 'province_id', keyType: 'string', incrementing: false)]
 #[ScopedBy([ActiveOnlyScope::class])]
 class Province extends Model
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, SerializableDate, SoftDelete;
-
-    protected $connection = 'pgsql';
 
     protected $guard_name = 'api';
 
@@ -32,5 +31,15 @@ class Province extends Model
     public function city()
     {
         return $this->hasMany(City::class, 'province_id', 'province_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'user_id');
     }
 }

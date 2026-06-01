@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\DistrictRequest;
+use Modules\Core\Models\District;
 
 class DistrictDraftController extends Controller
 {
@@ -14,7 +16,7 @@ class DistrictDraftController extends Controller
         return $this->erpExecution(function () {
             $query = DB::table('temporary.core_district');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -35,7 +37,7 @@ class DistrictDraftController extends Controller
             $draft = DB::table('temporary.core_district')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -70,6 +72,12 @@ class DistrictDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_district', $payload);
+
+            // Clear cache - auto scan relations & tenant aware
+            $district = District::find(request()->input('district_id'));
+            if ($district) {
+                CacheService::clearCache($district);
+            }
 
             return $this->erpResponse(
                 message: 'District committed to master successfully.',

@@ -32,11 +32,6 @@ return new class extends Migration
 
         $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130136_core.procedures_city.sql');
         DB::unprepared($sql);
-
-        $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
-        foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "core.{$action}.city", 'guard_name' => 'api']);
-        }
     }
 
     /**

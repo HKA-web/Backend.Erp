@@ -14,14 +14,13 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\Core\Database\Factories\MenuFactory;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
+use Modules\Authentication\Models\User;
 
 #[Table(name: 'core.menu', key: 'menu_id', keyType: 'string', incrementing: false)]
 #[ScopedBy([ActiveOnlyScope::class])]
 class Menu extends Model
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, SerializableDate, SoftDelete;
-
-    protected $connection = 'pgsql';
 
     protected $guard_name = 'api';
 
@@ -38,5 +37,15 @@ class Menu extends Model
     public function permission()
     {
         return $this->belongsTo(Permission::class, 'permission_id', 'id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'user_id');
     }
 }

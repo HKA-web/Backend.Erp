@@ -4,8 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\VillageRequest;
+use Modules\Core\Models\Village;
 
 class VillageDraftController extends Controller
 {
@@ -15,7 +17,7 @@ class VillageDraftController extends Controller
             // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.core_village');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -36,7 +38,7 @@ class VillageDraftController extends Controller
             $draft = DB::table('temporary.core_village')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -71,6 +73,12 @@ class VillageDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_village', $payload);
+
+            // Clear cache for village model
+            $village = Village::find(request()->input('village_id'));
+            if ($village) {
+                CacheService::clearCache($village);
+            }
 
             return $this->erpResponse(
                 message: 'Village committed to master successfully.',

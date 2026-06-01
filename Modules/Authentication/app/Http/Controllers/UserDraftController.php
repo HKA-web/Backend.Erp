@@ -15,7 +15,7 @@ class UserDraftController extends Controller
             // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.authentication_user');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -36,7 +36,7 @@ class UserDraftController extends Controller
             $draft = DB::table('temporary.authentication_user')
                 ->where('user_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 

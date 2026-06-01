@@ -41,6 +41,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Personal Access Token Model
+    |--------------------------------------------------------------------------
+    |
+    | This value controls which model is used for storing and
+    | retrieving personal access tokens. In a multi-tenant application,
+    | this should be a custom model that uses the central database connection.
+    |
+    */
+
+    'model' => \App\Models\PersonalAccessToken::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Connection
+    |--------------------------------------------------------------------------
+    |
+    | This value controls which database connection is used for storing and
+    | retrieving personal access tokens. In a multi-tenant application,
+    | this should be set to the central database connection to ensure
+    | tokens are shared across all tenants.
+    |
+    */
+
+    'database_connection' => 'central',
+
+    /*
+    |--------------------------------------------------------------------------
     | Expiration Minutes
     |--------------------------------------------------------------------------
     |

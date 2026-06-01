@@ -4,13 +4,13 @@ use Illuminate\Support\Facades\Route;
 use Modules\Authentication\Http\Controllers\UserController;
 use Modules\Authentication\Http\Controllers\UserDraftController;
 
-// Routes for User
+// Routes for User (tanpa tenant karena di database central)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
     Route::prefix('authentication/user')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
-        Route::post('/{id}/revise', [UserController::class, 'revise']);
+        Route::put('/{id}/revise', [UserController::class, 'revise']);
         Route::post('/{id}/reorder', [UserController::class, 'reorder']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
     });

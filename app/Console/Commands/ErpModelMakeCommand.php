@@ -95,15 +95,15 @@ class ErpModelMakeCommand extends Command
 -- 1. PROCEDURE UPSERT DRAFT (Menggunakan temporary_id sebagai PK draf)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_upsert_{$modelLower}_draft;
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_upsert_{$modelLower}_draft(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
 BEGIN
     -- Jika payload tidak bawa temporary_id, buat baru (Insert draf baru)
     IF v_temp_id IS NULL THEN
-        v_temp_id := gen_random_uuid();
+        v_temp_id := gen_random_uuid()::TEXT;
     END IF;
 
     INSERT INTO {$tempTableName} (
@@ -133,7 +133,7 @@ $$;
 -- 2. PROCEDURE REVISE (Check-out dari Master ke Temporary)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_revise_{$modelLower};
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_revise_{$modelLower}(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
@@ -169,11 +169,11 @@ $$;
 -- 3. PROCEDURE COMMIT (Finalisasi ke Master berdasarkan temporary_option)
 DROP PROCEDURE IF EXISTS {$schemaLower}.procedure_commit_{$modelLower};
 CREATE OR REPLACE PROCEDURE {$schemaLower}.procedure_commit_{$modelLower}(
-    p_session_id UUID,
+    p_session_id VARCHAR,
     p_payload JSONB
 ) LANGUAGE plpgsql AS $$
 DECLARE
-    v_temp_id UUID := (p_payload ->> 'temporary_id')::UUID;
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
@@ -250,7 +250,7 @@ SQL;
             $content = preg_replace("/(function\s*\(Blueprint\s*\\\$table\)\s*\{)/", "$1$newColumns", $content);
 
             $historySchema = "\n        Schema::create('history.{$schemaLower}_{$modelLower}', function (Blueprint \$table) {
-            \$table->uuid('history_id')->primary();
+            \$table->string('history_id')->primary();
             \$table->remoteForeign('executed_by', 'authentication.user', 'user_id');
             \$table->string('action');
             \$table->jsonb('old_data')->nullable();

@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseStaging;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\CompanyRequest;
 use Modules\Core\Models\Company;
@@ -17,7 +18,7 @@ class CompanyDraftController extends Controller
             // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.core_company');
 
-            return $this->erpResponse($query);
+            return $this->erpResponse($query, cache: false);
         });
     }
 
@@ -38,7 +39,7 @@ class CompanyDraftController extends Controller
             $draft = DB::table('temporary.core_company')
                 ->where('temporary_id', $id);
 
-            return $this->erpResponse($draft);
+            return $this->erpResponse($draft, cache: false);
         });
     }
 
@@ -73,6 +74,12 @@ class CompanyDraftController extends Controller
             ];
 
             $staging->executeStaging('core.procedure_commit_company', $payload);
+
+            // Clear cache for company model
+            $company = Company::find(request()->input('company_id'));
+            if ($company) {
+                CacheService::clearCache($company);
+            }
 
             // $company = Company::where('company_id', $payload['company_id'])->first();
 

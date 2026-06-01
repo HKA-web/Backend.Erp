@@ -7,15 +7,429 @@
     },
     "tags": [
         {
-            "name": "Core",
-            "description": "Core endpoints"
+            "name": "Core - Tenant",
+            "description": "Tenant endpoints in Core module"
+        },
+        {
+            "name": "Core - Domain",
+            "description": "Domain endpoints in Core module"
+        },
+        {
+            "name": "Core - Province",
+            "description": "Province endpoints in Core module"
+        },
+        {
+            "name": "Core - City",
+            "description": "City endpoints in Core module"
+        },
+        {
+            "name": "Core - District",
+            "description": "District endpoints in Core module"
+        },
+        {
+            "name": "Core - Village",
+            "description": "Village endpoints in Core module"
+        },
+        {
+            "name": "Core - Company",
+            "description": "Company endpoints in Core module"
+        },
+        {
+            "name": "Core - Dictionary",
+            "description": "Dictionary endpoints in Core module"
+        },
+        {
+            "name": "Core - Menu",
+            "description": "Menu endpoints in Core module"
+        },
+        {
+            "name": "Core - Option",
+            "description": "Option endpoints in Core module"
         }
     ],
     "paths": {
+        "/v1/core/tenant": {
+            "get": {
+                "tags": [
+                    "Core - Tenant"
+                ],
+                "summary": "Get tenant",
+                "description": "Get tenant resource",
+                "operationId": "getv1coretenant",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/tenant/{id}": {
+            "get": {
+                "tags": [
+                    "Core - Tenant"
+                ],
+                "summary": "Get {id}",
+                "description": "Get {id} resource",
+                "operationId": "getv1coretenantid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/domain": {
+            "get": {
+                "tags": [
+                    "Core - Domain"
+                ],
+                "summary": "Get domain",
+                "description": "Get domain resource",
+                "operationId": "getv1coredomain",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/domain/{id}": {
+            "get": {
+                "tags": [
+                    "Core - Domain"
+                ],
+                "summary": "Get {id}",
+                "description": "Get {id} resource",
+                "operationId": "getv1coredomainid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/v1/core/province": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Get province",
                 "description": "Get province resource",
@@ -105,7 +519,7 @@
         "/v1/core/province/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -202,7 +616,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -261,13 +675,13 @@
             }
         },
         "/v1/core/province/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1coreprovinceidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1coreprovinceidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -324,7 +738,7 @@
         "/v1/core/province-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Get province-drafts",
                 "description": "Get province-drafts resource",
@@ -412,7 +826,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Create province-drafts",
                 "description": "Create province-drafts resource",
@@ -489,7 +903,7 @@
         "/v1/core/province-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -586,7 +1000,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -670,7 +1084,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -731,7 +1145,7 @@
         "/v1/core/province-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Province"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -792,7 +1206,7 @@
         "/v1/core/city": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Get city",
                 "description": "Get city resource",
@@ -882,7 +1296,7 @@
         "/v1/core/city/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -979,7 +1393,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -1038,13 +1452,13 @@
             }
         },
         "/v1/core/city/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1corecityidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1corecityidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1101,7 +1515,7 @@
         "/v1/core/city-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Get city-drafts",
                 "description": "Get city-drafts resource",
@@ -1189,7 +1603,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Create city-drafts",
                 "description": "Create city-drafts resource",
@@ -1266,7 +1680,7 @@
         "/v1/core/city-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -1363,7 +1777,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -1447,7 +1861,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -1508,7 +1922,7 @@
         "/v1/core/city-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - City"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -1569,7 +1983,7 @@
         "/v1/core/district": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Get district",
                 "description": "Get district resource",
@@ -1659,7 +2073,7 @@
         "/v1/core/district/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -1756,7 +2170,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -1815,13 +2229,13 @@
             }
         },
         "/v1/core/district/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1coredistrictidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1coredistrictidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1878,7 +2292,7 @@
         "/v1/core/district-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Get district-drafts",
                 "description": "Get district-drafts resource",
@@ -1966,7 +2380,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Create district-drafts",
                 "description": "Create district-drafts resource",
@@ -2043,7 +2457,7 @@
         "/v1/core/district-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -2140,7 +2554,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -2224,7 +2638,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -2285,7 +2699,7 @@
         "/v1/core/district-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - District"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -2346,7 +2760,7 @@
         "/v1/core/village": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Get village",
                 "description": "Get village resource",
@@ -2436,7 +2850,7 @@
         "/v1/core/village/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -2533,7 +2947,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -2592,13 +3006,13 @@
             }
         },
         "/v1/core/village/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1corevillageidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1corevillageidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -2655,7 +3069,7 @@
         "/v1/core/village-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Get village-drafts",
                 "description": "Get village-drafts resource",
@@ -2743,7 +3157,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Create village-drafts",
                 "description": "Create village-drafts resource",
@@ -2820,7 +3234,7 @@
         "/v1/core/village-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -2917,7 +3331,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -3001,7 +3415,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -3062,7 +3476,7 @@
         "/v1/core/village-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Village"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -3123,7 +3537,7 @@
         "/v1/core/company": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Get company",
                 "description": "Get company resource",
@@ -3213,7 +3627,7 @@
         "/v1/core/company/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -3310,7 +3724,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -3369,13 +3783,13 @@
             }
         },
         "/v1/core/company/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1corecompanyidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1corecompanyidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -3432,7 +3846,7 @@
         "/v1/core/company-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Get company-drafts",
                 "description": "Get company-drafts resource",
@@ -3520,7 +3934,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Create company-drafts",
                 "description": "Create company-drafts resource",
@@ -3597,7 +4011,7 @@
         "/v1/core/company-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -3694,7 +4108,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -3778,7 +4192,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -3839,7 +4253,7 @@
         "/v1/core/company-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Company"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -3900,7 +4314,7 @@
         "/v1/core/dictionary": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Get dictionary",
                 "description": "Get dictionary resource",
@@ -3990,7 +4404,7 @@
         "/v1/core/dictionary/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -4087,7 +4501,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -4146,13 +4560,13 @@
             }
         },
         "/v1/core/dictionary/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1coredictionaryidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1coredictionaryidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -4209,7 +4623,7 @@
         "/v1/core/dictionary-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Get dictionary-drafts",
                 "description": "Get dictionary-drafts resource",
@@ -4297,7 +4711,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Create dictionary-drafts",
                 "description": "Create dictionary-drafts resource",
@@ -4374,7 +4788,7 @@
         "/v1/core/dictionary-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -4471,7 +4885,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -4555,7 +4969,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -4616,7 +5030,7 @@
         "/v1/core/dictionary-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Dictionary"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -4677,7 +5091,7 @@
         "/v1/core/menu": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Get menu",
                 "description": "Get menu resource",
@@ -4767,7 +5181,7 @@
         "/v1/core/menu/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -4864,7 +5278,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -4923,13 +5337,13 @@
             }
         },
         "/v1/core/menu/{id}/revise": {
-            "post": {
+            "put": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
-                "summary": "Create revise",
-                "description": "Create revise resource",
-                "operationId": "postv1coremenuidrevise",
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1coremenuidrevise",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -4986,7 +5400,7 @@
         "/v1/core/menu-drafts": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Get menu-drafts",
                 "description": "Get menu-drafts resource",
@@ -5074,7 +5488,7 @@
             },
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Create menu-drafts",
                 "description": "Create menu-drafts resource",
@@ -5171,7 +5585,7 @@
         "/v1/core/menu-drafts/{id}": {
             "get": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Get {id}",
                 "description": "Get {id} resource",
@@ -5268,7 +5682,7 @@
             },
             "put": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
@@ -5372,7 +5786,7 @@
             },
             "delete": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Delete {id}",
                 "description": "Delete {id} resource",
@@ -5433,7 +5847,7 @@
         "/v1/core/menu-drafts/{id}/commit": {
             "post": {
                 "tags": [
-                    "Core"
+                    "Core - Menu"
                 ],
                 "summary": "Create commit",
                 "description": "Create commit resource",
@@ -5490,6 +5904,891 @@
                     }
                 ]
             }
+        },
+        "/v1/core/option": {
+            "get": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Get option",
+                "description": "Get option resource",
+                "operationId": "getv1coreoption",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/option/{id}": {
+            "get": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Get {id}",
+                "description": "Get {id} resource",
+                "operationId": "getv1coreoptionid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Delete {id}",
+                "description": "Delete {id} resource",
+                "operationId": "deletev1coreoptionid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/option/{id}/revise": {
+            "put": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Update revise",
+                "description": "Update revise resource",
+                "operationId": "putv1coreoptionidrevise",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/option-drafts": {
+            "get": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Get option-drafts",
+                "description": "Get option-drafts resource",
+                "operationId": "getv1coreoption-drafts",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Create option-drafts",
+                "description": "Create option-drafts resource",
+                "operationId": "postv1coreoption-drafts",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "option_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "option_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "key": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/option-drafts/{id}": {
+            "get": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Get {id}",
+                "description": "Get {id} resource",
+                "operationId": "getv1coreoption-draftsid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter criteria (JSON string)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "description": "Related resources to expand (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Fields to return (comma-separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Update {id}",
+                "description": "Update {id} resource",
+                "operationId": "putv1coreoption-draftsid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "option_id": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "option_name": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "key": {
+                                        "type": "string",
+                                        "description": "nullable|string|max:255",
+                                        "maxLength": 255
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "nullable|string"
+                                    },
+                                    "is_removed": {
+                                        "type": "boolean",
+                                        "description": "nullable|boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Delete {id}",
+                "description": "Delete {id} resource",
+                "operationId": "deletev1coreoption-draftsid",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/v1/core/option-drafts/{id}/commit": {
+            "post": {
+                "tags": [
+                    "Core - Option"
+                ],
+                "summary": "Create commit",
+                "description": "Create commit resource",
+                "operationId": "postv1coreoption-draftsidcommit",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id parameter",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Session-ID",
+                        "in": "header",
+                        "description": "Session ID for temporary workspace isolation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Tenant",
+                        "in": "header",
+                        "description": "Tenant ID for multi-tenancy (default header name)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -5502,5 +6801,22 @@
             }
         }
     },
-    "x-module": "Core"
+    "x-module": "Core",
+    "x-tagGroups": [
+        {
+            "name": "Core",
+            "tags": [
+                "Core - Tenant",
+                "Core - Domain",
+                "Core - Province",
+                "Core - City",
+                "Core - District",
+                "Core - Village",
+                "Core - Company",
+                "Core - Dictionary",
+                "Core - Menu",
+                "Core - Option"
+            ]
+        }
+    ]
 }

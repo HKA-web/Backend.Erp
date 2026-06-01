@@ -1,0 +1,150 @@
+-- 1. PROCEDURE UPSERT DRAFT (Menggunakan temporary_id sebagai PK draf)
+DROP PROCEDURE IF EXISTS core.procedure_upsert_option_draft;
+CREATE OR REPLACE PROCEDURE core.procedure_upsert_option_draft(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
+BEGIN
+    -- Jika payload tidak bawa temporary_id, buat baru (Insert draf baru)
+    IF v_temp_id IS NULL THEN
+        v_temp_id := gen_random_uuid()::TEXT;
+END IF;
+
+INSERT INTO temporary.core_option (
+    temporary_id,
+    session_id,
+    master_id,
+    temporary_option,
+    option_id,
+    option_name,
+    key,
+    value,
+    is_removed
+) VALUES (
+             v_temp_id,
+             p_session_id,
+             p_payload ->> 'master_id', -- ID asli dari core.option jika ada
+             COALESCE(p_payload ->> 'temporary_option', 'I'),
+             p_payload ->> 'option_id',
+             p_payload ->> 'option_name',
+             p_payload ->> 'key',
+             p_payload ->> 'value',
+             COALESCE((p_payload ->> 'is_removed')::BOOLEAN, FALSE)
+         ) ON CONFLICT (temporary_id) DO UPDATE SET
+    option_name = EXCLUDED.option_name,
+    key = EXCLUDED.key,
+    value = EXCLUDED.value,
+    is_removed = EXCLUDED.is_removed,
+    temporary_option = EXCLUDED.temporary_option,
+    updated_at = NOW();
+END;
+$$;
+
+-- 2. PROCEDURE REVISE (Check-out dari Master ke Temporary)
+DROP PROCEDURE IF EXISTS core.procedure_revise_option;
+CREATE OR REPLACE PROCEDURE core.procedure_revise_option(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+v_master_id TEXT := p_payload ->> 'option_id';
+BEGIN
+    -- Validasi Locking: Cek jika sudah ada draf milik session lain untuk record ini
+    IF EXISTS (SELECT 1 FROM temporary.core_option
+               WHERE master_id = v_master_id AND session_id <> p_session_id) THEN
+        RAISE EXCEPTION 'Data Option % is currently being edited by another session.', v_master_id;
+END IF;
+
+INSERT INTO temporary.core_option (
+    temporary_id,
+    session_id,
+    master_id,
+    temporary_option,
+    option_id,
+    option_name,
+    key,
+    value,
+    is_removed
+)
+SELECT
+    gen_random_uuid()::TEXT,
+    p_session_id,
+    option_id, -- masuk ke master_id
+    COALESCE(p_payload ->> 'temporary_option', 'U'),
+    option_id,
+    option_name,
+    key,
+    value,
+    COALESCE((p_payload ->> 'is_removed')::boolean, false)
+FROM core.option WHERE option_id = v_master_id
+    ON CONFLICT (master_id, session_id) DO NOTHING;
+END;
+$$;
+
+-- 3. PROCEDURE COMMIT (Finalisasi ke Master berdasarkan temporary_option)
+DROP PROCEDURE IF EXISTS core.procedure_commit_option;
+CREATE OR REPLACE PROCEDURE core.procedure_commit_option(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
+    v_rec RECORD;
+    v_old_data JSONB;
+    v_new_data JSONB;
+BEGIN
+    -- Ambil data dari temporary
+SELECT * INTO v_rec FROM temporary.core_option
+WHERE temporary_id = v_temp_id AND session_id = p_session_id;
+
+IF NOT FOUND THEN
+        RAISE EXCEPTION 'Draft Option record not found.';
+END IF;
+
+    -- A. Snapshot Data Lama (Jika Update/Delete berdasarkan master_id)
+    IF v_rec.master_id IS NOT NULL THEN
+SELECT to_jsonb(t) INTO v_old_data FROM core.option t WHERE t.option_id = v_rec.master_id;
+END IF;
+
+    -- B. Eksekusi ke Master berdasarkan temporary_option
+    IF v_rec.temporary_option = 'D' THEN
+DELETE FROM core.option WHERE option_id = v_rec.master_id;
+ELSE
+        -- INSERT atau UPDATE menggunakan UPSERT ke core.option
+        INSERT INTO core.option (option_id, option_name, key, value, status, is_removed, created_at, updated_at)
+        VALUES (v_rec.option_id, v_rec.option_name, key, value, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        ON CONFLICT (option_id) DO UPDATE SET
+    option_name = EXCLUDED.option_name,
+    key = EXCLUDED.key,
+    value = EXCLUDED.value,
+    is_removed = EXCLUDED.is_removed,
+    status = 'POSTED',
+    updated_at = NOW();
+END IF;
+
+    -- C. Snapshot Baru & History
+    -- Jika operasi adalah Delete, new_data akan null
+    IF v_rec.temporary_option <> 'D' THEN
+SELECT to_jsonb(t) INTO v_new_data FROM core.option t WHERE t.option_id = v_rec.option_id;
+END IF;
+
+INSERT INTO history.core_option (history_id, executed_by, action, old_data, new_data, executed_at)
+VALUES (
+           gen_random_uuid()::TEXT,
+           (p_payload ->> 'executed_by'), -- ID User yang melakukan commit
+           CASE
+               WHEN v_rec.temporary_option = 'D' THEN 'DELETE'
+               WHEN v_old_data IS NULL THEN 'INSERT'
+               ELSE 'UPDATE'
+               END,
+           v_old_data,
+           v_new_data,
+           NOW()
+       );
+
+-- D. Cleanup Temporary
+DELETE FROM temporary.core_option WHERE temporary_id = v_temp_id;
+END;
+$$;

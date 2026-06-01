@@ -38,6 +38,34 @@ class ProvinceRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation by casting is_removed to boolean.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Convert is_removed to proper boolean format
+        if ($this->has('is_removed')) {
+            $value = $this->get('is_removed');
+            
+            if (is_string($value)) {
+                // Convert string "true"/"false" to boolean
+                $this->merge([
+                    'is_removed' => $value === 'true' || $value === '1' ? true : false
+                ]);
+            } elseif (is_numeric($value)) {
+                // Convert numeric 0/1 to boolean
+                $this->merge([
+                    'is_removed' => (bool)$value
+                ]);
+            }
+        } else {
+            // Default is_removed to false if not provided
+            $this->merge([
+                'is_removed' => false
+            ]);
+        }
+    }
+
+    /**
      * Custom messages for validation errors.
      */
     public function messages(): array
