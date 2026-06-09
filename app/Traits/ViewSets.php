@@ -126,6 +126,21 @@ trait ViewSets
 
     public function applyFilter($query, $filter)
     {
+        $searchQuery = Request::input('search');
+        if ($searchQuery) {
+            $model = $query->getModel();
+            if (in_array('Laravel\Scout\Searchable', class_uses_recursive($model))) {
+                $searchResults = $model->search($searchQuery)->keys();
+                $ids = $searchResults->toArray();
+                
+                if (!empty($ids)) {
+                    $query->whereIn($model->getKeyName(), $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }
+        }
+        
         if (empty($filter)) {
             return $query;
         }

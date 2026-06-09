@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Scout\Searchable;
 use Modules\Core\Database\Factories\DistrictFactory;
 use Spatie\Permission\Traits\HasRoles;
 use Modules\Authentication\Models\User;
@@ -19,9 +20,20 @@ use Modules\Authentication\Models\User;
 #[ScopedBy([ActiveOnlyScope::class])]
 class District extends Model
 {
-    use HasApiTokens, HasFactory, HasRoles, Notifiable, SerializableDate, SoftDelete;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, Searchable, SerializableDate, SoftDelete;
 
     protected $guard_name = 'api';
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'district_id' => $this->district_id,
+            'district_name' => $this->district_name,
+        ];
+    }
 
     protected static function newFactory()
     {

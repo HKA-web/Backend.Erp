@@ -10,14 +10,15 @@
 
 ## 📚 Daftar Isi
 
-1. [Apa Ini?](#apa-ini)
+1. [Apa Ini](#apa-ini)
 2. [Mulai Cepat](#mulai-cepat)
 3. [Instalasi Lengkap](#instalasi-lengkap)
 4. [API Documentation](#api-documentation)
-5. [Multi-Tenancy](#multi-tenancy)
-6. [Struktur Project](#struktur-project)
-7. [Konsep Utama](#konsep-utama)
-8. [FAQ](#faq)
+5. [Laravel Scout - Full-Text Search](#laravel-scout---full-text-search)
+6. [Multi-Tenancy](#multi-tenancy)
+7. [Struktur Project](#struktur-project)
+8. [Konsep Utama](#konsep-utama)
+9. [FAQ](#faq)
 
 ---
 
@@ -190,6 +191,107 @@ GET /v1/core/province?take=1&skip=1&filter=["is_removed","=",false]&fields=provi
 ### Authentication
 
 Endpoint dengan middleware `auth:sanctum` butuh token. Gunakan endpoint `/api/v1/auth/login` untuk mendapatkan token.
+
+---
+
+## 🔍 Laravel Scout - Full-Text Search
+
+### Apa Itu Laravel Scout?
+
+Laravel Scout adalah package resmi Laravel untuk **full-text search** yang memudahkan pencarian data dengan performa tinggi.
+
+### Fitur
+
+- **Driver-based** - Mendukung PostgreSQL, dll
+- **Model Integration** - Tambah trait `Searchable` ke Eloquent model
+- **Auto Sync** - Otomatis sync data ke search index saat create/update/delete
+- **Simple API** - `Model::search('query')->get()`
+
+### Konfigurasi
+
+Driver sudah dikonfigurasi menggunakan **PostgreSQL full-text search** di `config/scout.php`:
+
+```php
+'driver' => env('SCOUT_DRIVER', 'database'),
+```
+
+### Cara Menggunakan
+
+#### 1. Tambah Trait ke Model
+
+```php
+use Laravel\Scout\Searchable;
+
+class Province extends Model
+{
+    use Searchable;
+}
+```
+
+#### 2. Import Data ke Search Index
+
+```bash
+# Import model
+php artisan scout:import "Modules\Core\Models\Province"
+
+# Import semua core models
+php artisan scout:import "Modules\Core\Models\*"
+```
+
+#### 3. Gunakan di API
+
+Search terintegrasi dalam parameter `filter`:
+
+```
+GET /api/v1/core/provinces?search=jawa
+```
+
+Atau dengan filter lain:
+
+```
+GET /api/v1/core/provinces?search=jawa&filter=["enable","=",true]
+```
+
+### Model yang Sudah Support
+
+Berikut model yang sudah mendukung Scout search:
+
+- ✅ Province
+- ✅ City
+- ✅ District
+- ✅ Village
+- ✅ Company
+- ✅ Dictionary
+- ✅ Menu
+
+### Perbedaan dengan Filter Biasa
+
+| Fitur | Filter Biasa | Scout Search |
+|-------|-------------|--------------|
+| Pencarian | Exact/partial match | Full-text search |
+| Performa | Good untuk data kecil | Optimal untuk data besar |
+| Relevansi | Tidak ada | Score-based ranking |
+| Bahasa | Case-sensitive | Case-insensitive |
+
+### Command Scout
+
+```bash
+# Import data ke search index
+php artisan scout:import "App\Models\User"
+
+# Flush search index
+php artisan scout:flush "App\Models\User"
+
+# Re-index (flush + import)
+php artisan scout:import "App\Models\User" --force
+```
+
+### Tips
+
+- Scout search hanya bekerja jika model punya trait `Searchable`
+- Data otomatis sync ke search index saat create/update/delete
+- Gunakan parameter `search` untuk full-text search
+- Bisa dikombinasi dengan parameter filter lain
 
 ---
 
