@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\District;
 
 class DistrictController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class DistrictController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_district', [
+            $this->baseService->executeProcedure('core.procedure_revise_district', [
                 'district_id' => $id,
-            ]);
+            ], District::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $district = District::find($id);
-            if ($district) {
-                CacheService::clearCache($district);
-            }
+                        
 
             return $this->erpResponse(
                 message: "District {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class DistrictController extends Controller
         }, 'Failed to initiate revision for District.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(District::class, $id, 'core.procedure_revise_district');
+            $this->baseService->requestDelete(District::class, $id, 'core.procedure_revise_district');
 
-            // Clear cache - auto scan relations & tenant aware
-            $district = District::find($id);
-            if ($district) {
-                CacheService::clearCache($district);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for District {$id} processed according to model policy."

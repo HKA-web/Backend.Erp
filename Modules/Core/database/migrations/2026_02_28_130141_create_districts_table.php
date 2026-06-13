@@ -16,22 +16,19 @@ return new class extends Migration
         Schema::createWithTemp('core.district', function (Blueprint $table) {
             $table->string('district_id')->primary();
             $table->string('district_name');
-            $table->remoteForeign('city_id', 'core.city', 'city_id');
+            $table->string('city_id')->nullable()->index();
             $table->baseColumn();
 
         });
 
         Schema::create('history.core_district', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130141_core.procedures_district.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -39,9 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_district_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_district');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_district');
         Schema::dropIfExists('history.core_district');
         Schema::dropIfExists('temporary.core_district');
         Schema::dropIfExists('core.district');

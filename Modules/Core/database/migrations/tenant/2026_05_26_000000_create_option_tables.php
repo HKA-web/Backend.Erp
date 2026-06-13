@@ -32,8 +32,7 @@ return new class extends Migration
             $table->timestamp('executed_at')->useCurrent();
         });
 
-        $sql = file_get_contents(__DIR__.'/../sql/2026_31_05_000000_core.procedures_option.sql');
-        DB::unprepared($sql);
+
     }
 
     /**

@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\VillageRequest;
 use Modules\Core\Models\Village;
 
 class VillageDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -21,10 +22,10 @@ class VillageDraftController extends Controller
         });
     }
 
-    public function store(VillageRequest $request, BaseStaging $staging)
+    public function store(VillageRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_village_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_village_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft Village saved successfully.'
@@ -42,12 +43,12 @@ class VillageDraftController extends Controller
         });
     }
 
-    public function update(VillageRequest $request, $id, BaseStaging $staging)
+    public function update(VillageRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_village_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_village_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -64,21 +65,17 @@ class VillageDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'village_id' => request()->input('village_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_village', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_village', $payload, Village::class);
 
-            // Clear cache for village model
-            $village = Village::find(request()->input('village_id'));
-            if ($village) {
-                CacheService::clearCache($village);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'Village committed to master successfully.',

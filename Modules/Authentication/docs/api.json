@@ -265,8 +265,8 @@
                 "tags": [
                     "Authentication - User"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1authenticationuseridrevise",
                 "responses": {
                     "200": {
@@ -326,8 +326,8 @@
                 "tags": [
                     "Authentication - User"
                 ],
-                "summary": "Create reorder",
-                "description": "Create reorder resource",
+                "summary": "Reorder reorder",
+                "description": "Reorder reorder resource",
                 "operationId": "postv1authenticationuseridreorder",
                 "responses": {
                     "200": {
@@ -661,13 +661,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Authentication - User"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1authenticationuser-draftsid",
+                "operationId": "postv1authenticationuser-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -810,8 +810,8 @@
                 "tags": [
                     "Authentication - User"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1authenticationuser-draftsidcommit",
                 "responses": {
                     "200": {

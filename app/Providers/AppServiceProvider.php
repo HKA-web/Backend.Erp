@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -35,46 +36,17 @@ class AppServiceProvider extends ServiceProvider
             return $this->limit($limit)->offset($offset);
         });
 
-        Blueprint::macro('remoteForeign', function (
-            string $column,
-            string $remoteTable,
-            string $remoteKey,
-            string $type = 'string', // Optional change on parameter with: integer, uuid, bigInteger, dll
-            string $onDelete = 'cascade' // Optional change on parameter with: cascade, restrict, no action, set null
-        ) {
-            $this->{$type}($column)->nullable()->index();
+        
 
-            return $this->foreign($column)
-                ->references($remoteKey)
-                ->on($remoteTable)
-                ->onDelete($onDelete);
-        });
-
-        Blueprint::macro('selfForeign', function (
-            string $column,
-            string $references = 'id',
-            string $type = 'string',
-            string $onDelete = 'set null'
-        ) {
-            $columnExists = collect($this->getColumns())->firstWhere('name', $column);
-
-            if (! $columnExists) {
-                $this->{$type}($column)->nullable()->index();
-            }
-
-            return $this->foreign($column)
-                ->references($references)
-                ->on($this->getTable())
-                ->onDelete($onDelete);
-        });
+        
 
         Blueprint::macro('baseColumn', function () {
             $this->jsonb('properties')->nullable();
             $this->boolean('enable')->default(true);
             $this->boolean('readonly')->default(false);
             $this->boolean('is_removed')->default(false);
-            $this->jsonb('created_by')->nullable();
-            $this->jsonb('updated_by')->nullable();
+            $this->string('created_by')->nullable();
+            $this->string('updated_by')->nullable();
             $this->timestamps();
             $this->string('status')->default('DRAFT');
         });

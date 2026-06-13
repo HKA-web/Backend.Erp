@@ -679,8 +679,8 @@
                 "tags": [
                     "Core - Province"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1coreprovinceidrevise",
                 "responses": {
                     "200": {
@@ -998,13 +998,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Province"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1coreprovince-draftsid",
+                "operationId": "postv1coreprovince-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1147,8 +1147,8 @@
                 "tags": [
                     "Core - Province"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1coreprovince-draftsidcommit",
                 "responses": {
                     "200": {
@@ -1456,8 +1456,8 @@
                 "tags": [
                     "Core - City"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1corecityidrevise",
                 "responses": {
                     "200": {
@@ -1775,13 +1775,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - City"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1corecity-draftsid",
+                "operationId": "postv1corecity-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1924,8 +1924,8 @@
                 "tags": [
                     "Core - City"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1corecity-draftsidcommit",
                 "responses": {
                     "200": {
@@ -2233,8 +2233,8 @@
                 "tags": [
                     "Core - District"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1coredistrictidrevise",
                 "responses": {
                     "200": {
@@ -2552,13 +2552,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - District"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1coredistrict-draftsid",
+                "operationId": "postv1coredistrict-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -2701,8 +2701,8 @@
                 "tags": [
                     "Core - District"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1coredistrict-draftsidcommit",
                 "responses": {
                     "200": {
@@ -3010,8 +3010,8 @@
                 "tags": [
                     "Core - Village"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1corevillageidrevise",
                 "responses": {
                     "200": {
@@ -3329,13 +3329,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Village"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1corevillage-draftsid",
+                "operationId": "postv1corevillage-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -3478,8 +3478,8 @@
                 "tags": [
                     "Core - Village"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1corevillage-draftsidcommit",
                 "responses": {
                     "200": {
@@ -3787,8 +3787,8 @@
                 "tags": [
                     "Core - Company"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1corecompanyidrevise",
                 "responses": {
                     "200": {
@@ -4106,13 +4106,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Company"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1corecompany-draftsid",
+                "operationId": "postv1corecompany-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -4255,8 +4255,8 @@
                 "tags": [
                     "Core - Company"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1corecompany-draftsidcommit",
                 "responses": {
                     "200": {
@@ -4564,8 +4564,8 @@
                 "tags": [
                     "Core - Dictionary"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1coredictionaryidrevise",
                 "responses": {
                     "200": {
@@ -4883,13 +4883,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Dictionary"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1coredictionary-draftsid",
+                "operationId": "postv1coredictionary-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -5032,8 +5032,8 @@
                 "tags": [
                     "Core - Dictionary"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1coredictionary-draftsidcommit",
                 "responses": {
                     "200": {
@@ -5341,8 +5341,8 @@
                 "tags": [
                     "Core - Menu"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1coremenuidrevise",
                 "responses": {
                     "200": {
@@ -5680,13 +5680,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Menu"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1coremenu-draftsid",
+                "operationId": "postv1coremenu-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -5849,8 +5849,8 @@
                 "tags": [
                     "Core - Menu"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1coremenu-draftsidcommit",
                 "responses": {
                     "200": {
@@ -6185,8 +6185,8 @@
                 "tags": [
                     "Core - Option"
                 ],
-                "summary": "Update revise",
-                "description": "Update revise resource",
+                "summary": "Revise revise",
+                "description": "Revise revise resource",
                 "operationId": "putv1coreoptionidrevise",
                 "responses": {
                     "200": {
@@ -6549,13 +6549,13 @@
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Core - Option"
                 ],
                 "summary": "Update {id}",
                 "description": "Update {id} resource",
-                "operationId": "putv1coreoption-draftsid",
+                "operationId": "postv1coreoption-draftsid",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -6725,8 +6725,8 @@
                 "tags": [
                     "Core - Option"
                 ],
-                "summary": "Create commit",
-                "description": "Create commit resource",
+                "summary": "Commit commit",
+                "description": "Commit commit resource",
                 "operationId": "postv1coreoption-draftsidcommit",
                 "responses": {
                     "200": {

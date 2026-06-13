@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\City;
 
 class CityController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class CityController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_city', [
+            $this->baseService->executeProcedure('core.procedure_revise_city', [
                 'city_id' => $id,
-            ]);
+            ], City::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $city = City::find($id);
-            if ($city) {
-                CacheService::clearCache($city);
-            }
+                        
 
             return $this->erpResponse(
                 message: "City {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class CityController extends Controller
         }, 'Failed to initiate revision for City.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(City::class, $id, 'core.procedure_revise_city');
+            $this->baseService->requestDelete(City::class, $id, 'core.procedure_revise_city');
 
-            // Clear cache - auto scan relations & tenant aware
-            $city = City::find($id);
-            if ($city) {
-                CacheService::clearCache($city);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for City {$id} processed according to model policy."

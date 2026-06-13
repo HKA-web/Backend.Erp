@@ -3,12 +3,14 @@
 namespace Modules\Authentication\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Authentication\Http\Requests\UserRequest;
 
 class UserDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -19,10 +21,10 @@ class UserDraftController extends Controller
         });
     }
 
-    public function store(UserRequest $request, BaseStaging $staging)
+    public function store(UserRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('authentication.procedure_upsert_user_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('authentication.procedure_upsert_user_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft User saved successfully.'
@@ -40,12 +42,12 @@ class UserDraftController extends Controller
         });
     }
 
-    public function update(UserRequest $request, $id, BaseStaging $staging)
+    public function update(UserRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['user_id' => $id]);
 
-            $staging->executeStaging('authentication.procedure_upsert_user_draft', $payload);
+            $this->baseService->executeProcedure('authentication.procedure_upsert_user_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -62,12 +64,12 @@ class UserDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = ['user_id' => $id];
 
-            $staging->executeStaging('authentication.procedure_commit_user', $payload, ['user']);
+            $this->baseService->executeProcedure('authentication.procedure_commit_user', $payload, User::class);
 
             return $this->erpResponse(
                 message: 'User committed to master successfully.'

@@ -14,68 +14,7 @@ class OpenApiGeneratorService
      */
     public function generateForModule(string $moduleName): array
     {
-        $modulePath = base_path("Modules/{$moduleName}");
-        $scanDirs = [
-            $modulePath . '/app',
-        ];
-
-        try {
-            // Use the Generator class with generate method
-            $generator = new Generator();
-            $openapi = $generator->generate($scanDirs);
-
-            if ($openapi === null) {
-                return [];
-            }
-
-            $json = $openapi->toJson();
-            $data = json_decode($json, true);
-
-            // Add module info
-            $data['x-module'] = $moduleName;
-            if (!isset($data['info']['title'])) {
-                $data['info']['title'] = $moduleName . ' API';
-            }
-
-            // Process tags to add nested structure if tags exist
-            if (isset($data['tags']) && !empty($data['tags'])) {
-                $data = $this->processTagsForModule($data, $moduleName);
-            }
-
-            // Check if module uses tenant identification middleware and add tenant headers
-            $routesFile = $modulePath . '/routes/api.php';
-            if (file_exists($routesFile)) {
-                $routesContent = file_get_contents($routesFile);
-                $hasTenantMiddleware = strpos($routesContent, 'InitializeTenancyByRequestData') !== false;
-
-                if ($hasTenantMiddleware && isset($data['paths'])) {
-                    foreach ($data['paths'] as $path => $methods) {
-                        foreach ($methods as $method => $details) {
-                            // Add tenant headers as parameters
-                            if (!isset($data['paths'][$path][$method]['parameters'])) {
-                                $data['paths'][$path][$method]['parameters'] = [];
-                            }
-                            // Add X-Tenant header (default header name)
-                            $data['paths'][$path][$method]['parameters'][] = [
-                                'name' => 'X-Tenant',
-                                'in' => 'header',
-                                'description' => 'Tenant ID for multi-tenancy (default header name)',
-                                'required' => true,
-                                'schema' => [
-                                    'type' => 'string'
-                                ]
-                            ];
-                        }
-                    }
-                }
-            }
-
-            return $data;
-        } catch (\Throwable $e) {
-            // If generation fails, try manual approach
-            error_log("API Docs generation failed for {$moduleName}: " . $e->getMessage());
-            return $this->generateManualForModule($moduleName);
-        }
+        return $this->generateManualForModule($moduleName);
     }
 
     /**
@@ -615,7 +554,7 @@ class OpenApiGeneratorService
     protected function generateSummary(string $method, string $path, string $methodName): string
     {
         $resource = $this->extractResourceName($path);
-        $action = $this->methodToAction($method);
+        $action = $this->methodNameToAction($methodName, $method);
 
         return ucfirst($action) . ' ' . $resource;
     }
@@ -631,7 +570,7 @@ class OpenApiGeneratorService
     protected function generateDescription(string $method, string $path, string $methodName): string
     {
         $resource = $this->extractResourceName($path);
-        $action = $this->methodToAction($method);
+        $action = $this->methodNameToAction($methodName, $method);
 
         return ucfirst($action) . ' ' . $resource . ' resource';
     }
@@ -677,22 +616,27 @@ class OpenApiGeneratorService
     }
 
     /**
-     * Convert HTTP method to action name
+     * Convert controller method name to action name
      *
-     * @param string $method
+     * @param string $methodName
+     * @param string $httpMethod
      * @return string
      */
-    protected function methodToAction(string $method): string
+    protected function methodNameToAction(string $methodName, string $httpMethod): string
     {
         $actions = [
-            'get' => 'get',
-            'post' => 'create',
-            'put' => 'update',
-            'patch' => 'update',
-            'delete' => 'delete',
+            'index' => 'get',
+            'show' => 'get',
+            'store' => 'create',
+            'update' => 'update',
+            'destroy' => 'delete',
         ];
 
-        return $actions[$method] ?? 'operation';
+        if (isset($actions[$methodName])) {
+            return $actions[$methodName];
+        }
+
+        return $methodName;
     }
 
     /**

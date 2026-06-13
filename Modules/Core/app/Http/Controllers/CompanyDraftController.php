@@ -3,8 +3,7 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\CompanyRequest;
 use Modules\Core\Models\Company;
@@ -12,6 +11,8 @@ use Modules\Core\Services\TenantRegistrationService;
 
 class CompanyDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -22,10 +23,10 @@ class CompanyDraftController extends Controller
         });
     }
 
-    public function store(CompanyRequest $request, BaseStaging $staging)
+    public function store(CompanyRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_company_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_company_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft Company saved successfully.'
@@ -43,12 +44,12 @@ class CompanyDraftController extends Controller
         });
     }
 
-    public function update(CompanyRequest $request, $id, BaseStaging $staging)
+    public function update(CompanyRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_company_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_company_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -65,21 +66,17 @@ class CompanyDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging, TenantRegistrationService $tenantService)
+    public function commit($id, TenantRegistrationService $tenantService)
     {
-        return $this->erpExecution(function () use ($staging, $id, $tenantService) {
+        return $this->erpExecution(function () use ($id, $tenantService) {
             $payload = [
                 'temporary_id' => $id,
                 'company_id' => request()->input('company_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_company', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_company', $payload, Company::class);
 
-            // Clear cache for company model
-            $company = Company::find(request()->input('company_id'));
-            if ($company) {
-                CacheService::clearCache($company);
-            }
+                        
 
             // $company = Company::where('company_id', $payload['company_id'])->first();
 

@@ -31,9 +31,10 @@ class TenantMigrationServiceProvider extends ServiceProvider
         
         Config::set('tenancy.migration_parameters.--path', $tenantPaths);
         
-        // Set seeder class jika ada, gunakan default jika tidak ada
+        // Set seeder class jika ada
         if (!empty($tenantSeeders)) {
-            Config::set('tenancy.seeder_parameters.--class', $tenantSeeders);
+            Config::set('tenancy.dynamic_tenant_seeders', $tenantSeeders);
+            Config::set('tenancy.seeder_parameters.--class', 'Database\Seeders\TenantSeeder');
         }
     }
 }

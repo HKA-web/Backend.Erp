@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\ProvinceRequest;
 use Modules\Core\Models\Province;
 
 class ProvinceDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -20,10 +21,10 @@ class ProvinceDraftController extends Controller
         });
     }
 
-    public function store(ProvinceRequest $request, BaseStaging $staging)
+    public function store(ProvinceRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_province_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_province_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft Province saved successfully.'
@@ -41,12 +42,12 @@ class ProvinceDraftController extends Controller
         });
     }
 
-    public function update(ProvinceRequest $request, $id, BaseStaging $staging)
+    public function update(ProvinceRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_province_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_province_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -63,21 +64,17 @@ class ProvinceDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'province_id' => request()->input('province_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_province', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_province', $payload, Province::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $province = Province::find(request()->input('province_id'));
-            if ($province) {
-                CacheService::clearCache($province);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'Province committed to master successfully.',

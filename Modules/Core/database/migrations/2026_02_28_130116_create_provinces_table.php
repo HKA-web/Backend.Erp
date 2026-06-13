@@ -23,15 +23,12 @@ return new class extends Migration
 
         Schema::create('history.core_province', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130116_core.procedures_province.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -39,9 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_province_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_province');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_province');
         Schema::dropIfExists('history.core_province');
         Schema::dropIfExists('temporary.core_province');
         Schema::dropIfExists('core.province');

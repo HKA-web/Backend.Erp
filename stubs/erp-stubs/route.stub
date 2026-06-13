@@ -1,20 +1,20 @@
 // Routes for {{module}}/{{model}}
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master
-    Route::prefix('{{module_lower}}/{{model_lower}}')->group(function () {
-        Route::get('/', [{{model}}Controller::class, 'index']);
-        Route::get('/{id}', [{{model}}Controller::class, 'show']);
-        Route::post('/{id}/revise', [{{model}}Controller::class, 'revise']);
-        Route::delete('/{id}', [{{model}}Controller::class, 'destroy']);
+    Route::prefix('{{module_lower}}/{{model_lower}}')->controller({{model}}Controller::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Temporary
-    Route::prefix('{{module_lower}}/{{model_lower}}-drafts')->group(function () {
-        Route::get('/', [{{model}}DraftController::class, 'index']);
-        Route::post('/', [{{model}}DraftController::class, 'store']);
-        Route::get('/{id}', [{{model}}DraftController::class, 'show']);
-        Route::put('/{id}', [{{model}}DraftController::class, 'update']);
-        Route::delete('/{id}', [{{model}}DraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [{{model}}DraftController::class, 'commit']);
+    Route::prefix('{{module_lower}}/{{model_lower}}-drafts')->controller({{model}}DraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });

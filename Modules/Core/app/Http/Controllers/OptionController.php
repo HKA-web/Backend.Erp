@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\Option;
 
 class OptionController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class OptionController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_option', [
+            $this->baseService->executeProcedure('core.procedure_revise_option', [
                 'option_id' => $id,
-            ]);
+            ], Option::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $option = Option::find($id);
-            if ($option) {
-                CacheService::clearCache($option);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Option {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class OptionController extends Controller
         }, 'Failed to initiate revision for Option.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(Option::class, $id, 'core.procedure_revise_option');
+            $this->baseService->requestDelete(Option::class, $id, 'core.procedure_revise_option');
 
-            // Clear cache - auto scan relations & tenant aware
-            $option = Option::find($id);
-            if ($option) {
-                CacheService::clearCache($option);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for Option {$id} processed according to model policy."

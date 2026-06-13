@@ -12,7 +12,7 @@ BEGIN
         v_temp_id := gen_random_uuid()::TEXT;
 END IF;
 
-INSERT INTO temporary.core_option (
+INSERT INTO temporary.core_option AS t (
     temporary_id,
     session_id,
     master_id,
@@ -33,11 +33,11 @@ INSERT INTO temporary.core_option (
              p_payload ->> 'value',
              COALESCE((p_payload ->> 'is_removed')::BOOLEAN, FALSE)
          ) ON CONFLICT (temporary_id) DO UPDATE SET
-    option_name = EXCLUDED.option_name,
-    key = EXCLUDED.key,
-    value = EXCLUDED.value,
-    is_removed = EXCLUDED.is_removed,
-    temporary_option = EXCLUDED.temporary_option,
+    option_name = CASE WHEN p_payload ? 'option_name' THEN EXCLUDED.option_name ELSE t.option_name END,
+    key = CASE WHEN p_payload ? 'key' THEN EXCLUDED.key ELSE t.key END,
+    value = CASE WHEN p_payload ? 'value' THEN EXCLUDED.value ELSE t.value END,
+    is_removed = CASE WHEN p_payload ? 'is_removed' THEN EXCLUDED.is_removed ELSE t.is_removed END,
+    temporary_option = CASE WHEN p_payload ? 'temporary_option' THEN EXCLUDED.temporary_option ELSE t.temporary_option END,
     updated_at = NOW();
 END;
 $$;
@@ -114,7 +114,7 @@ DELETE FROM core.option WHERE option_id = v_rec.master_id;
 ELSE
         -- INSERT atau UPDATE menggunakan UPSERT ke core.option
         INSERT INTO core.option (option_id, option_name, key, value, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.option_id, v_rec.option_name, key, value, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_rec.option_id, v_rec.option_name, v_rec.key, v_rec.value, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (option_id) DO UPDATE SET
     option_name = EXCLUDED.option_name,
     key = EXCLUDED.key,

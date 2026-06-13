@@ -3,12 +3,14 @@
 namespace Modules\{{module}}\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
+use App\Services\BaseService;
 use Modules\{{module}}\Models\{{model}};
 use Illuminate\Http\Request;
 
 class {{model}}Controller extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -24,11 +26,11 @@ class {{model}}Controller extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('{{module_lower}}.procedure_revise_{{model_lower}}', [
+            $this->baseService->executeProcedure('{{module_lower}}.procedure_revise_{{model_lower}}', [
                 '{{model_lower}}_id' => $id
             ]);
 
@@ -38,11 +40,11 @@ class {{model}}Controller extends Controller
         }, "Failed to initiate revision for {{model}}.");
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete({{model}}::class, $id, '{{module_lower}}.procedure_revise_{{model_lower}}');
+            $this->baseService->requestDelete({{model}}::class, $id, '{{module_lower}}.procedure_revise_{{model_lower}}');
 
             return $this->erpResponse(
                 message: "Delete request for {{model}} {$id} processed according to model policy."

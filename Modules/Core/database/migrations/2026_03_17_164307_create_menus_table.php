@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::createWithTemp('core.menu', function (Blueprint $table) {
             $table->string('menu_id')->primary();
-            $table->remoteForeign('permission_id', 'public.auth_permissions', 'id', 'bigInteger');
+            $table->bigInteger('permission_id')->nullable()->index();
             $table->string('menu_name');
             $table->string('sort_order');
             $table->string('action');
@@ -26,20 +26,17 @@ return new class extends Migration
         });
 
         Schema::table('core.menu', function (Blueprint $table) {
-            $table->selfForeign('parent_id', 'menu_id');
+            $table->string('parent_id')->nullable()->index();
         });
 
         Schema::create('history.core_menu', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_03_17_164307_core.procedures_menu.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -47,9 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_menu_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_menu');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_menu');
         Schema::dropIfExists('history.core_menu');
         Schema::dropIfExists('temporary.core_menu');
         Schema::dropIfExists('core.menu');

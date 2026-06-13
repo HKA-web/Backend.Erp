@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\CityRequest;
 use Modules\Core\Models\City;
 
 class CityDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -20,10 +21,10 @@ class CityDraftController extends Controller
         });
     }
 
-    public function store(CityRequest $request, BaseStaging $staging)
+    public function store(CityRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_city_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_city_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft City saved successfully.'
@@ -41,12 +42,12 @@ class CityDraftController extends Controller
         });
     }
 
-    public function update(CityRequest $request, $id, BaseStaging $staging)
+    public function update(CityRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_city_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_city_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -63,21 +64,17 @@ class CityDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'city_id' => request()->input('city_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_city', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_city', $payload, City::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $city = City::find(request()->input('city_id'));
-            if ($city) {
-                CacheService::clearCache($city);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'City committed to master successfully.',

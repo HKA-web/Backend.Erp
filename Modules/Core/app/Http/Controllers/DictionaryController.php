@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\Dictionary;
 
 class DictionaryController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class DictionaryController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_dictionary', [
+            $this->baseService->executeProcedure('core.procedure_revise_dictionary', [
                 'dictionary_id' => $id,
-            ]);
+            ], Dictionary::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $dictionary = Dictionary::find($id);
-            if ($dictionary) {
-                CacheService::clearCache($dictionary);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Dictionary {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class DictionaryController extends Controller
         }, 'Failed to initiate revision for Dictionary.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(Dictionary::class, $id, 'core.procedure_revise_dictionary');
+            $this->baseService->requestDelete(Dictionary::class, $id, 'core.procedure_revise_dictionary');
 
-            // Clear cache - auto scan relations & tenant aware
-            $dictionary = Dictionary::find($id);
-            if ($dictionary) {
-                CacheService::clearCache($dictionary);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for Dictionary {$id} processed according to model policy."

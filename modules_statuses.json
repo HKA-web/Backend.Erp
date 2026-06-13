@@ -2,5 +2,7 @@
     "Blog": true,
     "Authentication": true,
     "Keuangan": true,
-    "Core": true
+    "Core": true,
+    "TestModule": true,
+    "TestModule2": true
 }

@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\Menu;
 
 class MenuController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class MenuController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_menu', [
+            $this->baseService->executeProcedure('core.procedure_revise_menu', [
                 'menu_id' => $id,
-            ]);
+            ], Menu::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $menu = Menu::find($id);
-            if ($menu) {
-                CacheService::clearCache($menu);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Menu {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class MenuController extends Controller
         }, 'Failed to initiate revision for Menu.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(Menu::class, $id, 'core.procedure_revise_menu');
+            $this->baseService->requestDelete(Menu::class, $id, 'core.procedure_revise_menu');
 
-            // Clear cache - auto scan relations & tenant aware
-            $menu = Menu::find($id);
-            if ($menu) {
-                CacheService::clearCache($menu);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for Menu {$id} processed according to model policy."

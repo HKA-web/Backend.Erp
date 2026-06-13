@@ -3,12 +3,14 @@
 namespace Modules\{{module}}\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
+use App\Services\BaseService;
 use Modules\{{module}}\Http\Requests\{{model}}Request;
 use Illuminate\Support\Facades\DB;
 
 class {{model}}DraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -18,10 +20,10 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    public function store({{model}}Request $request, BaseStaging $staging)
+    public function store({{model}}Request $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $request->validated());
 
             return $this->erpResponse(
                 message: "Draft {{model}} saved successfully."
@@ -39,12 +41,12 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    public function update({{model}}Request $request, $id, BaseStaging $staging)
+    public function update({{model}}Request $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $payload);
+            $this->baseService->executeProcedure('{{module_lower}}.procedure_upsert_{{model_lower}}_draft', $payload);
 
             return $this->erpResponse(message: "Draft updated.");
         });
@@ -61,15 +63,15 @@ class {{model}}DraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 '{{model_lower}}_id'  => request()->input('{{model_lower}}_id')
             ];
 
-            $staging->executeStaging('{{module_lower}}.procedure_commit_{{model_lower}}', $payload, ['{{model_lower}}']);
+            $this->baseService->executeProcedure('{{module_lower}}.procedure_commit_{{model_lower}}', $payload, {{model}}::class);
 
             return $this->erpResponse(
                 message: "{{model}} committed to master successfully.",

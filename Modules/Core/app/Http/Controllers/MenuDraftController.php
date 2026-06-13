@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\MenuRequest;
 use Modules\Core\Models\Menu;
 
 class MenuDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -20,10 +21,10 @@ class MenuDraftController extends Controller
         });
     }
 
-    public function store(MenuRequest $request, BaseStaging $staging)
+    public function store(MenuRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_menu_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_menu_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft Menu saved successfully.'
@@ -41,12 +42,12 @@ class MenuDraftController extends Controller
         });
     }
 
-    public function update(MenuRequest $request, $id, BaseStaging $staging)
+    public function update(MenuRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_menu_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_menu_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -63,21 +64,17 @@ class MenuDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'menu_id' => request()->input('menu_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_menu', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_menu', $payload, Menu::class);
 
-            // Clear cache for menu model
-            $menu = Menu::find(request()->input('menu_id'));
-            if ($menu) {
-                CacheService::clearCache($menu);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'Menu committed to master successfully.',

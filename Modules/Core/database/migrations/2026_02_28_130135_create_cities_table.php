@@ -16,22 +16,19 @@ return new class extends Migration
         Schema::createWithTemp('core.city', function (Blueprint $table) {
             $table->string('city_id')->primary();
             $table->string('city_name');
-            $table->remoteForeign('province_id', 'core.province', 'province_id');
+            $table->string('province_id')->nullable()->index();
             $table->baseColumn();
 
         });
 
         Schema::create('history.core_city', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130136_core.procedures_city.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -39,9 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_city_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_city');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_city');
         Schema::dropIfExists('history.core_city');
         Schema::dropIfExists('temporary.core_city');
         Schema::dropIfExists('core.city');

@@ -38,10 +38,13 @@ class User extends Authenticatable
         return UserFactory::new();
     }
 
+    #[\Override]
+
     protected function casts(): array
     {
         return [
             'properties' => 'array',
+            'email_verified_at' => 'datetime',
         ];
     }
 }

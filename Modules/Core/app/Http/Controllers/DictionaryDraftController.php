@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\DictionaryRequest;
 use Modules\Core\Models\Dictionary;
 
 class DictionaryDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -20,10 +21,10 @@ class DictionaryDraftController extends Controller
         });
     }
 
-    public function store(DictionaryRequest $request, BaseStaging $staging)
+    public function store(DictionaryRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_dictionary_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_dictionary_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft Dictionary saved successfully.'
@@ -41,12 +42,12 @@ class DictionaryDraftController extends Controller
         });
     }
 
-    public function update(DictionaryRequest $request, $id, BaseStaging $staging)
+    public function update(DictionaryRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_dictionary_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_dictionary_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -63,21 +64,17 @@ class DictionaryDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'dictionary_id' => request()->input('dictionary_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_dictionary', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_dictionary', $payload, Dictionary::class);
 
-            // Clear cache for dictionary model
-            $dictionary = Dictionary::find(request()->input('dictionary_id'));
-            if ($dictionary) {
-                CacheService::clearCache($dictionary);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'Dictionary committed to master successfully.',

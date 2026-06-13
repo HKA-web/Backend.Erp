@@ -3,14 +3,15 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Http\Requests\DistrictRequest;
 use Modules\Core\Models\District;
 
 class DistrictDraftController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -20,10 +21,10 @@ class DistrictDraftController extends Controller
         });
     }
 
-    public function store(DistrictRequest $request, BaseStaging $staging)
+    public function store(DistrictRequest $request)
     {
-        return $this->erpExecution(function () use ($staging, $request) {
-            $staging->executeStaging('core.procedure_upsert_district_draft', $request->validated());
+        return $this->erpExecution(function () use ($request) {
+            $this->baseService->executeProcedure('core.procedure_upsert_district_draft', $request->validated());
 
             return $this->erpResponse(
                 message: 'Draft District saved successfully.'
@@ -41,12 +42,12 @@ class DistrictDraftController extends Controller
         });
     }
 
-    public function update(DistrictRequest $request, $id, BaseStaging $staging)
+    public function update(DistrictRequest $request, $id)
     {
-        return $this->erpExecution(function () use ($staging, $request, $id) {
+        return $this->erpExecution(function () use ($request, $id) {
             $payload = array_merge($request->validated(), ['temporary_id' => $id]);
 
-            $staging->executeStaging('core.procedure_upsert_district_draft', $payload);
+            $this->baseService->executeProcedure('core.procedure_upsert_district_draft', $payload);
 
             return $this->erpResponse(message: 'Draft updated.');
         });
@@ -63,21 +64,17 @@ class DistrictDraftController extends Controller
         });
     }
 
-    public function commit($id, BaseStaging $staging)
+    public function commit($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
             $payload = [
                 'temporary_id' => $id,
                 'district_id' => request()->input('district_id'),
             ];
 
-            $staging->executeStaging('core.procedure_commit_district', $payload);
+            $this->baseService->executeProcedure('core.procedure_commit_district', $payload, District::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $district = District::find(request()->input('district_id'));
-            if ($district) {
-                CacheService::clearCache($district);
-            }
+                        
 
             return $this->erpResponse(
                 message: 'District committed to master successfully.',

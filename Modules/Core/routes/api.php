@@ -23,180 +23,180 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 
 // Routes for Tenant (Central database - tanpa X-Tenant header)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::prefix('core/tenant')->group(function () {
-        Route::get('/', [TenantController::class, 'index']);
-        Route::get('/{id}', [TenantController::class, 'show']);
+    Route::prefix('core/tenant')->controller(TenantController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
     });
-    Route::prefix('core/domain')->group(function () {
-        Route::get('/', [DomainController::class, 'index']);
-        Route::get('/{id}', [DomainController::class, 'show']);
+    Route::prefix('core/domain')->controller(DomainController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
     });
 });
 
 // Routes for Province (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/province')->group(function () {
-        Route::get('/', [ProvinceController::class, 'index']);
-        Route::get('/{id}', [ProvinceController::class, 'show']);
-        Route::put('/{id}/revise', [ProvinceController::class, 'revise']);
-        Route::delete('/{id}', [ProvinceController::class, 'destroy']);
+    Route::prefix('core/province')->controller(ProvinceController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/province-drafts')->group(function () {
-        Route::get('/', [ProvinceDraftController::class, 'index']);
-        Route::post('/', [ProvinceDraftController::class, 'store']);
-        Route::get('/{id}', [ProvinceDraftController::class, 'show']);
-        Route::put('/{id}', [ProvinceDraftController::class, 'update']);
-        Route::delete('/{id}', [ProvinceDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [ProvinceDraftController::class, 'commit']);
+    Route::prefix('core/province-drafts')->controller(ProvinceDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for City (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/city')->group(function () {
-        Route::get('/', [CityController::class, 'index']);
-        Route::get('/{id}', [CityController::class, 'show']);
-        Route::put('/{id}/revise', [CityController::class, 'revise']);
-        Route::delete('/{id}', [CityController::class, 'destroy']);
+    Route::prefix('core/city')->controller(CityController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/city-drafts')->group(function () {
-        Route::get('/', [CityDraftController::class, 'index']);
-        Route::post('/', [CityDraftController::class, 'store']);
-        Route::get('/{id}', [CityDraftController::class, 'show']);
-        Route::put('/{id}', [CityDraftController::class, 'update']);
-        Route::delete('/{id}', [CityDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [CityDraftController::class, 'commit']);
+    Route::prefix('core/city-drafts')->controller(CityDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for District (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/district')->group(function () {
-        Route::get('/', [DistrictController::class, 'index']);
-        Route::get('/{id}', [DistrictController::class, 'show']);
-        Route::put('/{id}/revise', [DistrictController::class, 'revise']);
-        Route::delete('/{id}', [DistrictController::class, 'destroy']);
+    Route::prefix('core/district')->controller(DistrictController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/district-drafts')->group(function () {
-        Route::get('/', [DistrictDraftController::class, 'index']);
-        Route::post('/', [DistrictDraftController::class, 'store']);
-        Route::get('/{id}', [DistrictDraftController::class, 'show']);
-        Route::put('/{id}', [DistrictDraftController::class, 'update']);
-        Route::delete('/{id}', [DistrictDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [DistrictDraftController::class, 'commit']);
+    Route::prefix('core/district-drafts')->controller(DistrictDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for Village (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/village')->group(function () {
-        Route::get('/', [VillageController::class, 'index']);
-        Route::get('/{id}', [VillageController::class, 'show']);
-        Route::put('/{id}/revise', [VillageController::class, 'revise']);
-        Route::delete('/{id}', [VillageController::class, 'destroy']);
+    Route::prefix('core/village')->controller(VillageController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/village-drafts')->group(function () {
-        Route::get('/', [VillageDraftController::class, 'index']);
-        Route::post('/', [VillageDraftController::class, 'store']);
-        Route::get('/{id}', [VillageDraftController::class, 'show']);
-        Route::put('/{id}', [VillageDraftController::class, 'update']);
-        Route::delete('/{id}', [VillageDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [VillageDraftController::class, 'commit']);
+    Route::prefix('core/village-drafts')->controller(VillageDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for Company (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/company')->group(function () {
-        Route::get('/', [CompanyController::class, 'index']);
-        Route::get('/{id}', [CompanyController::class, 'show']);
-        Route::put('/{id}/revise', [CompanyController::class, 'revise']);
-        Route::delete('/{id}', [CompanyController::class, 'destroy']);
+    Route::prefix('core/company')->controller(CompanyController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/company-drafts')->group(function () {
-        Route::get('/', [CompanyDraftController::class, 'index']);
-        Route::post('/', [CompanyDraftController::class, 'store']);
-        Route::get('/{id}', [CompanyDraftController::class, 'show']);
-        Route::put('/{id}', [CompanyDraftController::class, 'update']);
-        Route::delete('/{id}', [CompanyDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [CompanyDraftController::class, 'commit']);
+    Route::prefix('core/company-drafts')->controller(CompanyDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for Dictionary (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/dictionary')->group(function () {
-        Route::get('/', [DictionaryController::class, 'index']);
-        Route::get('/{id}', [DictionaryController::class, 'show']);
-        Route::put('/{id}/revise', [DictionaryController::class, 'revise']);
-        Route::delete('/{id}', [DictionaryController::class, 'destroy']);
+    Route::prefix('core/dictionary')->controller(DictionaryController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/dictionary-drafts')->group(function () {
-        Route::get('/', [DictionaryDraftController::class, 'index']);
-        Route::post('/', [DictionaryDraftController::class, 'store']);
-        Route::get('/{id}', [DictionaryDraftController::class, 'show']);
-        Route::put('/{id}', [DictionaryDraftController::class, 'update']);
-        Route::delete('/{id}', [DictionaryDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [DictionaryDraftController::class, 'commit']);
+    Route::prefix('core/dictionary-drafts')->controller(DictionaryDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for core/Menu (Client harus kirim header: X-Tenant)
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/menu')->group(function () {
-        Route::get('/', [MenuController::class, 'index']);
-        Route::get('/{id}', [MenuController::class, 'show']);
-        Route::put('/{id}/revise', [MenuController::class, 'revise']);
-        Route::delete('/{id}', [MenuController::class, 'destroy']);
+    Route::prefix('core/menu')->controller(MenuController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/menu-drafts')->group(function () {
-        Route::get('/', [MenuDraftController::class, 'index']);
-        Route::post('/', [MenuDraftController::class, 'store']);
-        Route::get('/{id}', [MenuDraftController::class, 'show']);
-        Route::put('/{id}', [MenuDraftController::class, 'update']);
-        Route::delete('/{id}', [MenuDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [MenuDraftController::class, 'commit']);
+    Route::prefix('core/menu-drafts')->controller(MenuDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });
 
 // Routes for Option (Client harus kirim header: X-Tenant)
 Route::middleware([InitializeTenancyByRequestData::class, 'auth:sanctum'])->prefix('v1')->group(function () {
     // Master Resource
-    Route::prefix('core/option')->group(function () {
-        Route::get('/', [OptionController::class, 'index']);
-        Route::get('/{id}', [OptionController::class, 'show']);
-        Route::put('/{id}/revise', [OptionController::class, 'revise']);
-        Route::delete('/{id}', [OptionController::class, 'destroy']);
+    Route::prefix('core/option')->controller(OptionController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
     });
 
     // Draft Resource
-    Route::prefix('core/option-drafts')->group(function () {
-        Route::get('/', [OptionDraftController::class, 'index']);
-        Route::post('/', [OptionDraftController::class, 'store']);
-        Route::get('/{id}', [OptionDraftController::class, 'show']);
-        Route::put('/{id}', [OptionDraftController::class, 'update']);
-        Route::delete('/{id}', [OptionDraftController::class, 'destroy']);
-        Route::post('/{id}/commit', [OptionDraftController::class, 'commit']);
+    Route::prefix('core/option-drafts')->controller(OptionDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
     });
 });

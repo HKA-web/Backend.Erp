@@ -29,6 +29,16 @@ class Option extends Model
         return OptionFactory::new();
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'user_id');
+    }
+    
     public function executedBy()
     {
         return $this->belongsTo(User::class, 'executed_by', 'user_id');

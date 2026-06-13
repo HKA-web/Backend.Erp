@@ -1,0 +1,134 @@
+-- 1. PROCEDURE UPSERT DRAFT (Menggunakan temporary_id sebagai PK draf)
+DROP PROCEDURE IF EXISTS {{schema}}.procedure_upsert_{{model_lower}}_draft;
+CREATE OR REPLACE PROCEDURE {{schema}}.procedure_upsert_{{model_lower}}_draft(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
+BEGIN
+    -- Jika payload tidak bawa temporary_id, buat baru (Insert draf baru)
+    IF v_temp_id IS NULL THEN
+        v_temp_id := gen_random_uuid()::TEXT;
+    END IF;
+
+    INSERT INTO {{temp_table_name}} (
+        temporary_id,
+        session_id,
+        master_id,
+        temporary_option,
+        {{pk_name}},
+        {{model_lower}}_name,
+        is_removed
+    ) VALUES (
+        v_temp_id,
+        p_session_id,
+        p_payload ->> 'master_id',
+        COALESCE(p_payload ->> 'temporary_option', 'I'),
+        p_payload ->> '{{pk_name}}',
+        p_payload ->> '{{model_lower}}_name',
+        COALESCE((p_payload ->> 'is_removed')::BOOLEAN, FALSE)
+    ) ON CONFLICT (temporary_id) DO UPDATE SET
+        {{model_lower}}_name = EXCLUDED.{{model_lower}}_name,
+        is_removed = EXCLUDED.is_removed,
+        temporary_option = EXCLUDED.temporary_option,
+        updated_at = NOW();
+END;
+$$;
+
+-- 2. PROCEDURE REVISE (Check-out dari Master ke Temporary)
+DROP PROCEDURE IF EXISTS {{schema}}.procedure_revise_{{model_lower}};
+CREATE OR REPLACE PROCEDURE {{schema}}.procedure_revise_{{model_lower}}(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_master_id TEXT := p_payload ->> '{{pk_name}}';
+BEGIN
+    -- Validasi Locking (Logical): Jangan biarkan user lain edit data yang sama di temporary
+    IF EXISTS (SELECT 1 FROM {{temp_table_name}} WHERE master_id = v_master_id AND session_id <> p_session_id) THEN
+        RAISE EXCEPTION 'Data ID % is currently being edited by another session.', v_master_id;
+    END IF;
+
+    INSERT INTO {{temp_table_name}} (
+        temporary_id,
+        session_id,
+        master_id,
+        temporary_option,
+        {{pk_name}},
+        {{model_lower}}_name,
+        is_removed
+    )
+    SELECT
+        gen_random_uuid(),
+        p_session_id,
+        {{pk_name}},
+        COALESCE(p_payload ->> 'temporary_option', 'U'),
+        {{pk_name}},
+        {{model_lower}}_name,
+        COALESCE((p_payload ->> 'is_removed')::boolean, false)
+    FROM {{full_table_name}} WHERE {{pk_name}} = v_master_id
+    ON CONFLICT (master_id, session_id) DO NOTHING;
+END;
+$$;
+
+-- 3. PROCEDURE COMMIT (Finalisasi ke Master berdasarkan temporary_option)
+DROP PROCEDURE IF EXISTS {{schema}}.procedure_commit_{{model_lower}};
+CREATE OR REPLACE PROCEDURE {{schema}}.procedure_commit_{{model_lower}}(
+    p_session_id VARCHAR,
+    p_payload JSONB
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
+    v_rec RECORD;
+    v_old_data JSONB;
+    v_new_data JSONB;
+BEGIN
+    -- Ambil data dari temporary
+    SELECT * INTO v_rec FROM {{temp_table_name}}
+    WHERE temporary_id = v_temp_id AND session_id = p_session_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Draft record not found.';
+    END IF;
+
+    -- A. Snapshot Data Lama (Jika Update/Delete)
+    IF v_rec.master_id IS NOT NULL THEN
+        SELECT to_jsonb(t) INTO v_old_data FROM {{full_table_name}} t WHERE t.{{pk_name}} = v_rec.master_id;
+    END IF;
+
+    -- B. Eksekusi ke Master berdasarkan temporary_option
+    IF v_rec.temporary_option = 'D' THEN
+        DELETE FROM {{full_table_name}} WHERE {{pk_name}} = v_rec.master_id;
+    ELSE
+        -- INSERT atau UPDATE
+        INSERT INTO {{full_table_name}} ({{pk_name}}, {{model_lower}}_name, status, is_removed, created_at, updated_at)
+        VALUES (v_rec.{{pk_name}}, v_rec.{{model_lower}}_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        ON CONFLICT ({{pk_name}}) DO UPDATE SET
+            {{model_lower}}_name = EXCLUDED.{{model_lower}}_name,
+            is_removed = EXCLUDED.is_removed,
+            status = 'POSTED',
+            updated_at = NOW();
+    END IF;
+
+    -- C. History Logging
+    SELECT to_jsonb(t) INTO v_new_data FROM {{full_table_name}} t WHERE t.{{pk_name}} = v_rec.{{pk_name}};
+
+    INSERT INTO history.{{schema}}_{{model_lower}} (history_id, executed_by, action, old_data, new_data, executed_at)
+    VALUES (
+        gen_random_uuid(),
+        (p_payload ->> 'executed_by')::UUID,
+        CASE
+            WHEN v_rec.temporary_option = 'D' THEN 'DELETE'
+            WHEN v_old_data IS NULL THEN 'INSERT'
+            ELSE 'UPDATE'
+        END,
+        v_old_data,
+        v_new_data,
+        NOW()
+    );
+
+    -- D. Cleanup Temporary
+    DELETE FROM {{temp_table_name}} WHERE temporary_id = v_temp_id;
+END;
+$$;

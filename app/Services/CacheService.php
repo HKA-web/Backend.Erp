@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class CacheService
+final readonly class CacheService
 {
     /**
      * Get cached data with tags
@@ -64,7 +64,7 @@ class CacheService
     public static function modelTags(string $schema, string $model, ?string $id = null): array
     {
         $fullModel = $schema ? "{$schema}.{$model}" : $model;
-        $tags = [$fullModel, 'all'];
+        $tags = [$fullModel];
 
         if ($id) {
             $tags[] = "{$fullModel}:{$id}";
@@ -129,7 +129,7 @@ class CacheService
     public static function clearDraft(string $schema, string $model): void
     {
         $fullModel = $schema ? "{$schema}.{$model}" : $model;
-        $tags = ["{$fullModel}:draft", 'all'];
+        $tags = ["{$fullModel}:draft"];
         self::clearTags($tags);
     }
 
@@ -155,8 +155,7 @@ class CacheService
             self::clearTags([
                 $baseTag,
                 "{$baseTag}:{$id}",
-                "{$baseTag}:list",
-                'all'
+                "{$baseTag}:list"
             ]);
         } else {
             $tenantPrefix = $tenantId ? "tenant.{$tenantId}" : null;
@@ -164,14 +163,13 @@ class CacheService
                 self::clearTags([
                     "{$tenantPrefix}.{$baseTag}",
                     "{$tenantPrefix}.{$baseTag}:{$id}",
-                    "{$tenantPrefix}.{$baseTag}:list",
-                    'all'
+                    "{$tenantPrefix}.{$baseTag}:list"
                 ]);
             }
         }
 
         // Clear related models
-        $relatedTags = self::scanRelations($model, $tenantId, $isCentral);
+        $relatedTags = self::getRelatedTags($model, $tenantId, $isCentral);
         if ($relatedTags) {
             self::clearTags($relatedTags);
         }
@@ -211,6 +209,10 @@ class CacheService
      */
     protected static function isCentralModel($model): bool
     {
+        if (method_exists($model, 'getConnectionName')) {
+            return $model->getConnectionName() !== 'tenant';
+        }
+
         static $centralModels = [
             \App\Models\Tenant::class,
             \Stancl\Tenancy\Database\Models\Domain::class,
@@ -220,65 +222,47 @@ class CacheService
     }
 
     /**
-     * Scan model relations otomatis dengan tenant awareness
+     * Get tags for related models based on $clearsCache property on the model.
+     * Extremely fast compared to reflection.
      */
-    protected static function scanRelations($model, ?string $tenantId, bool $isCentral): array
+    protected static function getRelatedTags($model, ?string $tenantId, bool $isCentral): array
     {
         $tags = [];
 
-        try {
-            $reflection = new \ReflectionClass($model);
+        // Modern approach: Model mendefinisikan relasi apa saja yang ingin di-clear cache-nya
+        // Contoh di Model: public array $clearsCache = ['roles', 'permissions'];
+        $relationsToClear = $model->clearsCache ?? [];
 
-            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                if (!self::isRelationMethod($method, $model)) {
+        if (empty($relationsToClear) || !is_array($relationsToClear)) {
+            return $tags;
+        }
+
+        foreach ($relationsToClear as $method) {
+            try {
+                if (!method_exists($model, $method)) {
                     continue;
                 }
 
-                try {
-                    $relation = $model->{$method->getName()}();
-                    if (!method_exists($relation, 'getRelated')) {
-                        continue;
-                    }
-
-                    $relatedModel = $relation->getRelated();
-                    $relatedSchema = method_exists($relatedModel, 'getSchema') ? $relatedModel->getSchema() : null;
-                    $relatedName = strtolower(class_basename($relatedModel));
-                    $relatedIsCentral = self::isCentralModel($relatedModel);
-
-                    $tag = self::buildTag($relatedSchema, $relatedName, $tenantId, $relatedIsCentral);
-                    if ($tag && !in_array($tag, $tags, true)) {
-                        $tags[] = $tag;
-                    }
-                } catch (\Throwable $e) {
-                    Log::debug("Skip relation", ['method' => $method->getName(), 'error' => $e->getMessage()]);
+                $relation = $model->{$method}();
+                if (!method_exists($relation, 'getRelated')) {
+                    continue;
                 }
+
+                $relatedModel = $relation->getRelated();
+                $relatedSchema = method_exists($relatedModel, 'getSchema') ? $relatedModel->getSchema() : null;
+                $relatedName = strtolower(class_basename($relatedModel));
+                $relatedIsCentral = self::isCentralModel($relatedModel);
+
+                $tag = self::buildTag($relatedSchema, $relatedName, $tenantId, $relatedIsCentral);
+                if ($tag && !in_array($tag, $tags, true)) {
+                    $tags[] = $tag;
+                }
+            } catch (\Throwable $e) {
+                Log::debug("Skip relation cache clear", ['method' => $method, 'error' => $e->getMessage()]);
             }
-        } catch (\Throwable $e) {
-            Log::debug("Scan relations failed", ['error' => $e->getMessage()]);
         }
 
         return $tags;
-    }
-
-    /**
-     * Check apakah method adalah relation
-     */
-    protected static function isRelationMethod(\ReflectionMethod $method, $model): bool
-    {
-        if ($method->isPrivate() || $method->isProtected() || str_starts_with($method->getName(), '_')) {
-            return false;
-        }
-
-        if ($method->getDeclaringClass()->getName() !== get_class($model)) {
-            return false;
-        }
-
-        try {
-            $result = $model->{$method->getName()}();
-            return is_object($result) && method_exists($result, 'getRelated');
-        } catch (\Throwable $e) {
-            return false;
-        }
     }
 
     /**

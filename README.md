@@ -8,19 +8,7 @@
 
 ---
 
-## 📚 Daftar Isi
 
-1. [Apa Ini](#apa-ini)
-2. [Mulai Cepat](#mulai-cepat)
-3. [Instalasi Lengkap](#instalasi-lengkap)
-4. [API Documentation](#api-documentation)
-5. [Laravel Scout - Full-Text Search](#laravel-scout---full-text-search)
-6. [Multi-Tenancy](#multi-tenancy)
-7. [Struktur Project](#struktur-project)
-8. [Konsep Utama](#konsep-utama)
-9. [FAQ](#faq)
-
----
 
 ## 🎯 Apa Ini?
 
@@ -41,95 +29,49 @@ ERP Backend adalah sistem modular berbasis **Laravel 13 + PostgreSQL** yang dira
 
 ---
 
-## 🚀 Mulai Cepat
+## 🚀 Panduan Instalasi
 
-### Prasyarat
+Berikut adalah satu-satunya panduan instalasi yang Anda butuhkan untuk menjalankan *project* ini dari nol. 
 
+### 1. Prasyarat
 - PHP 8.3+
 - Composer
 - PostgreSQL
 - Node.js (opsional)
 
-### 3 Langkah Mulai
+### 2. Instalasi Cepat (Terminal)
+Jika Anda baru melakukan *clone* atau *setup server*, eksekusi perintah berikut secara berurutan:
 
 ```bash
-# 1. Install dependency
+# 1. Install dependency & setup environment
 composer install
-
-# 2. Setup environment
 cp .env.example .env
 php artisan key:generate
 
-# 3. Setup database
-php artisan migrate
-php artisan module:seed Authentication
-php artisan module:seed Core
+# 2. Setup Database Pusat (Ini sekaligus akan membuat 1 Tenant awal secara otomatis via Seeder)
+php artisan migrate:fresh --seed
 
-# 4. Jalankan server
+# 3. Suntikkan Stored Procedure ke Database Pusat
+php artisan erp:procedure-compile
+
+# 4. Suntikkan Stored Procedure ke seluruh Tenant (termasuk tenant awal)
+php artisan erp:tenant:procedure-compile
+
+# 5. Isi data default (seeder) ke seluruh Tenant
+php artisan tenants:seed
+
+# 6. Jalankan Server
 php artisan serve
 ```
-
 Server berjalan di: `http://localhost:8000`
-
 API Docs di: `http://localhost:8000/api/docs`
 
----
-
-## 📖 Instalasi Lengkap
-
-### 1. Clone Project
-
-```bash
-git clone <repository-url>
-cd Backend.Erp
-```
-
-### 2. Install Dependency
-
-```bash
-composer install
-```
-
-### 3. Setup Environment
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-### 4. Setup Database
-
-Edit file `.env` dan atur koneksi PostgreSQL:
-
-```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=erp
-DB_USERNAME=postgres
-DB_PASSWORD=password
-```
-
-### 5. Migrasi Database
-
-```bash
-php artisan migrate
-```
-
-### 6. Seed Data
-
-```bash
-php artisan module:seed Authentication
-php artisan module:seed Core
-```
-
-### 7. Jalankan Server
-
-```bash
-php artisan serve
-```
-
-Server berjalan di: `http://localhost:8000`
+> 💡 **Auto-Setup Klien Baru via Aplikasi:** 
+> Jika sistem Anda sudah berjalan dan ada *Tenant* (perusahaan) baru yang mendaftar via Web/Aplikasi, Anda tidak perlu lagi repot menjalankan terminal! Cukup masukkan kode ini ke dalam *Controller* pendaftaran Anda agar sistem bekerja otomatis:
+> ```php
+> \Illuminate\Support\Facades\Artisan::call('erp:tenant:procedure-compile', ['--tenant' => $tenant->id]);
+> \Illuminate\Support\Facades\Artisan::call('tenants:seed', ['--tenant' => $tenant->id]);
+> ```
 
 ---
 
@@ -408,7 +350,7 @@ Modules/Core/
 │   └── Models/               # Eloquent Models
 ├── database/
 │   ├── migrations/           # Database migrations
-│   │   ├── central/          # Central database migrations
+│   │   ├── /                 # Central database migrations
 │   │   └── tenant/           # Tenant database migrations
 │   └── seeders/              # Database seeders
 ├── routes/
@@ -469,6 +411,8 @@ Business logic diletakkan di database (stored procedure) untuk:
 - Bisa diubah tanpa deploy ulang
 - Lebih aman (logic di server database)
 
+
+
 ---
 
 ## ❓ FAQ
@@ -477,6 +421,19 @@ Business logic diletakkan di database (stored procedure) untuk:
 
 ```bash
 php artisan erp:make-module {nama_module}
+```
+
+### Q: Bagaimana cara manual compile procedure SQL?
+
+```bash
+# Untuk Central/Pusat
+php artisan erp:procedure-compile
+
+# Untuk Semua Tenant
+php artisan erp:tenant:procedure-compile
+
+# Untuk Spesifik Tenant
+php artisan erp:tenant:procedure-compile --tenant={id}
 ```
 
 ### Q: Bagaimana cara membuat model baru?

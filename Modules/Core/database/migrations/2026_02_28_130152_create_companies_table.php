@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::createWithTemp('core.company', function (Blueprint $table) {
             $table->string('company_id')->primary();
             $table->string('tenant_id')->nullable(); // Reference ke tabel tenants (Stancl Tenancy)
-            $table->remoteForeign('province_id', 'core.province', 'province_id');
-            $table->remoteForeign('city_id', 'core.city', 'city_id');
-            $table->remoteForeign('district_id', 'core.district', 'district_id');
-            $table->remoteForeign('village_id', 'core.village', 'village_id');
+            $table->string('province_id')->nullable()->index();
+            $table->string('city_id')->nullable()->index();
+            $table->string('district_id')->nullable()->index();
+            $table->string('village_id')->nullable()->index();
             $table->string('company_name');
             $table->string('email')->unique();
             $table->string('phone');
@@ -31,15 +31,12 @@ return new class extends Migration
 
         Schema::create('history.core_company', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130152_core.procedures_company.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -47,9 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_company_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_company');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_company');
         Schema::dropIfExists('history.core_company');
         Schema::dropIfExists('temporary.core_company');
         Schema::dropIfExists('core.company');

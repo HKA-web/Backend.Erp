@@ -16,22 +16,19 @@ return new class extends Migration
         Schema::createWithTemp('core.village', function (Blueprint $table) {
             $table->string('village_id')->primary();
             $table->string('village_name');
-            $table->remoteForeign('district_id', 'core.district', 'district_id');
+            $table->string('district_id')->nullable()->index();
             $table->baseColumn();
 
         });
 
         Schema::create('history.core_village', function (Blueprint $table) {
             $table->string('history_id')->primary();
-            $table->remoteForeign('executed_by', 'authentication.user', 'user_id');
+            $table->string('executed_by')->nullable()->index();
             $table->string('action');
             $table->jsonb('old_data')->nullable();
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-
-        $sql = file_get_contents(__DIR__.'/sql/2026_02_28_130148_core.procedures_village.sql');
-        DB::unprepared($sql);
     }
 
     /**
@@ -39,9 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_upsert_village_draft');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_revise_village');
-        DB::unprepared('DROP PROCEDURE IF EXISTS core.procedure_commit_village');
         Schema::dropIfExists('history.core_village');
         Schema::dropIfExists('temporary.core_village');
         Schema::dropIfExists('core.village');

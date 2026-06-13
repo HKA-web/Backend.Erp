@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\Company;
 
 class CompanyController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class CompanyController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_company', [
+            $this->baseService->executeProcedure('core.procedure_revise_company', [
                 'company_id' => $id,
-            ]);
+            ], Company::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $company = Company::find($id);
-            if ($company) {
-                CacheService::clearCache($company);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Company {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class CompanyController extends Controller
         }, 'Failed to initiate revision for Company.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(Company::class, $id, 'core.procedure_revise_company');
+            $this->baseService->requestDelete(Company::class, $id, 'core.procedure_revise_company');
 
-            // Clear cache - auto scan relations & tenant aware
-            $company = Company::find($id);
-            if ($company) {
-                CacheService::clearCache($company);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for Company {$id} processed according to model policy."

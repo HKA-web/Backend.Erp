@@ -3,12 +3,13 @@
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BaseStaging;
-use App\Services\CacheService;
+use App\Services\BaseService;
 use Modules\Core\Models\Province;
 
 class ProvinceController extends Controller
 {
+    public function __construct(protected readonly BaseService $baseService) {}
+
     public function index()
     {
         return $this->erpExecution(function () {
@@ -25,19 +26,15 @@ class ProvinceController extends Controller
         });
     }
 
-    public function revise($id, BaseStaging $staging)
+    public function revise($id)
     {
-        return $this->erpExecution(function () use ($staging, $id) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->executeStaging('core.procedure_revise_province', [
+            $this->baseService->executeProcedure('core.procedure_revise_province', [
                 'province_id' => $id,
-            ]);
+            ], Province::class);
 
-            // Clear cache - auto scan relations & tenant aware
-            $province = Province::find($id);
-            if ($province) {
-                CacheService::clearCache($province);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Province {$id} has been moved to drafts for revision."
@@ -45,17 +42,13 @@ class ProvinceController extends Controller
         }, 'Failed to initiate revision for Province.');
     }
 
-    public function destroy($id, BaseStaging $staging)
+    public function destroy($id)
     {
-        return $this->erpExecution(function () use ($id, $staging) {
+        return $this->erpExecution(function () use ($id) {
 
-            $staging->requestDelete(Province::class, $id, 'core.procedure_revise_province');
+            $this->baseService->requestDelete(Province::class, $id, 'core.procedure_revise_province');
 
-            // Clear cache - auto scan relations & tenant aware
-            $province = Province::find($id);
-            if ($province) {
-                CacheService::clearCache($province);
-            }
+                        
 
             return $this->erpResponse(
                 message: "Delete request for Province {$id} processed according to model policy."

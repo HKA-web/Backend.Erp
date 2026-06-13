@@ -18,8 +18,15 @@ class {{model}} extends Model
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel, SoftDelete;
 
-    protected $connection = 'pgsql';
+    public array $clearsCache = ['createdBy', 'updatedBy'];
+
     protected $guard_name = 'api';
+
+    #[Override]
+    protected function casts(): array
+    {
+        return [];
+    }
 
     protected static function newFactory()
     {
