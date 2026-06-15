@@ -85,19 +85,20 @@ Dokumentasi API dibuat otomatis menggunakan Swagger UI. Ini memudahkan developer
 - Mencoba API langsung dari browser
 - Memahami parameter yang dibutuhkan
 - Melihat contoh response
+- Memahami contoh response
 
 ### Generate Documentation
 
 #### Generate Semua Module
 
 ```bash
-php artisan api:docs:generate --all
+php artisan erp:api-docs --all
 ```
 
-#### Generate Module Tertentu
-
+#### Generasi untuk Modul Spesifik
+Jika Anda hanya ingin memperbarui/men-generate ulang dokumentasi untuk 1 modul saja (biar cepat):
 ```bash
-php artisan api:docs:generate --module=Core
+php artisan erp:api-docs --module=Core
 ```
 
 ### Akses Swagger UI

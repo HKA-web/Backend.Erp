@@ -202,6 +202,24 @@ Route::middleware([InitializeTenancyByRequestData::class, 'auth:sanctum'])->pref
         Route::delete('/{id}', 'destroy');
         Route::post('/{id}/commit', 'commit');
     });
+
+    // Master Resource for Tenant Sequence
+    Route::prefix('core/tenant-sequence')->controller(SequenceController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
+    });
+
+    // Draft Resource for Tenant Sequence
+    Route::prefix('core/tenant-sequence-drafts')->controller(SequenceDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
+    });
 });
 
 // Routes for Core/Sequence

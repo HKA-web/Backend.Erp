@@ -84,6 +84,7 @@ v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
 SELECT * INTO v_rec FROM temporary.core_company
@@ -101,9 +102,17 @@ END IF;
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
 DELETE FROM core.company WHERE company_id = v_rec.master_id;
-ELSE
+    v_final_pk := v_rec.master_id;
+    ELSE
+        v_final_pk := v_rec.company_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('COMPANY');
+        END IF;
+
+
         INSERT INTO core.company (company_id, company_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.company_id, v_rec.company_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.company_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (company_id) DO UPDATE SET
     company_name = EXCLUDED.company_name,
                                         is_removed = EXCLUDED.is_removed,
@@ -113,7 +122,7 @@ END IF;
 
     -- C. Snapshot Baru & History
     IF v_rec.temporary_option <> 'D' THEN
-SELECT to_jsonb(t) INTO v_new_data FROM core.company t WHERE t.company_id = v_rec.company_id;
+SELECT to_jsonb(t) INTO v_new_data FROM core.company t WHERE t.company_id = v_final_pk;
 END IF;
 
 INSERT INTO history.core_company (history_id, executed_by, action, old_data, new_data, executed_at)

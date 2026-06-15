@@ -2,7 +2,6 @@
 
 namespace Modules\Core\Models;
 
-use App\Traits\BaseModel;
 use App\Traits\SerializableDate;
 use App\Traits\SoftDelete;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -16,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[Table(name: 'core.sequence', key: 'sequence_id', keyType: 'string', incrementing: false)]
 class Sequence extends Model
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel, SoftDelete;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, SoftDelete;
 
     public array $clearsCache = ['createdBy', 'updatedBy'];
 

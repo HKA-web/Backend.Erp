@@ -31,10 +31,15 @@ class SequenceRequest extends FormRequest
         $isPost = $this->isMethod('post');
 
         return [
-            'sequence_id'   => $isPost ? 'required|string' : 'nullable|string',
-            'sequence_name' => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
+            'sequence_id'    => $isPost ? 'required|string' : 'nullable|string',
+            'sequence_name'  => $isPost ? 'required|string|max:255' : 'nullable|string|max:255',
+            'prefix'         => 'nullable|string|max:255',
+            'suffix'         => 'nullable|string|max:255',
+            'padding'        => 'nullable|integer|min:1|max:10',
+            'current_number' => 'nullable|integer|min:0',
+            'reset_type'     => 'nullable|string|in:NONE,YEARLY,MONTHLY,DAILY',
             // Kita tetap jaga is_removed untuk soft-delete logic di level draft
-            'is_removed'           => 'nullable|boolean',
+            'is_removed'     => 'nullable|boolean',
         ];
     }
 

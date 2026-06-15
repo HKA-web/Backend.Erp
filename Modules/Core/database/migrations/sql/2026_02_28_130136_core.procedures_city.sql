@@ -91,6 +91,7 @@ v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data draf City
 SELECT * INTO v_rec FROM temporary.core_city
@@ -108,9 +109,17 @@ END IF;
     -- B. Eksekusi ke Master
     IF v_rec.temporary_option = 'D' THEN
 DELETE FROM core.city WHERE city_id = v_rec.master_id;
-ELSE
+    v_final_pk := v_rec.master_id;
+    ELSE
+        v_final_pk := v_rec.city_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('CITY');
+        END IF;
+
+
         INSERT INTO core.city (city_id, province_id, city_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.city_id, v_rec.province_id, v_rec.city_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.province_id, v_rec.city_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (city_id) DO UPDATE SET
     province_id = EXCLUDED.province_id,
                                      city_name = EXCLUDED.city_name,
@@ -121,7 +130,7 @@ END IF;
 
     -- C. Snapshot Baru & History
     IF v_rec.temporary_option <> 'D' THEN
-SELECT to_jsonb(t) INTO v_new_data FROM core.city t WHERE t.city_id = v_rec.city_id;
+SELECT to_jsonb(t) INTO v_new_data FROM core.city t WHERE t.city_id = v_final_pk;
 END IF;
 
 INSERT INTO history.core_city (history_id, executed_by, action, old_data, new_data, executed_at)

@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use App\Services\OpenApiGeneratorService;
 use Illuminate\Console\Command;
 
-class GenerateApiDocs extends Command
+class ErpApiCommand extends Command
 {
-    protected $signature = 'api:docs:generate 
+    protected $signature = 'erp:api-docs 
                             {--module= : Generate docs for specific module}
                             {--all : Generate docs for all modules}';
 

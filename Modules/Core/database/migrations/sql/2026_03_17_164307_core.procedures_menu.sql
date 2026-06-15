@@ -83,6 +83,7 @@ DECLARE
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
     SELECT * INTO v_rec FROM temporary.core_menu
@@ -100,10 +101,18 @@ BEGIN
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
         DELETE FROM core.menu WHERE menu_id = v_rec.master_id;
+        v_final_pk := v_rec.master_id;
     ELSE
+        v_final_pk := v_rec.menu_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('MENU');
+        END IF;
+
+
         -- INSERT atau UPDATE
         INSERT INTO core.menu (menu_id, menu_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.menu_id, v_rec.menu_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.menu_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (menu_id) DO UPDATE SET
             menu_name = EXCLUDED.menu_name,
             is_removed = EXCLUDED.is_removed,
@@ -112,7 +121,7 @@ BEGIN
     END IF;
 
     -- C. History Logging
-    SELECT to_jsonb(t) INTO v_new_data FROM core.menu t WHERE t.menu_id = v_rec.menu_id;
+    SELECT to_jsonb(t) INTO v_new_data FROM core.menu t WHERE t.menu_id = v_final_pk;
 
     INSERT INTO history.core_menu (history_id, executed_by, action, old_data, new_data, executed_at)
     VALUES (

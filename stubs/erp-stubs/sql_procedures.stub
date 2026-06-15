@@ -83,6 +83,7 @@ DECLARE
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
     SELECT * INTO v_rec FROM {{temp_table_name}}
@@ -100,10 +101,18 @@ BEGIN
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
         DELETE FROM {{full_table_name}} WHERE {{pk_name}} = v_rec.master_id;
+        v_final_pk := v_rec.master_id;
     ELSE
+        v_final_pk := v_rec.{{pk_name}};
+
+        -- Generate penomoran otomatis jika ini data baru dan PK kosong
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence(UPPER('{{model}}'));
+        END IF;
+
         -- INSERT atau UPDATE
         INSERT INTO {{full_table_name}} ({{pk_name}}, {{model_lower}}_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.{{pk_name}}, v_rec.{{model_lower}}_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.{{model_lower}}_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT ({{pk_name}}) DO UPDATE SET
             {{model_lower}}_name = EXCLUDED.{{model_lower}}_name,
             is_removed = EXCLUDED.is_removed,
@@ -112,12 +121,12 @@ BEGIN
     END IF;
 
     -- C. History Logging
-    SELECT to_jsonb(t) INTO v_new_data FROM {{full_table_name}} t WHERE t.{{pk_name}} = v_rec.{{pk_name}};
+    SELECT to_jsonb(t) INTO v_new_data FROM {{full_table_name}} t WHERE t.{{pk_name}} = v_final_pk;
 
     INSERT INTO history.{{schema}}_{{model_lower}} (history_id, executed_by, action, old_data, new_data, executed_at)
     VALUES (
         gen_random_uuid(),
-        (p_payload ->> 'executed_by')::UUID,
+        (p_payload ->> 'executed_by'),
         CASE
             WHEN v_rec.temporary_option = 'D' THEN 'DELETE'
             WHEN v_old_data IS NULL THEN 'INSERT'

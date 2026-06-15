@@ -20,7 +20,7 @@ class SequenceFactory extends Factory
             [
                 'sequence_id' => \Illuminate\Support\Str::uuid(),
                 'prefix' => "{$modelUpper}-{YYYY}{MM}-",
-                'suffix' => "-{$moduleUpper}",
+                'suffix' => "{$moduleUpper}",
                 'padding' => 4,
                 'current_number' => 0,
                 'reset_type' => 'MONTHLY',
@@ -29,7 +29,7 @@ class SequenceFactory extends Factory
         );
 
         return [
-            'sequence_id'   => \Illuminate\Support\Str::uuid(),
+            'sequence_id'   => Str::uuid(),
             'sequence_name' => fake()->name(),
         ];
     }

@@ -91,6 +91,7 @@ v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
 SELECT * INTO v_rec FROM temporary.core_village
@@ -108,9 +109,17 @@ END IF;
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
 DELETE FROM core.village WHERE village_id = v_rec.master_id;
-ELSE
+    v_final_pk := v_rec.master_id;
+    ELSE
+        v_final_pk := v_rec.village_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('VILLAGE');
+        END IF;
+
+
         INSERT INTO core.village (village_id, district_id, village_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.village_id, v_rec.district_id, v_rec.village_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.district_id, v_rec.village_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (village_id) DO UPDATE SET
     district_id = EXCLUDED.district_id,
                                         village_name = EXCLUDED.village_name,
@@ -121,7 +130,7 @@ END IF;
 
     -- C. Snapshot Baru & History
     IF v_rec.temporary_option <> 'D' THEN
-SELECT to_jsonb(t) INTO v_new_data FROM core.village t WHERE t.village_id = v_rec.village_id;
+SELECT to_jsonb(t) INTO v_new_data FROM core.village t WHERE t.village_id = v_final_pk;
 END IF;
 
 INSERT INTO history.core_village (history_id, executed_by, action, old_data, new_data, executed_at)

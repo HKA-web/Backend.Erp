@@ -279,7 +279,6 @@ trait ViewSets
                 ];
             };
 
-            // Always use tags for cache, add 'all' tag for global cache clearing
             $usedTags = ! empty($tags) ? array_merge($tags, ['all']) : ['all'];
             
             if ($cache) {
@@ -291,7 +290,6 @@ trait ViewSets
             return response()->json($resultData, 200);
         }
 
-        // For non-query responses (messages, etc), clear cache by tags if provided
         if (! empty($tags)) {
             CacheService::clearTags(array_merge($tags, ['all']));
         }

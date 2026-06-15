@@ -21,7 +21,7 @@ class DistrictFactory extends Factory
             [
                 'sequence_id' => \Illuminate\Support\Str::uuid(),
                 'prefix' => "{$modelUpper}-{YYYY}{MM}-",
-                'suffix' => "-{$moduleUpper}",
+                'suffix' => "{$moduleUpper}",
                 'padding' => 4,
                 'current_number' => 0,
                 'reset_type' => 'MONTHLY',

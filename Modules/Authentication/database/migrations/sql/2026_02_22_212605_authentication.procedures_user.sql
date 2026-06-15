@@ -83,6 +83,7 @@ v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
 SELECT * INTO v_rec FROM temporary.authentication_user
@@ -100,10 +101,18 @@ END IF;
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
 DELETE FROM authentication.user WHERE user_id = v_rec.master_id;
-ELSE
+    v_final_pk := v_rec.master_id;
+    ELSE
+        v_final_pk := v_rec.user_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('USER');
+        END IF;
+
+
         -- INSERT atau UPDATE
         INSERT INTO authentication.user (user_id, user_name, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.user_id, v_rec.user_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.user_name, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (user_id) DO UPDATE SET
     user_name = EXCLUDED.user_name,
                                      is_removed = EXCLUDED.is_removed,
@@ -112,7 +121,7 @@ ELSE
 END IF;
 
     -- C. History Logging
-SELECT to_jsonb(t) INTO v_new_data FROM authentication.user t WHERE t.user_id = v_rec.user_id;
+SELECT to_jsonb(t) INTO v_new_data FROM authentication.user t WHERE t.user_id = v_final_pk;
 
 INSERT INTO history.authentication_user (history_id, executed_by, action, old_data, new_data, executed_at)
 VALUES (

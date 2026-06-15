@@ -94,6 +94,7 @@ v_temp_id VARCHAR := (p_payload ->> 'temporary_id');
     v_rec RECORD;
     v_old_data JSONB;
     v_new_data JSONB;
+    v_final_pk VARCHAR;
 BEGIN
     -- Ambil data dari temporary
 SELECT * INTO v_rec FROM temporary.core_option
@@ -111,10 +112,18 @@ END IF;
     -- B. Eksekusi ke Master berdasarkan temporary_option
     IF v_rec.temporary_option = 'D' THEN
 DELETE FROM core.option WHERE option_id = v_rec.master_id;
-ELSE
+    v_final_pk := v_rec.master_id;
+    ELSE
+        v_final_pk := v_rec.option_id;
+
+        IF v_old_data IS NULL AND (v_final_pk IS NULL OR v_final_pk = '') THEN
+            v_final_pk := core.get_next_sequence('OPTION');
+        END IF;
+
+
         -- INSERT atau UPDATE menggunakan UPSERT ke core.option
         INSERT INTO core.option (option_id, option_name, key, value, status, is_removed, created_at, updated_at)
-        VALUES (v_rec.option_id, v_rec.option_name, v_rec.key, v_rec.value, 'POSTED', v_rec.is_removed, NOW(), NOW())
+        VALUES (v_final_pk, v_rec.option_name, v_rec.key, v_rec.value, 'POSTED', v_rec.is_removed, NOW(), NOW())
         ON CONFLICT (option_id) DO UPDATE SET
     option_name = EXCLUDED.option_name,
     key = EXCLUDED.key,
@@ -127,7 +136,7 @@ END IF;
     -- C. Snapshot Baru & History
     -- Jika operasi adalah Delete, new_data akan null
     IF v_rec.temporary_option <> 'D' THEN
-SELECT to_jsonb(t) INTO v_new_data FROM core.option t WHERE t.option_id = v_rec.option_id;
+SELECT to_jsonb(t) INTO v_new_data FROM core.option t WHERE t.option_id = v_final_pk;
 END IF;
 
 INSERT INTO history.core_option (history_id, executed_by, action, old_data, new_data, executed_at)
