@@ -10,20 +10,20 @@ class TenantMigrationServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Auto-scan semua module untuk tenant migrations
-        $tenantPaths = [database_path('migrations/tenant')];
+        $tenantPaths = [database_path('migrations/Tenant')];
         $tenantSeeders = [];
         
         foreach (glob(base_path('Modules/*')) as $modulePath) {
             $moduleName = basename($modulePath);
             
             // Tenant migrations
-            $tenantMigrationPath = $modulePath . '/database/migrations/tenant';
+            $tenantMigrationPath = $modulePath . '/database/migrations/Tenant';
             if (is_dir($tenantMigrationPath)) {
                 $tenantPaths[] = $tenantMigrationPath;
             }
             
             // Tenant seeders
-            $seederClass = "Modules\\{$moduleName}\\Database\\Seeders\\TenantDatabaseSeeder";
+            $seederClass = "Modules\\{$moduleName}\\Database\\Seeders\\TenantSeeder";
             if (class_exists($seederClass)) {
                 $tenantSeeders[] = $seederClass;
             }

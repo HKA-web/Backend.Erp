@@ -291,7 +291,7 @@ php artisan tenants:seed --tenants={tenant_id}
 
 #### Migration Tenant
 
-Diletakkan di: `Modules/{module}/database/migrations/tenant/`
+Diletakkan di: `Modules/{module}/database/migrations/Tenant/`
 
 ```php
 DB::statement('CREATE SCHEMA IF NOT EXISTS core');
@@ -303,23 +303,42 @@ Schema::create('core.province', function (Blueprint $table) {
 });
 ```
 
-#### Seeder Tenant
+#### Factory Tenant (Seeder)
 
-Diletakkan di: `Modules/{module}/database/seeders/tenant/`
+Untuk menghasilkan *dummy data* di database tenant, kita menggunakan sistem **Factory** yang diletakkan di: `Modules/{module}/database/factories/Tenant/`
 
 ```php
-namespace Modules\Core\Database\Seeders\Tenant;
+namespace Modules\Core\Database\Factories\Tenant;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Models\Option;
+
+class OptionFactory extends Factory
+{
+    protected $model = Option::class;
+
+    public function definition(): array
+    {
+        return [
+            'option_id' => fake()->uuid(),
+            'option_name' => fake()->word(),
+        ];
+    }
+}
+```
+
+Nantinya, Anda tinggal memanggil *factory* tersebut secara eksplisit di dalam `TenantSeeder.php` milik modul Anda:
+
+```php
+namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class ProvinceSeeder extends Seeder
+class TenantSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('core.province')->insert([
-            ['province_id' => 'ID-JK', 'province_name' => 'DKI Jakarta'],
-        ]);
+        \Modules\Core\Models\Option::factory()->count(10)->create();
     }
 }
 ```

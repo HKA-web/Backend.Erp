@@ -39,14 +39,13 @@ class ErpModelMakeCommand extends Command
         $this->generateFromStub('erp-stubs/controller_draft', base_path("Modules/{$module}/app/Http/Controllers/{$model}DraftController.php"), $vars);
         $this->generateFromStub('erp-stubs/requests', base_path("Modules/{$module}/app/Http/Requests/{$model}Request.php"), $vars);
         $this->generateFromStub('erp-stubs/model', base_path("Modules/{$module}/app/Models/{$model}.php"), $vars);
-        $this->generateFromStub('erp-stubs/factory', base_path("Modules/{$module}/database/factories/{$model}Factory.php"), $vars);
-        $this->injectRoute($module, $model);
-        
-        $seederBasePath = base_path("Modules/{$module}/database/seeders/tenant");
-        if (! File::isDirectory($seederBasePath)) {
-            $seederBasePath = base_path("Modules/{$module}/Database/Seeders/tenant");
+        $factoryBasePath = base_path("Modules/{$module}/database/factories/Tenant");
+        if (! File::isDirectory($factoryBasePath)) {
+            $factoryBasePath = base_path("Modules/{$module}/Database/Factories/Tenant");
         }
-        $this->generateFromStub('erp-stubs/seeder', "{$seederBasePath}/{$model}Seeder.php", $vars);
+        $this->generateFromStub('erp-stubs/factory', "{$factoryBasePath}/{$model}Factory.php", $vars);
+        
+        $this->injectRoute($module, $model);
 
         $this->generateMigrationFiles($module, $model, $vars, $timestamp, $sqlFileName);
 
@@ -80,9 +79,9 @@ class ErpModelMakeCommand extends Command
         $lowerCaseBasePath = base_path("Modules/{$module}/database/migrations");
 
         if (File::isDirectory($lowerCaseBasePath)) {
-            $dir = $lowerCaseBasePath . '/tenant';
+            $dir = $lowerCaseBasePath . '/Tenant';
         } else {
-            $dir = base_path("Modules/{$module}/Database/Migrations/tenant");
+            $dir = base_path("Modules/{$module}/Database/Migrations/Tenant");
         }
 
         if (! File::isDirectory($dir)) {

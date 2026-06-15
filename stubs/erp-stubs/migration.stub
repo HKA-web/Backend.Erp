@@ -25,10 +25,6 @@ return new class extends Migration
             $table->jsonb('new_data')->nullable();
             $table->timestamp('executed_at')->useCurrent();
         });
-        $actions = ['lookup', 'view', 'add', 'edit', 'delete'];
-        foreach ($actions as $action) {
-            Permission::firstOrCreate(['name' => "{{schema}}.{$action}.{{model_lower}}", 'guard_name' => 'api']);
-        }
     }
 
     public function down(): void

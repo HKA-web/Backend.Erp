@@ -4,7 +4,10 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BaseService;
+use App\Models\Tenant;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 use Modules\Core\Http\Requests\CompanyRequest;
 use Modules\Core\Models\Company;
 use Modules\Core\Services\TenantRegistrationService;
@@ -16,7 +19,6 @@ class CompanyDraftController extends Controller
     public function index()
     {
         return $this->erpExecution(function () {
-            // Membaca langsung dari tabel temporary
             $query = DB::table('temporary.core_company');
 
             return $this->erpResponse($query, cache: false);
@@ -76,30 +78,51 @@ class CompanyDraftController extends Controller
 
             $this->baseService->executeProcedure('core.procedure_commit_company', $payload, Company::class);
 
-                        
+            $company = Company::where('company_id', $payload['company_id'])->first();
 
-            // $company = Company::where('company_id', $payload['company_id'])->first();
+            if ($company && $company->status === 'POSTED') {
+                if (empty($company->tenant_id)) {
+                    $domain = request()->input('domain') ?? ($company->website ?? strtolower(str_replace(' ', '', $company->company_name)) . '.com');
+                    
+                    $tenant = Tenant::create([
+                        'id' => (string) Str::uuid(),
+                        'data' => json_encode([
+                            'company_name' => $company->company_name,
+                            'email' => $company->email,
+                            'phone' => $company->phone,
+                            'address' => $company->address,
+                            'website' => $domain,
+                        ]),
+                    ]);
 
-            // if ($company && $company->status === 'POSTED') {
-            //     $domains = request()->input('domains', []);
-            //     $runSeeder = request()->input('run_seeder', false);
+                    $company->update([
+                        'tenant_id' => $tenant->id,
+                        'website' => $domain,
+                    ]);
 
-            //     $tenantService->createTenant(
-            //         companyData: $company->toArray(),
-            //         domainData: $domains,
-            //         runSeeder: $runSeeder,
-            //     );
+                    $tenant->domains()->create([
+                        'domain' => $domain,
+                    ]);
+                                        
+                    $runSeeder = request()->input('run_seeder', false);
+                    if ($runSeeder) {
+                        Artisan::call('tenants:seed', [
+                            '--tenants' => [$tenant->id],
+                            '--force' => true,
+                        ]);
+                    }
+                }
 
-            //     return $this->erpResponse(
-            //         message: 'Company committed to master and tenant created successfully.',
-            //         tags: ['company']
-            //     );
-            // }
+                return $this->erpResponse(
+                    message: 'Company committed to master and tenant created successfully.',
+                    tags: ['company']
+                );
+            }
 
-            // return $this->erpResponse(
-            //     message: 'Company committed to master but tenant creation skipped (status is not POSTED).',
-            //     tags: ['company']
-            // );
+            return $this->erpResponse(
+                message: 'Company committed to master but tenant creation skipped (status is not POSTED).',
+                tags: ['company']
+            );
         }, 'Failed to commit draft and create tenant.');
     }
 }

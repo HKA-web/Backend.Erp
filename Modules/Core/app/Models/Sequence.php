@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\{{module}}\Models;
+namespace Modules\Core\Models;
 
 use App\Traits\BaseModel;
 use App\Traits\SerializableDate;
@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Modules\{{module}}\Database\Factories\Tenant\{{model}}Factory;
+use Modules\Core\Database\Factories\Tenant\SequenceFactory;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Table(name: '{{schema}}.{{model_lower}}', key: '{{model_lower}}_id', keyType: 'string', incrementing: false)]
-class {{model}} extends Model
+#[Table(name: 'core.sequence', key: 'sequence_id', keyType: 'string', incrementing: false)]
+class Sequence extends Model
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles, SerializableDate, BaseModel, SoftDelete;
 
@@ -30,6 +30,6 @@ class {{model}} extends Model
 
     protected static function newFactory()
     {
-        return {{model}}Factory::new();
+        return SequenceFactory::new();
     }
 }

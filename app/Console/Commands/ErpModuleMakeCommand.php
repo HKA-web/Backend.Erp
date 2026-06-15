@@ -101,8 +101,8 @@ PHP;
 
     protected function setupTenantSeeder($name)
     {
-        $lowerCaseSeederPath = base_path("Modules/{$name}/database/seeders/TenantDatabaseSeeder.php");
-        $studlyCaseSeederPath = base_path("Modules/{$name}/Database/Seeders/TenantDatabaseSeeder.php");
+        $lowerCaseSeederPath = base_path("Modules/{$name}/database/seeders/TenantSeeder.php");
+        $studlyCaseSeederPath = base_path("Modules/{$name}/Database/Seeders/TenantSeeder.php");
         $seederPath = File::isDirectory(base_path("Modules/{$name}/database/seeders")) ? $lowerCaseSeederPath : $studlyCaseSeederPath;
 
         $stubPath = base_path('stubs/erp-stubs/tenant_seeder_runner.stub');

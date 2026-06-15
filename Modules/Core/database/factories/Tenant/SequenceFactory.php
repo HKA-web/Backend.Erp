@@ -1,19 +1,18 @@
 <?php
 
-namespace Modules\Core\Database\Factories;
+namespace Modules\Core\Database\Factories\Tenant;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Modules\Core\Models\City;
+use Modules\Core\Models\Sequence;
 
-class CityFactory extends Factory
+class SequenceFactory extends Factory
 {
-    protected $model = City::class;
+    protected $model = Sequence::class;
 
     public function definition(): array
     {
-        $modelUpper = strtoupper('City');
+        $modelUpper = strtoupper('Sequence');
         $moduleUpper = strtoupper('Core');
         
         \Modules\Core\Models\Sequence::firstOrCreate(
@@ -30,9 +29,8 @@ class CityFactory extends Factory
         );
 
         return [
-            'city_id' => Str::uuid(),
-            'city_name' => fake()->name(),
-            'province_id' => DB::table('core.province')->inRandomOrder()->value('province_id'),
+            'sequence_id'   => \Illuminate\Support\Str::uuid(),
+            'sequence_name' => fake()->name(),
         ];
     }
 }

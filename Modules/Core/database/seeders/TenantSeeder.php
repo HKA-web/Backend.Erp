@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\{{module}}\Database\Seeders;
+namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -8,8 +8,7 @@ class TenantSeeder extends Seeder
 {
     public function run(): void
     {
-        // Add your tenant-specific factories here. Example:
-        // \Modules\{{module}}\Models\YourModel::factory()->count(10)->create();
+        \Modules\Core\Models\Option::factory()->count(10)->create();
 
         $this->command->info('Tenant database seeded successfully using factories.');
     }

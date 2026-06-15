@@ -217,11 +217,11 @@ return [
     /**
      * Parameters used by the tenants:migrate command.
      * 
-     * Migration files tenant harus diletakkan di folder database/migrations/tenant
+     * Migration files tenant harus diletakkan di folder database/migrations/Tenant
      * di root Laravel atau di dalam module yang sesuai
      * 
      * NOTE: Path migration di-set secara dinamis oleh TenantMigrationServiceProvider
-     * untuk auto-discover semua module yang memiliki folder database/migrations/tenant
+     * untuk auto-discover semua module yang memiliki folder database/migrations/Tenant
      */
     'migration_parameters' => [
         '--force' => true, // Perlu true untuk production migration
@@ -236,7 +236,7 @@ return [
      * untuk auto-discover semua module yang memiliki TenantDatabaseSeeder
      */
     'seeder_parameters' => [
-        '--class' => 'Modules\\Core\\Database\\Seeders\\TenantDatabaseSeeder', // Default, bisa di-override oleh service provider
+        '--class' => 'Modules\\Core\\Database\\Seeders\\TenantSeeder', // Default, bisa di-override oleh service provider
         '--force' => true,
     ],
 ];

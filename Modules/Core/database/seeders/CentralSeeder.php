@@ -13,7 +13,7 @@ use Modules\Core\Models\Village;
 use App\Models\Tenant;
 use Spatie\Permission\Models\Permission;
 
-class CoreDatabaseSeeder extends Seeder
+class CentralSeeder extends Seeder
 {
     /**
      * Run the database seeds.

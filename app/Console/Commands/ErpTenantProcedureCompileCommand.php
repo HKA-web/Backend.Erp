@@ -59,7 +59,7 @@ class ErpTenantProcedureCompileCommand extends Command
         $executedCount = 0;
 
         foreach ($modules as $modulePath) {
-            $tenantSqlDir = $modulePath . '/database/migrations/tenant/sql';
+            $tenantSqlDir = $modulePath . '/database/migrations/Tenant/sql';
             if (!File::isDirectory($tenantSqlDir)) {
                 continue;
             }

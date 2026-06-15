@@ -1,5 +1,8 @@
 <?php
 
+use Modules\Core\Http\Controllers\SequenceController;
+use Modules\Core\Http\Controllers\SequenceDraftController;
+
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\CityController;
 use Modules\Core\Http\Controllers\CityDraftController;
@@ -192,6 +195,27 @@ Route::middleware([InitializeTenancyByRequestData::class, 'auth:sanctum'])->pref
 
     // Draft Resource
     Route::prefix('core/option-drafts')->controller(OptionDraftController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}', 'update');
+        Route::delete('/{id}', 'destroy');
+        Route::post('/{id}/commit', 'commit');
+    });
+});
+
+// Routes for Core/Sequence
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+    // Master
+    Route::prefix('core/sequence')->controller(SequenceController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/revise', 'revise');
+        Route::delete('/{id}', 'destroy');
+    });
+
+    // Temporary
+    Route::prefix('core/sequence-drafts')->controller(SequenceDraftController::class)->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('/{id}', 'show');

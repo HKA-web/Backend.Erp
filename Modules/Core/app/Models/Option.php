@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
-use Modules\Core\Database\Factories\OptionFactory;
+use Modules\Core\Database\Factories\Tenant\OptionFactory;
 use Spatie\Permission\Traits\HasRoles;
 use Modules\Authentication\Models\User;
 
